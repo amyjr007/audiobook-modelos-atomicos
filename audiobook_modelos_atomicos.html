@@ -1,0 +1,776 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#160c05;
+  --surface:#1f1108;
+  --surface2:#2a1a0f;
+  /* Paleta laranja predominante */
+  --orange:#ff7a18;      /* principal */
+  --orange2:#ffab4d;     /* âmbar claro */
+  --amber:#ffc777;       /* dourado quente */
+  --copper:#e2622a;      /* cobre */
+  --coral:#ff5436;       /* coral / vermelho-laranja */
+  --text:#fbeee2;
+  --text2:#cbb29c;
+}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+.app{width:100%;max-width:720px;margin:0 auto;min-height:100vh;position:relative}
+
+/* NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;background:rgba(22,12,5,0.95);backdrop-filter:blur(20px);border-top:1px solid rgba(255,122,24,0.22);display:flex;z-index:100}
+.nav-btn{flex:1;padding:14px 8px 10px;background:none;border:none;color:var(--text2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.5px;transition:all 0.3s}
+.nav-btn.active{color:var(--orange)}
+.nav-btn .nav-icon{font-size:20px;transition:transform 0.3s}
+.nav-btn.active .nav-icon{transform:scale(1.1)}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 56px);padding-bottom:80px}
+.screen.active{display:block}
+
+/* ===== CAPA ===== */
+#screen-capa{
+  min-height:100vh;
+  padding-bottom:0;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+}
+#screen-capa.active{display:flex}
+
+.capa-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 70% 15%,rgba(255,122,24,0.12),transparent 55%),radial-gradient(circle at 20% 90%,rgba(226,98,42,0.12),transparent 50%)}
+.capa-bg-orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.30}
+.orb1{width:400px;height:400px;background:var(--orange);top:-100px;right:-80px}
+.orb2{width:300px;height:300px;background:var(--amber);bottom:0px;left:-60px}
+.orb3{width:200px;height:200px;background:var(--coral);top:40%;left:40%}
+
+.atom-anim{position:absolute;inset:0;z-index:1;pointer-events:none}
+.atom-anim svg{width:100%;height:100%;opacity:0.09}
+
+.capa-content{position:relative;z-index:2;text-align:center;padding:40px 32px;max-width:480px}
+.capa-badge{display:inline-block;background:rgba(255,122,24,0.15);border:1px solid rgba(255,122,24,0.45);color:var(--orange2);font-size:10px;font-weight:700;letter-spacing:2px;padding:6px 16px;border-radius:20px;margin-bottom:28px;text-transform:uppercase}
+
+.capa-titulo{font-family:'Fraunces',serif;font-size:clamp(40px,9vw,62px);font-weight:900;line-height:1.02;letter-spacing:-1px;margin-bottom:12px}
+.capa-titulo span{display:block;background:linear-gradient(135deg,var(--amber) 0%,var(--orange) 45%,var(--coral) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.capa-titulo span:last-child{font-style:italic}
+
+.capa-linha{width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--orange),transparent);margin:20px auto}
+
+.capa-subtitulo{font-size:15px;font-weight:300;color:var(--text2);line-height:1.65;letter-spacing:0.2px;margin-bottom:32px}
+
+.capa-atoms-row{display:flex;justify-content:center;gap:12px;margin-bottom:36px}
+.atom-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);opacity:0.4;animation:pulse-dot 2s ease-in-out infinite}
+.atom-dot:nth-child(2){background:var(--amber);animation-delay:0.4s}
+.atom-dot:nth-child(3){background:var(--coral);animation-delay:0.8s}
+@keyframes pulse-dot{0%,100%{transform:scale(1);opacity:0.4}50%{transform:scale(1.6);opacity:0.9}}
+
+.capa-btn{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--orange),var(--coral));border:none;color:#160c05;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;padding:14px 32px;border-radius:50px;cursor:pointer;letter-spacing:0.3px;transition:all 0.3s;box-shadow:0 8px 30px rgba(255,122,24,0.30)}
+.capa-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(255,122,24,0.42)}
+
+.capa-designer{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);color:var(--text2);font-size:11px;letter-spacing:1.5px;opacity:0.6;white-space:nowrap;z-index:2}
+
+/* ===== APRENDA ===== */
+#screen-aprenda{background:var(--bg)}
+
+/* Carrossel de tópicos */
+.topic-carousel{position:sticky;top:0;z-index:50;background:rgba(22,12,5,0.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,122,24,0.12);padding:0}
+
+.carousel-track{display:flex;overflow-x:auto;scrollbar-width:none;gap:0}
+.carousel-track::-webkit-scrollbar{display:none}
+.topic-tab{flex-shrink:0;padding:16px 20px;font-size:12px;font-weight:600;letter-spacing:0.3px;color:var(--text2);cursor:pointer;border:none;background:none;font-family:'Plus Jakarta Sans',sans-serif;border-bottom:2px solid transparent;transition:all 0.3s;white-space:nowrap;position:relative}
+.topic-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.topic-tab:hover:not(.active){color:var(--text)}
+
+/* Páginas */
+.topic-content{display:none}
+.topic-content.active{display:block}
+
+/* Page slide effect */
+.pages-wrapper{position:relative;overflow:hidden}
+
+.page-slide{
+  display:none;
+  animation:pageIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  min-height:calc(100vh - 120px);
+}
+.page-slide.active{display:block}
+.page-slide.exit{animation:pageOut 0.3s ease-in both}
+
+@keyframes pageIn{
+  from{opacity:0;transform:translateX(40px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes pageOut{
+  from{opacity:1;transform:translateX(0)}
+  to{opacity:0;transform:translateX(-40px)}
+}
+
+/* Page design */
+.page-inner{padding:28px 24px;min-height:calc(100vh - 120px);display:flex;flex-direction:column;position:relative;background-position:center 78%;background-repeat:no-repeat;background-size:min(78%,360px)}
+/* Véu quente sobre a imagem de fundo para legibilidade */
+.page-inner::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 78%,rgba(22,12,5,0.35),rgba(22,12,5,0.78) 70%),linear-gradient(180deg,rgba(22,12,5,0.55),transparent 30%,transparent 60%,rgba(22,12,5,0.7))}
+
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px}
+.page-num{font-family:'Fraunces',serif;font-size:13px;font-weight:600;color:var(--orange);letter-spacing:2px;opacity:0.85}
+.page-topic-label{font-size:10px;color:var(--text2);letter-spacing:1px;opacity:0.55;text-align:right;text-transform:uppercase}
+
+/* Decorative elements for pages */
+.page-deco{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center}
+
+.page-icon-ring{width:90px;height:90px;border-radius:50%;border:1.5px solid rgba(255,122,24,0.35);display:flex;align-items:center;justify-content:center;position:relative}
+.page-icon-ring::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(255,122,24,0.12)}
+.page-icon-ring .ring-icon{font-size:32px}
+
+.page-title-main{font-family:'Fraunces',serif;font-size:clamp(24px,5.5vw,34px);font-weight:600;line-height:1.18;max-width:320px}
+.page-title-main em{font-style:italic;font-weight:600;color:var(--orange)}
+
+.page-deco-line{width:48px;height:1.5px;background:linear-gradient(90deg,transparent,var(--orange),transparent)}
+
+.page-subtitle{font-size:13.5px;color:var(--text2);font-weight:300;line-height:1.7;max-width:280px;opacity:0.9}
+
+/* Geometric decorations */
+.geo-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.geo-circle{position:absolute;border-radius:50%;border:1px solid}
+.g1{width:180px;height:180px;top:-40px;right:-50px;border-color:rgba(255,122,24,0.10)}
+.g2{width:100px;height:100px;bottom:100px;left:-20px;border-color:rgba(255,171,77,0.12)}
+.g3{width:60px;height:60px;bottom:200px;right:40px;border-color:rgba(255,84,54,0.10)}
+
+.page-relative{position:relative;z-index:1}
+
+/* Navigation arrows */
+.page-nav{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:24px}
+.page-nav-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,122,24,0.18);color:var(--text2);padding:10px 20px;border-radius:50px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;transition:all 0.3s;display:flex;align-items:center;gap:6px}
+.page-nav-btn:hover{background:rgba(255,122,24,0.12);border-color:rgba(255,122,24,0.4);color:var(--orange)}
+.page-nav-btn:disabled{opacity:0.2;cursor:default}
+.page-dots{display:flex;gap:6px}
+.page-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s;cursor:pointer}
+.page-dot.active{background:var(--orange);width:18px;border-radius:3px}
+
+/* ===== Temas de página (variações de laranja) ===== */
+/* Tema 1 — âmbar dourado (Introdução à Química) */
+.page-theme-gold .page-icon-ring{border-color:rgba(255,199,119,0.45);background:rgba(255,199,119,0.06)}
+.page-theme-gold .page-num{color:var(--amber)}
+.page-theme-gold .page-title-main em{color:var(--amber)}
+.page-theme-gold .page-deco-line{background:linear-gradient(90deg,transparent,var(--amber),transparent)}
+.page-theme-gold .page-inner,
+.page-theme-gold.ab-stage{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cg fill='none' stroke='%23ffc777' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' opacity='0.55'%3E%3Cpath d='M168 56 L168 150 L104 292 Q94 332 138 332 L262 332 Q306 332 296 292 L232 150 L232 56'/%3E%3Cline x1='156' y1='56' x2='244' y2='56'/%3E%3Cpath d='M120 252 Q200 232 280 252' stroke-width='2'/%3E%3Ccircle cx='158' cy='288' r='9'/%3E%3Ccircle cx='212' cy='302' r='6'/%3E%3Ccircle cx='244' cy='276' r='5'/%3E%3C/g%3E%3Cg fill='%23ffab4d' opacity='0.45'%3E%3Ccircle cx='148' cy='38' r='6'/%3E%3Ccircle cx='252' cy='28' r='5'/%3E%3Ccircle cx='296' cy='86' r='4'/%3E%3C/g%3E%3C/svg%3E")}
+
+/* Tema 2 — cobre / coral (Os filósofos do invisível) */
+.page-theme-purple .page-icon-ring{border-color:rgba(226,98,42,0.45);background:rgba(226,98,42,0.06)}
+.page-theme-purple .page-num{color:var(--copper)}
+.page-theme-purple .page-title-main em{color:var(--copper)}
+.page-theme-purple .page-deco-line{background:linear-gradient(90deg,transparent,var(--copper),transparent)}
+.page-theme-purple .page-inner{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='400' viewBox='0 0 420 400'%3E%3Cg fill='none' stroke='%23e2622a' stroke-width='3' stroke-linejoin='round' opacity='0.55'%3E%3Cpath d='M36 120 L210 46 L384 120 Z'/%3E%3Cline x1='28' y1='138' x2='392' y2='138'/%3E%3Cline x1='28' y1='150' x2='392' y2='150'/%3E%3Cg stroke-width='5'%3E%3Cline x1='70' y1='162' x2='70' y2='330'/%3E%3Cline x1='140' y1='162' x2='140' y2='330'/%3E%3Cline x1='210' y1='162' x2='210' y2='330'/%3E%3Cline x1='280' y1='162' x2='280' y2='330'/%3E%3Cline x1='350' y1='162' x2='350' y2='330'/%3E%3C/g%3E%3Cline x1='28' y1='344' x2='392' y2='344'/%3E%3Cline x1='18' y1='360' x2='402' y2='360'/%3E%3C/g%3E%3C/svg%3E")}
+
+/* Tema 3 — laranja-coral / átomo (John Dalton) */
+.page-theme-teal .page-icon-ring{border-color:rgba(255,84,54,0.45);background:rgba(255,84,54,0.06)}
+.page-theme-teal .page-num{color:var(--coral)}
+.page-theme-teal .page-title-main em{color:var(--coral)}
+.page-theme-teal .page-deco-line{background:linear-gradient(90deg,transparent,var(--coral),transparent)}
+.page-theme-teal .page-inner{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cg fill='none' stroke='%23ff5436' stroke-width='3' opacity='0.5'%3E%3Cellipse cx='200' cy='200' rx='162' ry='60'/%3E%3Cellipse cx='200' cy='200' rx='162' ry='60' transform='rotate(60 200 200)'/%3E%3Cellipse cx='200' cy='200' rx='162' ry='60' transform='rotate(120 200 200)'/%3E%3C/g%3E%3Ccircle cx='200' cy='200' r='20' fill='%23ff7a18' opacity='0.55'/%3E%3Ccircle cx='362' cy='200' r='8' fill='%23ffab4d' opacity='0.65'/%3E%3Ccircle cx='118' cy='74' r='7' fill='%23ffc777' opacity='0.65'/%3E%3C/svg%3E")}
+
+/* ===== AUDIOBOOK (Introdução à Química) ===== */
+.ab-stage{position:relative;min-height:calc(100vh - 120px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 26px 40px;text-align:center;overflow:hidden;background-position:center 82%;background-repeat:no-repeat;background-size:min(80%,360px)}
+/* Quando o carrossel aparece, sobe o conteúdo p/ dar espaço à imagem inteira */
+.ab-stage.with-carousel{justify-content:flex-start;padding-top:40px}
+.ab-stage.with-carousel .ab-relative{gap:18px}
+.ab-stage::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 80%,rgba(22,12,5,0.42),rgba(22,12,5,0.84) 72%),linear-gradient(180deg,rgba(22,12,5,0.6),transparent 28%,transparent 60%,rgba(22,12,5,0.78))}
+.ab-relative{position:relative;z-index:2;width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;gap:26px}
+
+/* Controle Play/Pause (canto inferior direito) */
+.ab-fab{position:fixed;z-index:120;bottom:74px;left:50%;transform:translateX(calc(min(360px,50vw) - 62px));width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--orange),var(--coral));color:#160c05;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(255,122,24,0.5);transition:box-shadow .25s,filter .2s}
+.ab-fab:hover{filter:brightness(1.08)}
+.ab-fab-icon{font-size:22px;line-height:1;pointer-events:none}
+
+/* Sequência de texto */
+.ab-seq{display:flex;flex-direction:column;align-items:center;gap:18px}
+.ab-seq.vanish{animation:abVanish .9s cubic-bezier(.5,0,.75,0) forwards}
+@keyframes abVanish{to{opacity:0;transform:scale(1.28) translateY(-22px);filter:blur(9px)}}
+
+.ab-credit{font-family:'Fraunces',serif;font-size:clamp(17px,4.4vw,23px);font-weight:600;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s;letter-spacing:.2px}
+.ab-credit.show{opacity:1;transform:none}
+
+.ab-subject{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;transform:translateY(14px);transition:opacity .7s,transform .7s}
+.ab-subject.show{opacity:1;transform:none}
+.ab-subject-label{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--text2);font-weight:600}
+.ab-subject-value{min-height:1.1em;font-family:'Fraunces',serif;font-size:clamp(30px,8.5vw,50px);font-weight:900;line-height:1}
+
+/* Palavra do assunto: entrada e saída dramática */
+.ab-word{display:inline-block}
+.ab-word.enter{animation:abWordIn .6s cubic-bezier(.22,1,.36,1) both}
+@keyframes abWordIn{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:none}}
+.ab-word.exit{animation:abWordOut .95s cubic-bezier(.6,0,.85,0) forwards}
+@keyframes abWordOut{40%{transform:translateY(-8px) scale(1.1);opacity:1}100%{opacity:0;transform:translateY(-44px) scale(.45) rotate(-9deg);filter:blur(7px)}}
+
+/* "Modelos atômicos" no estilo da capa */
+.ab-word.cover-style{background:linear-gradient(135deg,var(--amber) 0%,var(--orange) 45%,var(--coral) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:italic;letter-spacing:-1px}
+
+/* Frase da jornada (efeito de digitação) */
+.ab-journey{display:none;position:relative;z-index:2;font-family:'Fraunces',serif;font-style:italic;font-size:clamp(21px,5.4vw,31px);font-weight:600;line-height:1.32;color:var(--text);max-width:460px;min-height:2.6em}
+.ab-journey.show{display:block;animation:abFadeIn .5s ease both}
+@keyframes abFadeIn{from{opacity:0}to{opacity:1}}
+.ab-caret{display:inline-block;width:3px;height:0.95em;background:var(--orange);margin-left:3px;vertical-align:-1px;animation:abBlink 1s step-end infinite}
+.ab-caret.gone{display:none}
+@keyframes abBlink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+
+/* Carrossel */
+.ab-carousel{display:none;width:100%;max-width:460px;flex-direction:column;align-items:center;gap:14px;margin-top:4px}
+.ab-carousel.show{display:flex;animation:abFadeIn .7s ease both}
+.ab-viewport{position:relative;width:100%;height:min(56vh,420px);border-radius:18px;overflow:hidden;background:#1a0e06;box-shadow:0 16px 44px rgba(0,0,0,.5);border:1px solid rgba(255,122,24,.28);touch-action:pan-y;cursor:grab;user-select:none}
+.ab-viewport:active{cursor:grabbing}
+.ab-track{display:flex;height:100%;will-change:transform}
+.ab-slide{flex:0 0 100%;height:100%}
+.ab-slide img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;-webkit-user-drag:none;user-select:none}
+
+/* Mão / gesto de swipe */
+.ab-hand{position:absolute;top:50%;left:50%;margin-top:-20px;font-size:44px;pointer-events:none;opacity:0;z-index:4;filter:drop-shadow(0 5px 9px rgba(0,0,0,.55))}
+.ab-hand.demo{animation:abHandSwipe 1.1s ease-in-out 1 forwards}
+.ab-hand.hint{animation:abHandSwipe 1.9s ease-in-out infinite}
+@keyframes abHandSwipe{0%{transform:translateX(70px);opacity:0}18%{opacity:1}82%{opacity:1}100%{transform:translateX(-90px);opacity:0}}
+
+.ab-dots{display:flex;gap:7px}
+.ab-cdot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2);transition:all .3s;cursor:pointer}
+.ab-cdot.active{background:var(--orange);width:20px;border-radius:4px}
+
+/* ===== QUIZ ===== */
+#screen-quiz{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px}
+#screen-quiz.active{display:flex}
+.quiz-placeholder{text-align:center;opacity:0.5}
+.quiz-placeholder .qp-icon{font-size:48px;margin-bottom:16px}
+.quiz-placeholder p{font-size:14px;color:var(--text2);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- CAPA -->
+<div id="screen-capa" class="screen active">
+  <div class="capa-bg">
+    <div class="capa-bg-orb orb1"></div>
+    <div class="capa-bg-orb orb2"></div>
+    <div class="capa-bg-orb orb3"></div>
+  </div>
+  <div class="atom-anim">
+    <svg viewBox="0 0 720 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <g transform="translate(360,450)">
+        <ellipse cx="0" cy="0" rx="200" ry="70" fill="none" stroke="#ff7a18" stroke-width="1.5" transform="rotate(0)"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="8s" repeatCount="indefinite"/></ellipse>
+        <ellipse cx="0" cy="0" rx="200" ry="70" fill="none" stroke="#e2622a" stroke-width="1" transform="rotate(60)"><animateTransform attributeName="transform" type="rotate" from="60" to="420" dur="12s" repeatCount="indefinite"/></ellipse>
+        <ellipse cx="0" cy="0" rx="200" ry="70" fill="none" stroke="#ffc777" stroke-width="1" transform="rotate(120)"><animateTransform attributeName="transform" type="rotate" from="120" to="480" dur="10s" repeatCount="indefinite"/></ellipse>
+        <circle cx="0" cy="0" r="18" fill="#ff7a18" opacity="0.6"/>
+        <circle cx="200" cy="0" r="8" fill="#ff5436" opacity="0.8"><animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="8s" repeatCount="indefinite" additive="sum"/></circle>
+      </g>
+    </svg>
+  </div>
+  <div class="capa-content">
+    <div class="capa-badge">audiobook interativo</div>
+    <h1 class="capa-titulo">
+      <span>Modelos</span>
+      <span>Atômicos</span>
+    </h1>
+    <div class="capa-linha"></div>
+    <p class="capa-subtitulo">Uma jornada lúdica e narrada pela história do átomo</p>
+    <div class="capa-atoms-row">
+      <div class="atom-dot"></div>
+      <div class="atom-dot"></div>
+      <div class="atom-dot"></div>
+    </div>
+    <button class="capa-btn" onclick="goTo('aprenda')">
+      ▶ Começar Jornada
+    </button>
+  </div>
+  <div class="capa-designer">Designed by Amauri Junior</div>
+</div>
+
+<!-- APRENDA -->
+<div id="screen-aprenda" class="screen">
+  <!-- Carrossel de tópicos -->
+  <div class="topic-carousel">
+    <div class="carousel-track" id="carouselTrack">
+      <button class="topic-tab active" data-topic="0" onclick="switchTopic(0)">1. Introdução à Química</button>
+      <button class="topic-tab" data-topic="1" onclick="switchTopic(1)">2. Os filósofos do invisível</button>
+      <button class="topic-tab" data-topic="2" onclick="switchTopic(2)">3. John Dalton e o Átomo</button>
+    </div>
+  </div>
+
+  <!-- Tópico 1: Introdução à Química (AUDIOBOOK) -->
+  <div class="topic-content active" id="topic-0">
+    <div class="ab-stage page-theme-gold" id="abStage">
+      <div class="geo-bg">
+        <div class="geo-circle g1"></div>
+        <div class="geo-circle g2"></div>
+        <div class="geo-circle g3"></div>
+      </div>
+
+      <!-- Controle Play/Pause (canto inferior) -->
+      <button class="ab-fab" id="abFab" onclick="abToggle()" aria-label="Tocar ou pausar narração">
+        <span class="ab-fab-icon" id="abFabIcon">▶</span>
+      </button>
+
+      <!-- Conteúdo narrado -->
+      <div class="ab-relative" id="abContent">
+        <div class="ab-seq" id="abSeq">
+          <div class="ab-credit" id="abCredit">Desenvolvido pelo professor Amauri Junior</div>
+          <div class="ab-subject" id="abSubject">
+            <span class="ab-subject-label">Assunto:</span>
+            <span class="ab-subject-value" id="abSubjectValue"></span>
+          </div>
+        </div>
+
+        <div class="ab-journey" id="abJourney"><span id="abJourneyText"></span><span class="ab-caret" id="abCaret"></span></div>
+
+        <!-- Carrossel interativo -->
+        <div class="ab-carousel" id="abCarousel">
+          <div class="ab-viewport" id="abViewport">
+            <div class="ab-track" id="abTrack">
+              <div class="ab-slide"><img src="images/img1.jpg" alt="Imagem 1" draggable="false"></div>
+              <div class="ab-slide"><img src="images/img2.jpg" alt="Imagem 2" draggable="false"></div>
+              <div class="ab-slide"><img src="images/img3.jpg" alt="Imagem 3" draggable="false"></div>
+              <div class="ab-slide"><img src="images/img4.jpg" alt="Imagem 4" draggable="false"></div>
+              <div class="ab-slide"><img src="images/img5.jpg" alt="Imagem 5" draggable="false"></div>
+              <div class="ab-slide"><img src="images/img6.jpg" alt="Imagem 6" draggable="false"></div>
+            </div>
+            <div class="ab-hand" id="abHand">👆</div>
+          </div>
+          <div class="ab-dots" id="abDots"></div>
+        </div>
+      </div>
+
+      <audio id="abAudio" src="audio/dialogo0.mp3" preload="auto"></audio>
+    </div>
+  </div>
+
+  <!-- Tópico 2: Os filósofos do invisível -->
+  <div class="topic-content" id="topic-1">
+    <div class="pages-wrapper" id="pages-1">
+
+      <!-- Página 1 -->
+      <div class="page-slide active page-theme-purple" id="t1p1">
+        <div class="page-inner">
+          <div class="geo-bg">
+            <div class="geo-circle g1" style="border-color:rgba(226,98,42,0.10)"></div>
+            <div class="geo-circle g2" style="border-color:rgba(255,199,119,0.10)"></div>
+            <div class="geo-circle g3" style="border-color:rgba(226,98,42,0.12)"></div>
+          </div>
+          <div class="page-relative">
+            <div class="page-header">
+              <span class="page-num">01</span>
+              <span class="page-topic-label">Os filósofos do invisível</span>
+            </div>
+            <div class="page-deco">
+              <div class="page-icon-ring">
+                <span class="ring-icon">🏛️</span>
+              </div>
+              <h2 class="page-title-main">O <em>pensamento</em> grego</h2>
+              <div class="page-deco-line"></div>
+              <p class="page-subtitle">Os primeiros filósofos gregos questionaram: o que existe de menor no mundo? Uma questão que mudaria tudo.</p>
+            </div>
+            <div class="page-nav">
+              <button class="page-nav-btn" disabled>← Anterior</button>
+              <div class="page-dots">
+                <div class="page-dot active" onclick="goPage(1,0)"></div>
+                <div class="page-dot" onclick="goPage(1,1)"></div>
+              </div>
+              <button class="page-nav-btn" onclick="goPage(1,1)">Próxima →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Página 2 -->
+      <div class="page-slide page-theme-purple" id="t1p2">
+        <div class="page-inner">
+          <div class="geo-bg">
+            <div class="geo-circle g1" style="border-color:rgba(226,98,42,0.10)"></div>
+            <div class="geo-circle g2" style="border-color:rgba(255,199,119,0.10)"></div>
+            <div class="geo-circle g3" style="border-color:rgba(226,98,42,0.12)"></div>
+          </div>
+          <div class="page-relative">
+            <div class="page-header">
+              <span class="page-num">02</span>
+              <span class="page-topic-label">Os filósofos do invisível</span>
+            </div>
+            <div class="page-deco">
+              <div class="page-icon-ring">
+                <span class="ring-icon">💡</span>
+              </div>
+              <h2 class="page-title-main"><em>Demócrito</em> e o átomo</h2>
+              <div class="page-deco-line"></div>
+              <p class="page-subtitle">Demócrito imaginou que a matéria era formada por partículas tão pequenas que seriam indivisíveis — os átomos.</p>
+            </div>
+            <div class="page-nav">
+              <button class="page-nav-btn" onclick="goPage(1,0)">← Anterior</button>
+              <div class="page-dots">
+                <div class="page-dot" onclick="goPage(1,0)"></div>
+                <div class="page-dot active" onclick="goPage(1,1)"></div>
+              </div>
+              <button class="page-nav-btn" disabled>Próxima →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Tópico 3: John Dalton -->
+  <div class="topic-content" id="topic-2">
+    <div class="pages-wrapper" id="pages-2">
+
+      <!-- Página 1 -->
+      <div class="page-slide active page-theme-teal" id="t2p1">
+        <div class="page-inner">
+          <div class="geo-bg">
+            <div class="geo-circle g1" style="border-color:rgba(255,84,54,0.10)"></div>
+            <div class="geo-circle g2" style="border-color:rgba(255,199,119,0.10)"></div>
+            <div class="geo-circle g3" style="border-color:rgba(255,84,54,0.12)"></div>
+          </div>
+          <div class="page-relative">
+            <div class="page-header">
+              <span class="page-num">01</span>
+              <span class="page-topic-label">John Dalton e o Átomo</span>
+            </div>
+            <div class="page-deco">
+              <div class="page-icon-ring">
+                <span class="ring-icon">⚛️</span>
+              </div>
+              <h2 class="page-title-main">O modelo de <em>Dalton</em></h2>
+              <div class="page-deco-line"></div>
+              <p class="page-subtitle">Em 1808, John Dalton propôs o primeiro modelo científico do átomo, baseado em evidências experimentais.</p>
+            </div>
+            <div class="page-nav">
+              <button class="page-nav-btn" disabled>← Anterior</button>
+              <div class="page-dots">
+                <div class="page-dot active" onclick="goPage(2,0)"></div>
+                <div class="page-dot" onclick="goPage(2,1)"></div>
+              </div>
+              <button class="page-nav-btn" onclick="goPage(2,1)">Próxima →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Página 2 -->
+      <div class="page-slide page-theme-teal" id="t2p2">
+        <div class="page-inner">
+          <div class="geo-bg">
+            <div class="geo-circle g1" style="border-color:rgba(255,84,54,0.10)"></div>
+            <div class="geo-circle g2" style="border-color:rgba(255,199,119,0.10)"></div>
+            <div class="geo-circle g3" style="border-color:rgba(255,84,54,0.12)"></div>
+          </div>
+          <div class="page-relative">
+            <div class="page-header">
+              <span class="page-num">02</span>
+              <span class="page-topic-label">John Dalton e o Átomo</span>
+            </div>
+            <div class="page-deco">
+              <div class="page-icon-ring">
+                <span class="ring-icon">🔭</span>
+              </div>
+              <h2 class="page-title-main">A <em>bola de bilhar</em> atômica</h2>
+              <div class="page-deco-line"></div>
+              <p class="page-subtitle">Dalton descreveu o átomo como uma esfera maciça e indivisível, como uma bola de bilhar — sólida e uniforme.</p>
+            </div>
+            <div class="page-nav">
+              <button class="page-nav-btn" onclick="goPage(2,0)">← Anterior</button>
+              <div class="page-dots">
+                <div class="page-dot" onclick="goPage(2,0)"></div>
+                <div class="page-dot active" onclick="goPage(2,1)"></div>
+              </div>
+              <button class="page-nav-btn" disabled>Próxima →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <div class="quiz-placeholder">
+    <div class="qp-icon">🧪</div>
+    <p>O Quiz está em construção.<br>Em breve você poderá testar seus conhecimentos!</p>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-capa" onclick="goTo('capa')">
+    <span class="nav-icon">🏠</span>
+    Capa
+  </button>
+  <button class="nav-btn" id="nav-aprenda" onclick="goTo('aprenda')">
+    <span class="nav-icon">📖</span>
+    Aprenda
+  </button>
+  <button class="nav-btn" id="nav-quiz" onclick="goTo('quiz')">
+    <span class="nav-icon">🧩</span>
+    Quiz
+  </button>
+</nav>
+
+</div>
+<script>
+var currentTopic = 0;
+var currentPages = [0, 0, 0];
+
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  var el = document.getElementById('screen-' + screen);
+  if(el){ el.classList.add('active'); }
+  var nb = document.getElementById('nav-' + screen);
+  if(nb){ nb.classList.add('active'); }
+}
+
+function switchTopic(idx) {
+  document.querySelectorAll('.topic-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.topic-content').forEach(function(c){ c.classList.remove('active'); });
+  document.querySelector('[data-topic="'+idx+'"]').classList.add('active');
+  document.getElementById('topic-'+idx).classList.add('active');
+  currentTopic = idx;
+  var track = document.getElementById('carouselTrack');
+  var tab = document.querySelector('[data-topic="'+idx+'"]');
+  if(tab && track){ track.scrollLeft = tab.offsetLeft - 24; }
+}
+
+function goPage(topicIdx, pageIdx) {
+  var wrapper = document.getElementById('pages-' + topicIdx);
+  if(!wrapper) return;
+  var pages = wrapper.querySelectorAll('.page-slide');
+  if(!pages[pageIdx]) return;
+
+  var old = wrapper.querySelector('.page-slide.active');
+  if(old){
+    old.classList.add('exit');
+    setTimeout(function(){ old.classList.remove('active','exit'); }, 280);
+  }
+  setTimeout(function(){
+    pages[pageIdx].classList.add('active');
+  }, 100);
+
+  currentPages[topicIdx] = pageIdx;
+}
+
+/* ===================== AUDIOBOOK ===================== */
+var ab = {
+  audio:null, started:false, raf:null, playing:false,
+  endedAt:null, duration:0,
+  index:0, dragging:false, startX:0, dragDX:0, userInteracted:false,
+  journeyText:'A jornada através do tempo pra entender o átomo',
+  cues:[]
+};
+
+function abEl(id){ return document.getElementById(id); }
+
+function abSetFab(playing){ abEl('abFabIcon').textContent = playing ? '⏸' : '▶'; }
+
+/* Play / Pause: o áudio é a única fonte do tempo, então pausar o áudio
+   congela todos os eventos; ao voltar, continua exatamente do mesmo ponto. */
+function abToggle(){
+  if(!ab.started){ startAudiobook(); return; }
+  if(ab.endedAt != null){ /* já terminou: reinicia do começo */
+    ab.endedAt = null; abResetSeq(); ab.audio.currentTime = 0;
+  }
+  if(ab.audio.paused){
+    ab.playing = true;
+    ab.audio.play();
+    abSetFab(true);
+    if(!ab.raf){ abLoop(); }
+  } else {
+    ab.playing = false;
+    ab.audio.pause();
+    abSetFab(false);
+  }
+}
+
+function startAudiobook(){
+  if(ab.started) return;
+  ab.started = true;
+  ab.audio = abEl('abAudio');
+  ab.endedAt = null;
+
+  ab.cues = abBuildCues();
+  abResetSeq();
+  abSetupCarousel();
+
+  ab.audio.addEventListener('ended', function(){
+    ab.duration = ab.audio.duration || ab.audio.currentTime;
+    ab.endedAt = performance.now();
+    abSetFab(false);
+  });
+
+  ab.audio.currentTime = 0;
+  ab.playing = true;
+  ab.audio.play();
+  abSetFab(true);
+  abLoop();
+}
+
+function abResetSeq(){
+  ab.cues.forEach(function(c){ c.done = false; });
+  ab.index = 0; ab.userInteracted = false;
+  abEl('abStage').classList.remove('with-carousel');
+  abEl('abCredit').classList.remove('show');
+  abEl('abSubject').classList.remove('show');
+  abEl('abSubjectValue').innerHTML = '';
+  abEl('abSeq').classList.remove('vanish');
+  abEl('abSeq').style.display = '';
+  abEl('abJourney').classList.remove('show');
+  abEl('abJourneyText').textContent = '';
+  abEl('abCaret').classList.remove('gone');
+  abEl('abCarousel').classList.remove('show');
+  abEl('abHand').className = 'ab-hand';
+}
+
+/* Define a palavra do "Assunto:" */
+function abSetWord(text, cover){
+  var v = abEl('abSubjectValue');
+  v.innerHTML = '';
+  var span = document.createElement('span');
+  span.className = 'ab-word enter' + (cover ? ' cover-style' : '');
+  span.textContent = text;
+  v.appendChild(span);
+}
+function abExitWord(){
+  var span = abEl('abSubjectValue').querySelector('.ab-word');
+  if(span){ span.classList.remove('enter'); span.classList.add('exit'); }
+}
+
+/* Cues acionadas uma única vez, ancoradas no tempo (em segundos) */
+function abBuildCues(){
+  return [
+    { time:3.0,  done:false, fn:function(){ abEl('abCredit').classList.add('show'); } },
+    { time:5.0,  done:false, fn:function(){ abEl('abSubject').classList.add('show'); } },
+    { time:6.8,  done:false, fn:function(){ abSetWord('Átomos', false); } },
+    { time:7.6,  done:false, fn:function(){ abExitWord(); } },
+    { time:8.6,  done:false, fn:function(){ abSetWord('Modelos atômicos', true); } },
+    { time:11.0, done:false, fn:function(){ abEl('abSeq').classList.add('vanish'); } },
+    { time:12.0, done:false, fn:function(){
+        abEl('abSeq').style.display = 'none';
+        abEl('abJourney').classList.add('show');
+      } },
+    { time:18.0, done:false, fn:function(){
+        abEl('abStage').classList.add('with-carousel'); /* sobe o texto */
+        abEl('abCarousel').classList.add('show');
+        abGoTo(0, false); /* img1 */
+      } },
+    { time:20.0, done:false, fn:function(){ abDemoSwipe(); } },
+    { time:21.0, done:false, fn:function(){
+        if(!ab.userInteracted){ abEl('abHand').className = 'ab-hand hint'; }
+      } }
+  ];
+}
+
+/* Digitação letra a letra entre 12s e 17s, sincronizada ao tempo */
+function abTypewriter(t){
+  var start = 12, end = 17, txt = ab.journeyText, len = txt.length;
+  if(t < start) return;
+  var n, caret = abEl('abCaret'), cur = abEl('abJourneyText');
+  if(t >= end){ n = len; caret.classList.add('gone'); }
+  else { n = Math.floor((t - start) / (end - start) * len); caret.classList.remove('gone'); }
+  if(cur.textContent.length !== n){ cur.textContent = txt.slice(0, n); }
+}
+
+/* Relógio sincronizado: segue o áudio; após o fim continua contando */
+function abLoop(){
+  /* Se pausado (e o áudio ainda não terminou), congela tudo no ponto atual */
+  if(!ab.playing && ab.endedAt == null){ ab.raf = null; return; }
+
+  var t;
+  if(ab.endedAt != null){ t = ab.duration + (performance.now() - ab.endedAt) / 1000; }
+  else { t = ab.audio.currentTime; }
+
+  for(var i=0;i<ab.cues.length;i++){
+    var c = ab.cues[i];
+    if(!c.done && t >= c.time){ c.done = true; c.fn(); }
+  }
+  abTypewriter(t);
+
+  var allDone = ab.cues.every(function(c){ return c.done; });
+  if(allDone && t > 23){ ab.raf = null; return; } /* encerra o loop após a sequência */
+  ab.raf = requestAnimationFrame(abLoop);
+}
+
+/* ---------- Carrossel ---------- */
+function abSetupCarousel(){
+  var dots = abEl('abDots');
+  dots.innerHTML = '';
+  for(var i=0;i<6;i++){
+    var d = document.createElement('div');
+    d.className = 'ab-cdot' + (i===0 ? ' active' : '');
+    (function(idx){ d.onclick = function(){ abGoTo(idx, true); }; })(i);
+    dots.appendChild(d);
+  }
+  var vp = abEl('abViewport');
+  vp.addEventListener('pointerdown', abDragStart);
+  window.addEventListener('pointermove', abDragMove);
+  window.addEventListener('pointerup', abDragEnd);
+}
+
+function abWidth(){ return abEl('abViewport').clientWidth; }
+
+function abGoTo(i, user){
+  ab.index = Math.max(0, Math.min(5, i));
+  var track = abEl('abTrack');
+  track.style.transition = 'transform .42s cubic-bezier(.22,1,.36,1)';
+  track.style.transform = 'translateX(' + (-ab.index * abWidth()) + 'px)';
+  var dots = abEl('abDots').children;
+  for(var k=0;k<dots.length;k++){ dots[k].classList.toggle('active', k === ab.index); }
+  if(user){
+    ab.userInteracted = true;
+    abEl('abHand').className = 'ab-hand'; /* remove o gesto guia */
+  }
+}
+
+/* Demonstração automática (20s): mão desliza para a esquerda e troca p/ img2 */
+function abDemoSwipe(){
+  if(ab.userInteracted) return;
+  abEl('abHand').className = 'ab-hand demo';
+  setTimeout(function(){ if(!ab.userInteracted){ abGoTo(1, false); } }, 560);
+}
+
+function abDragStart(e){
+  ab.dragging = true;
+  ab.startX = e.clientX;
+  ab.dragDX = 0;
+  abEl('abTrack').style.transition = 'none';
+}
+function abDragMove(e){
+  if(!ab.dragging) return;
+  ab.dragDX = e.clientX - ab.startX;
+  abEl('abTrack').style.transform = 'translateX(' + (-ab.index * abWidth() + ab.dragDX) + 'px)';
+}
+function abDragEnd(){
+  if(!ab.dragging) return;
+  ab.dragging = false;
+  var th = abWidth() * 0.18;
+  if(ab.dragDX < -th){ abGoTo(ab.index + 1, true); }       /* swipe p/ esquerda → próxima */
+  else if(ab.dragDX > th){ abGoTo(ab.index - 1, true); }   /* swipe p/ direita → anterior */
+  else { abGoTo(ab.index, true); }
+}
+
+/* Reposiciona o carrossel se a janela mudar de tamanho */
+window.addEventListener('resize', function(){
+  if(ab.started){
+    var track = abEl('abTrack');
+    track.style.transition = 'none';
+    track.style.transform = 'translateX(' + (-ab.index * abWidth()) + 'px)';
+  }
+});
+</script>
+</body>
+</html>
