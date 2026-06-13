@@ -33,6 +33,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .nav-btn .nav-icon{font-size:20px;transition:transform 0.3s}
 .nav-btn.active .nav-icon{transform:scale(1.1)}
 
+/* Selo de versão (canto inferior esquerdo) */
+.app-version{position:fixed;z-index:120;left:12px;bottom:62px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--text2);opacity:.55;pointer-events:none;background:rgba(22,12,5,.55);padding:3px 9px;border-radius:10px;backdrop-filter:blur(4px);border:1px solid rgba(255,122,24,.18)}
+
 /* SCREENS */
 .screen{display:none;min-height:calc(100vh - 56px);padding-bottom:80px}
 .screen.active{display:block}
@@ -521,6 +524,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
     Quiz
   </button>
 </nav>
+
+<!-- Selo de versão -->
+<div class="app-version" id="appVersion">v1.0.0</div>
 
 </div>
 <script>

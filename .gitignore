@@ -14,3 +14,6 @@ Desktop.ini
 
 # Claude Code (configuração local)
 .claude/
+
+# QR code gerado localmente
+qrcode-app.png
