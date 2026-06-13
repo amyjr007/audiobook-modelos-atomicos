@@ -34,13 +34,25 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .nav-btn.active .nav-icon{transform:scale(1.1)}
 
 /* Selo de versão (canto inferior esquerdo) */
-.app-version{position:fixed;z-index:120;left:12px;bottom:108px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--text2);opacity:.55;pointer-events:none;background:rgba(22,12,5,.55);padding:3px 9px;border-radius:10px;backdrop-filter:blur(4px);border:1px solid rgba(255,122,24,.18)}
+.app-version{position:fixed;z-index:120;left:12px;bottom:46px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--text2);opacity:.55;pointer-events:none;background:rgba(22,12,5,.55);padding:3px 9px;border-radius:10px;backdrop-filter:blur(4px);border:1px solid rgba(255,122,24,.18)}
 
-/* Barra de marcadores (time stamps) acima da navegação */
-.ts-bar{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);width:100%;max-width:720px;z-index:105;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 16px 11px;background:rgba(31,17,8,0.95);backdrop-filter:blur(20px);border-top:1px solid rgba(255,122,24,0.18);color:var(--orange2);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:background .2s}
-.ts-bar:hover{background:rgba(42,26,15,0.97)}
-.ts-bar .ts-grabber{position:absolute;top:5px;left:50%;transform:translateX(-50%);width:36px;height:4px;border-radius:2px;background:rgba(255,122,24,0.4)}
-.ts-bar .ts-bar-icon{font-size:14px}
+/* Barra de navegação rápida (marcadores) — discreta, na base */
+.ts-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;z-index:105;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px 10px;background:rgba(22,12,5,0.72);backdrop-filter:blur(14px);border-top:1px solid rgba(255,122,24,0.12);color:var(--text2);font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;opacity:.75;transition:opacity .25s,background .25s}
+.ts-bar:hover{opacity:1;background:rgba(31,17,8,0.92)}
+.ts-bar .ts-grabber{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:34px;height:3.5px;border-radius:2px;background:rgba(255,122,24,0.4)}
+.ts-bar .ts-bar-icon{font-size:12px}
+
+/* Destaque escurecido com pergunta centralizada (dialogo0.1) */
+.ab-spotlight{position:fixed;inset:0;z-index:115;display:flex;align-items:center;justify-content:center;padding:36px;background:rgba(8,5,2,0);opacity:0;visibility:hidden;transition:background .7s ease,opacity .7s ease,visibility .7s ease}
+.ab-spotlight.on{background:rgba(8,5,2,0.9);opacity:1;visibility:visible}
+.ab-spotlight-text{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(25px,6.8vw,42px);line-height:1.32;color:var(--text);text-align:center;max-width:540px;transform:translateY(16px) scale(.96);opacity:0;transition:transform .8s cubic-bezier(.22,1,.36,1) .15s,opacity .8s ease .15s;text-shadow:0 0 40px rgba(255,122,24,.4)}
+.ab-spotlight.on .ab-spotlight-text{transform:none;opacity:1}
+
+/* Mãozinha ilustrativa que demonstra a barra de navegação */
+.nav-hand{position:fixed;left:50%;top:82vh;z-index:210;font-size:42px;pointer-events:none;opacity:0;transform:translate(-50%,0);transition:opacity .35s ease,top .55s cubic-bezier(.22,1,.36,1);filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))}
+.nav-hand.show{opacity:1}
+.nav-hand.tap{animation:navTap .55s ease-in-out 2}
+@keyframes navTap{0%,100%{transform:translate(-50%,0) scale(1)}50%{transform:translate(-50%,6px) scale(.82)}}
 
 /* Backdrop */
 .ts-backdrop{position:fixed;inset:0;z-index:190;background:rgba(0,0,0,0.55);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
@@ -220,7 +232,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-relative{position:relative;z-index:2;width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;gap:26px}
 
 /* Controle Play/Pause (canto inferior direito) */
-.ab-fab{position:fixed;z-index:120;bottom:118px;left:50%;transform:translateX(calc(min(360px,50vw) - 62px));width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--orange),var(--coral));color:#160c05;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(255,122,24,0.5);transition:box-shadow .25s,filter .2s}
+.ab-fab{position:fixed;z-index:120;bottom:50px;left:50%;transform:translateX(calc(min(360px,50vw) - 62px));width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--orange),var(--coral));color:#160c05;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(255,122,24,0.5);transition:box-shadow .25s,filter .2s}
 .ab-fab:hover{filter:brightness(1.08)}
 .ab-fab-icon{font-size:22px;line-height:1;pointer-events:none}
 
@@ -536,21 +548,13 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" id="nav-capa" onclick="goTo('capa')">
-    <span class="nav-icon">🏠</span>
-    Capa
-  </button>
-  <button class="nav-btn" id="nav-aprenda" onclick="goTo('aprenda')">
-    <span class="nav-icon">📖</span>
-    Aprenda
-  </button>
-  <button class="nav-btn" id="nav-quiz" onclick="goTo('quiz')">
-    <span class="nav-icon">🧩</span>
-    Quiz
-  </button>
-</nav>
+<!-- Destaque escurecido (dialogo0.1) -->
+<div class="ab-spotlight" id="abSpotlight">
+  <div class="ab-spotlight-text">Por que é importante aprender sobre átomos?</div>
+</div>
+
+<!-- Mãozinha ilustrativa da barra de navegação -->
+<div class="nav-hand" id="navHand">👆</div>
 
 <!-- Barra de marcadores (time stamps) -->
 <div class="ts-bar" id="tsBar" onclick="tsToggle()">
@@ -571,7 +575,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.0.1</div>
+<div class="app-version" id="appVersion">v1.0.2</div>
 
 </div>
 <script>
@@ -672,63 +676,80 @@ function tsGo(i){
 
 renderTimestamps();
 
-/* ===================== AUDIOBOOK ===================== */
+/* ===================== AUDIOBOOK (multi-segmento) ===================== */
 var ab = {
-  audio:null, started:false, raf:null, playing:false,
-  endedAt:null, duration:0,
+  audio:null, inited:false, started:false, raf:null, playing:false,
+  ended:false, awaitingNext:false, seg:0,
   index:0, dragging:false, startX:0, dragDX:0, userInteracted:false,
   journeyText:'A jornada através do tempo pra entender o átomo',
-  cues:[]
+  cues:[],
+  segments:[
+    { src:'audio/dialogo0.mp3',   build:abCuesSeg0, onStart:abResetSeg0, next:true  },
+    { src:'audio/dialogo0.1.mp3', build:abCuesSeg1, onStart:abInitSeg1,  next:false }
+  ]
 };
 
 function abEl(id){ return document.getElementById(id); }
-
 function abSetFab(playing){ abEl('abFabIcon').textContent = playing ? '⏸' : '▶'; }
 
-/* Play / Pause: o áudio é a única fonte do tempo, então pausar o áudio
-   congela todos os eventos; ao voltar, continua exatamente do mesmo ponto. */
+function abInit(){
+  if(ab.inited) return;
+  ab.inited = true;
+  ab.audio = abEl('abAudio');
+  abSetupCarousel();
+  ab.audio.addEventListener('ended', abOnEnded);
+}
+
+/* Ao terminar um segmento: tudo fica na tela; mostra ▶ para continuar */
+function abOnEnded(){
+  ab.playing = false;
+  ab.ended = true;
+  abSetFab(false);
+  if(ab.segments[ab.seg].next){ ab.awaitingNext = true; }
+}
+
+/* Botão Play/Pause:
+   - 1º clique: começa o segmento 0 (dialogo0)
+   - se o segmento anterior terminou e há próximo: avança (dialogo0.1)
+   - caso contrário, alterna play/pausa (o áudio é a única fonte do tempo:
+     pausar congela todos os eventos; voltar continua do mesmo ponto). */
 function abToggle(){
-  if(!ab.started){ startAudiobook(); return; }
-  if(ab.endedAt != null){ /* já terminou: reinicia do começo */
-    ab.endedAt = null; abResetSeq(); ab.audio.currentTime = 0;
-  }
+  abInit();
+  if(!ab.started){ startSegment(0); return; }
+  if(ab.awaitingNext){ startSegment(ab.seg + 1); return; }
+  if(ab.ended){ startSegment(ab.seg); return; } /* replay do último segmento */
   if(ab.audio.paused){
-    ab.playing = true;
-    ab.audio.play();
-    abSetFab(true);
+    ab.playing = true; ab.audio.play(); abSetFab(true);
     if(!ab.raf){ abLoop(); }
   } else {
-    ab.playing = false;
-    ab.audio.pause();
-    abSetFab(false);
+    ab.playing = false; ab.audio.pause(); abSetFab(false);
   }
 }
 
-function startAudiobook(){
-  if(ab.started) return;
+function startSegment(n){
+  abInit();
+  if(n >= ab.segments.length){ n = ab.segments.length - 1; }
+  var seg = ab.segments[n];
+  ab.seg = n;
   ab.started = true;
-  ab.audio = abEl('abAudio');
-  ab.endedAt = null;
+  ab.ended = false;
+  ab.awaitingNext = false;
+  ab.cues = seg.build();
+  ab.cues.forEach(function(c){ c.done = false; });
+  if(seg.onStart){ seg.onStart(); }
 
-  ab.cues = abBuildCues();
-  abResetSeq();
-  abSetupCarousel();
+  if(ab.audio.getAttribute('src') !== seg.src){ ab.audio.src = seg.src; } /* novo áudio começa em 0 */
+  else { ab.audio.currentTime = 0; }
 
-  ab.audio.addEventListener('ended', function(){
-    ab.duration = ab.audio.duration || ab.audio.currentTime;
-    ab.endedAt = performance.now();
-    abSetFab(false);
-  });
-
-  ab.audio.currentTime = 0;
   ab.playing = true;
-  ab.audio.play();
   abSetFab(true);
-  abLoop();
+  var p = ab.audio.play();
+  if(p && p.catch){ p.catch(function(){}); }
+  if(!ab.raf){ abLoop(); }
 }
 
-function abResetSeq(){
-  ab.cues.forEach(function(c){ c.done = false; });
+/* Reset dos visuais do segmento 0 (dialogo0) */
+function abResetSeg0(){
   ab.index = 0; ab.userInteracted = false;
   abEl('abStage').classList.remove('with-carousel');
   abEl('abCredit').classList.remove('show');
@@ -741,6 +762,15 @@ function abResetSeq(){
   abEl('abCaret').classList.remove('gone');
   abEl('abCarousel').classList.remove('show');
   abEl('abHand').className = 'ab-hand';
+  abSpotlight(false);
+  abNavDemoEnd();
+}
+
+/* Início do segmento 1 (dialogo0.1): mantém na tela tudo do dialogo0,
+   apenas garante destaque/mãozinha resetados. */
+function abInitSeg1(){
+  abSpotlight(false);
+  abNavDemoEnd();
 }
 
 /* Define a palavra do "Assunto:" */
@@ -757,8 +787,8 @@ function abExitWord(){
   if(span){ span.classList.remove('enter'); span.classList.add('exit'); }
 }
 
-/* Cues acionadas uma única vez, ancoradas no tempo (em segundos) */
-function abBuildCues(){
+/* ---- Cues do segmento 0 (dialogo0) ---- */
+function abCuesSeg0(){
   return [
     { time:3.0,  done:false, fn:function(){ abEl('abCredit').classList.add('show'); } },
     { time:5.0,  done:false, fn:function(){ abEl('abSubject').classList.add('show'); } },
@@ -771,9 +801,9 @@ function abBuildCues(){
         abEl('abJourney').classList.add('show');
       } },
     { time:18.0, done:false, fn:function(){
-        abEl('abStage').classList.add('with-carousel'); /* sobe o texto */
+        abEl('abStage').classList.add('with-carousel');
         abEl('abCarousel').classList.add('show');
-        abGoTo(0, false); /* img1 */
+        abGoTo(0, false);
       } },
     { time:20.0, done:false, fn:function(){ abDemoSwipe(); } },
     { time:21.0, done:false, fn:function(){
@@ -782,7 +812,43 @@ function abBuildCues(){
   ];
 }
 
-/* Digitação letra a letra entre 12s e 17s, sincronizada ao tempo */
+/* ---- Cues do segmento 1 (dialogo0.1) ---- */
+function abCuesSeg1(){
+  return [
+    { time:9.8,  done:false, fn:function(){ abSpotlight(true); } },   /* escurece + pergunta */
+    { time:15.0, done:false, fn:function(){ abSpotlight(false); } },  /* volta ao normal */
+    { time:22.0, done:false, fn:function(){ abNavDemoStart(); } },    /* mãozinha toca a barra, abre menu */
+    { time:23.6, done:false, fn:function(){ abNavHandTo('47vh'); } }, /* move entre os tópicos */
+    { time:24.4, done:false, fn:function(){ abNavHandTo('57vh'); } },
+    { time:25.2, done:false, fn:function(){ abNavHandTo('67vh'); } },
+    { time:26.4, done:false, fn:function(){ abNavDemoEnd(); } }       /* fecha a barra de navegação */
+  ];
+}
+
+/* Destaque escurecido com a pergunta */
+function abSpotlight(on){
+  abEl('abSpotlight').classList.toggle('on', !!on);
+}
+
+/* Demonstração da barra de navegação (mãozinha) */
+function abNavDemoStart(){
+  var h = abEl('navHand');
+  h.style.top = 'calc(100vh - 92px)';   /* sobre a barra discreta */
+  h.classList.add('show', 'tap');
+  tsOpen();
+}
+function abNavHandTo(top){
+  var h = abEl('navHand');
+  h.classList.remove('tap');
+  h.style.top = top;
+}
+function abNavDemoEnd(){
+  tsClose();
+  var h = abEl('navHand');
+  h.classList.remove('show', 'tap');
+}
+
+/* Digitação letra a letra entre 12s e 17s (apenas no segmento 0) */
 function abTypewriter(t){
   var start = 12, end = 17, txt = ab.journeyText, len = txt.length;
   if(t < start) return;
@@ -792,23 +858,16 @@ function abTypewriter(t){
   if(cur.textContent.length !== n){ cur.textContent = txt.slice(0, n); }
 }
 
-/* Relógio sincronizado: segue o áudio; após o fim continua contando */
+/* Relógio: enquanto toca, segue o currentTime do áudio.
+   Pausado ou terminado -> para o loop e congela o estado atual. */
 function abLoop(){
-  /* Se pausado (e o áudio ainda não terminou), congela tudo no ponto atual */
-  if(!ab.playing && ab.endedAt == null){ ab.raf = null; return; }
-
-  var t;
-  if(ab.endedAt != null){ t = ab.duration + (performance.now() - ab.endedAt) / 1000; }
-  else { t = ab.audio.currentTime; }
-
+  if(!ab.playing){ ab.raf = null; return; }
+  var t = ab.audio.currentTime;
   for(var i=0;i<ab.cues.length;i++){
     var c = ab.cues[i];
     if(!c.done && t >= c.time){ c.done = true; c.fn(); }
   }
-  abTypewriter(t);
-
-  var allDone = ab.cues.every(function(c){ return c.done; });
-  if(allDone && t > 23){ ab.raf = null; return; } /* encerra o loop após a sequência */
+  if(ab.seg === 0){ abTypewriter(t); }
   ab.raf = requestAnimationFrame(abLoop);
 }
 
