@@ -34,7 +34,34 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .nav-btn.active .nav-icon{transform:scale(1.1)}
 
 /* Selo de versão (canto inferior esquerdo) */
-.app-version{position:fixed;z-index:120;left:12px;bottom:62px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--text2);opacity:.55;pointer-events:none;background:rgba(22,12,5,.55);padding:3px 9px;border-radius:10px;backdrop-filter:blur(4px);border:1px solid rgba(255,122,24,.18)}
+.app-version{position:fixed;z-index:120;left:12px;bottom:108px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--text2);opacity:.55;pointer-events:none;background:rgba(22,12,5,.55);padding:3px 9px;border-radius:10px;backdrop-filter:blur(4px);border:1px solid rgba(255,122,24,.18)}
+
+/* Barra de marcadores (time stamps) acima da navegação */
+.ts-bar{position:fixed;bottom:56px;left:50%;transform:translateX(-50%);width:100%;max-width:720px;z-index:105;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 16px 11px;background:rgba(31,17,8,0.95);backdrop-filter:blur(20px);border-top:1px solid rgba(255,122,24,0.18);color:var(--orange2);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.5px;cursor:pointer;transition:background .2s}
+.ts-bar:hover{background:rgba(42,26,15,0.97)}
+.ts-bar .ts-grabber{position:absolute;top:5px;left:50%;transform:translateX(-50%);width:36px;height:4px;border-radius:2px;background:rgba(255,122,24,0.4)}
+.ts-bar .ts-bar-icon{font-size:14px}
+
+/* Backdrop */
+.ts-backdrop{position:fixed;inset:0;z-index:190;background:rgba(0,0,0,0.55);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.ts-backdrop.open{opacity:1;visibility:visible}
+
+/* Painel deslizante de marcadores */
+.ts-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:720px;max-height:72vh;z-index:200;background:var(--surface);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid rgba(255,122,24,0.25);box-shadow:0 -16px 50px rgba(0,0,0,0.5);transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;overflow:hidden}
+.ts-sheet.open{transform:translateX(-50%) translateY(0)}
+.ts-sheet-handle{flex-shrink:0;display:flex;justify-content:center;padding:12px 0 4px;cursor:pointer}
+.ts-sheet-handle span{width:42px;height:5px;border-radius:3px;background:rgba(255,122,24,0.4)}
+.ts-sheet-header{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:6px 22px 14px}
+.ts-sheet-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;color:var(--text)}
+.ts-sheet-close{background:rgba(255,255,255,0.06);border:none;color:var(--text2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center}
+.ts-sheet-close:hover{background:rgba(255,122,24,0.15);color:var(--orange)}
+.ts-list{overflow-y:auto;padding:0 14px 22px}
+.ts-item{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;border:none;border-radius:14px;padding:13px 12px;cursor:pointer;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;transition:background .2s}
+.ts-item:hover{background:rgba(255,122,24,0.08)}
+.ts-item-num{flex-shrink:0;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--orange);background:rgba(255,122,24,0.12);border:1px solid rgba(255,122,24,0.3)}
+.ts-item-txt{display:flex;flex-direction:column;gap:2px}
+.ts-item-title{font-size:14px;font-weight:600}
+.ts-item-sub{font-size:11px;color:var(--text2);opacity:.7}
 
 /* SCREENS */
 .screen{display:none;min-height:calc(100vh - 56px);padding-bottom:80px}
@@ -193,7 +220,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-relative{position:relative;z-index:2;width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;gap:26px}
 
 /* Controle Play/Pause (canto inferior direito) */
-.ab-fab{position:fixed;z-index:120;bottom:74px;left:50%;transform:translateX(calc(min(360px,50vw) - 62px));width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--orange),var(--coral));color:#160c05;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(255,122,24,0.5);transition:box-shadow .25s,filter .2s}
+.ab-fab{position:fixed;z-index:120;bottom:118px;left:50%;transform:translateX(calc(min(360px,50vw) - 62px));width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--orange),var(--coral));color:#160c05;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(255,122,24,0.5);transition:box-shadow .25s,filter .2s}
 .ab-fab:hover{filter:brightness(1.08)}
 .ab-fab-icon{font-size:22px;line-height:1;pointer-events:none}
 
@@ -525,8 +552,26 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   </button>
 </nav>
 
+<!-- Barra de marcadores (time stamps) -->
+<div class="ts-bar" id="tsBar" onclick="tsToggle()">
+  <span class="ts-grabber"></span>
+  <span class="ts-bar-icon">⏱</span>
+  <span>Marcadores</span>
+</div>
+
+<!-- Backdrop + Painel -->
+<div class="ts-backdrop" id="tsBackdrop" onclick="tsClose()"></div>
+<div class="ts-sheet" id="tsSheet" role="dialog" aria-label="Marcadores do audiobook">
+  <div class="ts-sheet-handle" onclick="tsClose()"><span></span></div>
+  <div class="ts-sheet-header">
+    <div class="ts-sheet-title">Marcadores</div>
+    <button class="ts-sheet-close" onclick="tsClose()" aria-label="Fechar">✕</button>
+  </div>
+  <div class="ts-list" id="tsList"></div>
+</div>
+
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.0.0</div>
+<div class="app-version" id="appVersion">v1.0.1</div>
 
 </div>
 <script>
@@ -570,6 +615,62 @@ function goPage(topicIdx, pageIdx) {
 
   currentPages[topicIdx] = pageIdx;
 }
+
+/* ===================== MARCADORES (TIME STAMPS) ===================== */
+/* time = null  -> ainda não definido (clique não navega).
+   Depois é só preencher time (em segundos) e, se quiser, screen/topic. */
+var timestamps = [
+  { title:'Marcador 1',  sub:'Título provisório', time:null },
+  { title:'Marcador 2',  sub:'Título provisório', time:null },
+  { title:'Marcador 3',  sub:'Título provisório', time:null },
+  { title:'Marcador 4',  sub:'Título provisório', time:null },
+  { title:'Marcador 5',  sub:'Título provisório', time:null },
+  { title:'Marcador 6',  sub:'Título provisório', time:null },
+  { title:'Marcador 7',  sub:'Título provisório', time:null },
+  { title:'Marcador 8',  sub:'Título provisório', time:null },
+  { title:'Marcador 9',  sub:'Título provisório', time:null },
+  { title:'Marcador 10', sub:'Título provisório', time:null }
+];
+
+function renderTimestamps(){
+  var list = document.getElementById('tsList');
+  if(!list) return;
+  list.innerHTML = '';
+  timestamps.forEach(function(ts, i){
+    var btn = document.createElement('button');
+    btn.className = 'ts-item';
+    btn.onclick = function(){ tsGo(i); };
+    btn.innerHTML =
+      '<span class="ts-item-num">' + (i+1) + '</span>' +
+      '<span class="ts-item-txt">' +
+        '<span class="ts-item-title">' + ts.title + '</span>' +
+        '<span class="ts-item-sub">' + ts.sub + '</span>' +
+      '</span>';
+    list.appendChild(btn);
+  });
+}
+
+function tsToggle(){
+  var sheet = document.getElementById('tsSheet');
+  if(sheet.classList.contains('open')){ tsClose(); } else { tsOpen(); }
+}
+function tsOpen(){
+  document.getElementById('tsSheet').classList.add('open');
+  document.getElementById('tsBackdrop').classList.add('open');
+}
+function tsClose(){
+  document.getElementById('tsSheet').classList.remove('open');
+  document.getElementById('tsBackdrop').classList.remove('open');
+}
+
+/* Por enquanto não leva a lugar nenhum — será ligado ao tempo do áudio depois. */
+function tsGo(i){
+  var ts = timestamps[i];
+  if(!ts || ts.time == null){ return; } /* marcador provisório: sem ação */
+  /* (futuro) ir até o ponto: goTo('aprenda'); ab.audio.currentTime = ts.time; ... */
+}
+
+renderTimestamps();
 
 /* ===================== AUDIOBOOK ===================== */
 var ab = {
