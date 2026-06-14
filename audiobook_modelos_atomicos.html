@@ -358,14 +358,16 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-fgtext{position:fixed;inset:0;z-index:110;display:flex;align-items:center;justify-content:center;padding:0 7vw;pointer-events:none}
 .ab-fgtext-inner{display:inline-block;max-width:440px;text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:clamp(23px,6.2vw,39px);line-height:1.32;color:var(--text);opacity:0;text-shadow:0 4px 30px rgba(0,0,0,.55)}
 .ab-fgtext-inner.in{animation:abWordIn .6s cubic-bezier(.22,1,.36,1) both}
-.ab-fgtext-inner.out{animation:abWordOut .95s cubic-bezier(.6,0,.85,0) forwards}
+.ab-fgtext-inner.out{animation:abTextOut .55s cubic-bezier(.5,0,.75,0) forwards}
+/* saída limpa (sem repique) para textos cuja base é opacity:0 */
+@keyframes abTextOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-16px) scale(.96)}}
 
 /* ===== Sequência das ciências (dialogo1.2) ===== */
 /* título no topo (Biologia / Física / Astronomia) */
 .ab-sci-title{position:fixed;top:66px;left:0;right:0;text-align:center;z-index:108;pointer-events:none;padding:0 6vw}
 .ab-sci-title-inner{display:inline-block;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(30px,8.5vw,52px);line-height:1.05;letter-spacing:-.5px;background:linear-gradient(135deg,var(--amber),var(--orange) 50%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0}
 .ab-sci-title-inner.in{animation:abWordIn .6s cubic-bezier(.22,1,.36,1) both}
-.ab-sci-title-inner.out{animation:abWordOut .95s cubic-bezier(.6,0,.85,0) forwards}
+.ab-sci-title-inner.out{animation:abTextOut .55s cubic-bezier(.5,0,.75,0) forwards}
 
 /* elementos espalhados (emojis) */
 .ab-scatter{position:fixed;inset:0;z-index:106;pointer-events:none}
