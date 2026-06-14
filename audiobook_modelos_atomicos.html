@@ -345,7 +345,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 #abLayerCase.fly{transform:translate(min(40vw,205px),min(24vh,168px)) rotate(11deg) scale(.74)}
 
 /* texto em 1º plano centralizado (entra/sai com abWordIn / abWordOut) */
-.ab-fgtext{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:8;width:86%;max-width:440px;text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:clamp(23px,6.2vw,39px);line-height:1.32;color:var(--text);opacity:0;pointer-events:none;text-shadow:0 4px 30px rgba(0,0,0,.55)}
+.ab-fgtext{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:110;width:86%;max-width:440px;text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:clamp(23px,6.2vw,39px);line-height:1.32;color:var(--text);opacity:0;pointer-events:none;text-shadow:0 4px 30px rgba(0,0,0,.55)}
 .ab-fgtext.in{animation:abWordIn .6s cubic-bezier(.22,1,.36,1) both}
 .ab-fgtext.out{animation:abWordOut .95s cubic-bezier(.6,0,.85,0) forwards}
 
