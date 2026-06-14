@@ -306,6 +306,49 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-stage.chapter-rise #abContent{transform:translateY(calc(-1 * var(--rise,0px)));transition:transform 1.15s cubic-bezier(.5,0,.18,1)}
 .ab-stage.chapter-rise #abSeq,.ab-stage.chapter-rise #abJourney,.ab-stage.chapter-rise #abCarousel{opacity:0;transition:opacity .75s ease}
 
+/* ===== Cena do celular (dialogo1.1) ===== */
+/* o bloco "Capítulo 1" some para liberar o palco */
+.ab-chapter.gone{opacity:0;transform:translateY(-18px);transition:opacity .55s ease,transform .55s ease;pointer-events:none}
+
+.ab-phone{position:absolute;left:50%;top:46%;width:clamp(116px,33vw,148px);height:clamp(238px,68vw,304px);transform:translate(-50%,-50%) scale(.86);opacity:0;z-index:5;pointer-events:none;transition:opacity .6s ease,transform .6s cubic-bezier(.22,1,.36,1)}
+.ab-phone.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.ab-layer{position:absolute;inset:0;border-radius:26px;transition:transform .7s cubic-bezier(.2,.7,.25,1),box-shadow .7s ease;box-shadow:0 18px 42px rgba(0,0,0,.5)}
+
+/* vidro / tela */
+.ab-layer-glass{z-index:4;background:linear-gradient(160deg,#1c2230,#05070c 62%);border:1px solid rgba(255,255,255,.14)}
+.ab-layer-glass::before{content:'';position:absolute;inset:0;border-radius:26px;background:linear-gradient(120deg,rgba(255,255,255,.22),transparent 40%);pointer-events:none}
+.ab-layer-glass::after{content:'';position:absolute;top:11px;left:50%;transform:translateX(-50%);width:46px;height:13px;border-radius:9px;background:#05070c;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+
+/* bateria */
+.ab-layer-battery{z-index:3;background:linear-gradient(150deg,#1f9e74,#0c5f47);border:1px solid rgba(255,255,255,.12)}
+.ab-layer-battery::before{content:'';position:absolute;left:50%;top:-7px;transform:translateX(-50%);width:30px;height:8px;border-radius:4px 4px 0 0;background:#0c5f47}
+.ab-layer-battery::after{content:'⚡';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:44px;color:rgba(255,255,255,.85)}
+
+/* placa de circuitos */
+.ab-layer-board{z-index:2;background-color:#08251d;background-image:repeating-linear-gradient(90deg,transparent 0 14px,rgba(180,255,210,.14) 14px 15px),repeating-linear-gradient(0deg,transparent 0 18px,rgba(180,255,210,.10) 18px 19px),linear-gradient(150deg,#0f3b2e,#08251d);border:1px solid rgba(120,255,200,.18)}
+.ab-layer-board::before{content:'';position:absolute;top:26%;left:22%;width:42%;height:21%;background:#06140f;border-radius:4px;box-shadow:0 0 0 2px rgba(200,255,220,.12)}
+.ab-layer-board::after{content:'';position:absolute;bottom:19%;right:21%;width:27%;height:14%;background:#06140f;border-radius:3px;box-shadow:0 0 0 2px rgba(255,210,120,.32)}
+
+/* plástico da carcaça */
+.ab-layer-case{z-index:1;background:linear-gradient(150deg,#3a3f47,#23272d);border:2px solid rgba(255,255,255,.10)}
+.ab-layer-case::before{content:'';position:absolute;inset:8px;border-radius:20px;border:1px dashed rgba(255,255,255,.14)}
+.ab-layer-case::after{content:'';position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:9px;background:#181b20;box-shadow:inset 0 0 0 3px rgba(255,255,255,.08)}
+
+/* rótulo de cada peça (aparece quando voa) */
+.ab-part-label{position:absolute;left:50%;top:calc(100% + 9px);transform:translateX(-50%);white-space:nowrap;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);opacity:0;transition:opacity .4s ease .25s}
+.ab-layer.fly .ab-part-label{opacity:.95}
+
+/* voos para as diagonais */
+#abLayerGlass.fly{transform:translate(min(40vw,205px),calc(-1*min(30vh,235px))) rotate(15deg) scale(.74)}
+#abLayerBattery.fly{transform:translate(calc(-1*min(40vw,205px)),calc(-1*min(30vh,235px))) rotate(-15deg) scale(.74)}
+#abLayerBoard.fly{transform:translate(calc(-1*min(40vw,205px)),min(24vh,168px)) rotate(-11deg) scale(.74)}
+#abLayerCase.fly{transform:translate(min(40vw,205px),min(24vh,168px)) rotate(11deg) scale(.74)}
+
+/* texto em 1º plano centralizado (entra/sai com abWordIn / abWordOut) */
+.ab-fgtext{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:8;width:86%;max-width:440px;text-align:center;font-family:'Fraunces',serif;font-weight:600;font-size:clamp(23px,6.2vw,39px);line-height:1.32;color:var(--text);opacity:0;pointer-events:none;text-shadow:0 4px 30px rgba(0,0,0,.55)}
+.ab-fgtext.in{animation:abWordIn .6s cubic-bezier(.22,1,.36,1) both}
+.ab-fgtext.out{animation:abWordOut .95s cubic-bezier(.6,0,.85,0) forwards}
+
 /* ===== QUIZ ===== */
 #screen-quiz{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px}
 #screen-quiz.active{display:flex}
@@ -418,6 +461,17 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           </div>
         </div>
       </div>
+
+      <!-- Cena do celular que se desmonta (dialogo1.1) -->
+      <div class="ab-phone" id="abPhone" aria-hidden="true">
+        <div class="ab-layer ab-layer-case" id="abLayerCase"><span class="ab-part-label">Plástico</span></div>
+        <div class="ab-layer ab-layer-board" id="abLayerBoard"><span class="ab-part-label">Placa de circuitos</span></div>
+        <div class="ab-layer ab-layer-battery" id="abLayerBattery"><span class="ab-part-label">Bateria</span></div>
+        <div class="ab-layer ab-layer-glass" id="abLayerGlass"><span class="ab-part-label">Vidro</span></div>
+      </div>
+
+      <!-- Texto em 1º plano (dialogo1.1) -->
+      <div class="ab-fgtext" id="abFgText"></div>
 
       <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.3" preload="auto"></audio>
     </div>
@@ -590,22 +644,22 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 <div class="ts-bar" id="tsBar" onclick="tsToggle()">
   <span class="ts-grabber"></span>
   <span class="ts-bar-icon">⏱</span>
-  <span>Marcadores</span>
+  <span>Navegação Rápida</span>
 </div>
 
 <!-- Backdrop + Painel -->
 <div class="ts-backdrop" id="tsBackdrop" onclick="tsClose()"></div>
-<div class="ts-sheet" id="tsSheet" role="dialog" aria-label="Marcadores do audiobook">
+<div class="ts-sheet" id="tsSheet" role="dialog" aria-label="Navegação Rápida do audiobook">
   <div class="ts-sheet-handle" onclick="tsClose()"><span></span></div>
   <div class="ts-sheet-header">
-    <div class="ts-sheet-title">Marcadores</div>
+    <div class="ts-sheet-title">Navegação Rápida</div>
     <button class="ts-sheet-close" onclick="tsClose()" aria-label="Fechar">✕</button>
   </div>
   <div class="ts-list" id="tsList"></div>
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.0.3</div>
+<div class="app-version" id="appVersion">v1.0.4</div>
 
 </div>
 <script>
@@ -721,7 +775,8 @@ var ab = {
     { src:'audio/dialogo0.mp3?v=1.0.3',   build:abCuesSeg0, onStart:abResetSeg0, next:true  },
     { src:'audio/dialogo0.1.mp3?v=1.0.3', build:abCuesSeg1, onStart:abInitSeg1,  next:true  },
     { src:'audio/dialogo1.mp3?v=1.0.3',   build:abCuesSeg2, onStart:abInitSeg2,  onEnd:abEndSeg2, auto:true },
-    { src:'audio/dialogo1.0.mp3?v=1.0.3', build:abCuesSeg3, onStart:abInitSeg3,  next:false }
+    { src:'audio/dialogo1.0.mp3?v=1.0.3', build:abCuesSeg3, onStart:abInitSeg3,  next:true  },
+    { src:'audio/dialogo1.1.mp3?v=1.0.3', build:abCuesSeg4, onStart:abInitSeg4,  next:false }
   ]
 };
 
@@ -810,6 +865,8 @@ function abResetSeg0(){
   abEl('abChapterNum').classList.remove('show');
   abEl('abChapterSub').classList.remove('show','orange');
   abEl('abChapterHead').classList.remove('show');
+  abEl('abChapter').classList.remove('gone');
+  abPhoneReset();
 }
 
 /* Início do segmento 1 (dialogo0.1): mantém na tela tudo do dialogo0,
@@ -832,6 +889,7 @@ function abInitSeg2(){
   content.style.removeProperty('--rise');
   var ch = abEl('abChapter');
   ch.style.display = 'flex';
+  ch.classList.remove('gone');
   abEl('abChapterNum').classList.remove('show');
   abEl('abChapterSub').classList.remove('show','orange');
   abEl('abChapterHead').classList.remove('show');
@@ -852,6 +910,41 @@ function abEndSeg2(){
 function abInitSeg3(){
   abSpotlight(false);
   abNavDemoEnd();
+}
+
+/* ===== Cena do celular (dialogo1.1) ===== */
+/* Reseta a cena: celular escondido, peças no centro, texto limpo. */
+function abPhoneReset(){
+  abEl('abPhone').classList.remove('show');
+  ['abLayerGlass','abLayerBattery','abLayerBoard','abLayerCase'].forEach(function(id){
+    abEl(id).classList.remove('fly');
+  });
+  var fg = abEl('abFgText');
+  fg.classList.remove('in','out');
+  fg.textContent = '';
+}
+
+/* onStart do segmento 4 (dialogo1.1): some o "Capítulo 1" e prepara a cena. */
+function abInitSeg4(){
+  abSpotlight(false);
+  abNavDemoEnd();
+  abEl('abChapter').classList.add('gone');
+  abPhoneReset();
+}
+
+/* Texto em 1º plano: entra (abWordIn) / sai (abWordOut), reaproveitando as
+   animações já usadas antes. */
+function abFgShow(text){
+  var el = abEl('abFgText');
+  el.textContent = text;
+  el.classList.remove('out');
+  void el.offsetWidth; /* reinicia a animação a cada troca de texto */
+  el.classList.add('in');
+}
+function abFgHide(){
+  var el = abEl('abFgText');
+  el.classList.remove('in');
+  el.classList.add('out');
 }
 
 /* Define a palavra do "Assunto:" */
@@ -919,6 +1012,22 @@ function abCuesSeg3(){
   return [
     { time:0.1, done:false, fn:function(){ abEl('abChapterSub').classList.add('orange'); } },
     { time:0.5, done:false, fn:function(){ abEl('abChapterHead').classList.add('show'); } }
+  ];
+}
+
+/* ---- Cues do segmento 4 (dialogo1.1): celular se desmonta + textos ---- */
+function abCuesSeg4(){
+  return [
+    { time:1.0,  done:false, fn:function(){ abEl('abPhone').classList.add('show'); } },
+    { time:3.6,  done:false, fn:function(){ abEl('abLayerGlass').classList.add('fly'); } },   /* vidro -> sup. direita */
+    { time:4.6,  done:false, fn:function(){ abEl('abLayerBattery').classList.add('fly'); } }, /* bateria -> sup. esquerda */
+    { time:6.6,  done:false, fn:function(){ abEl('abLayerBoard').classList.add('fly'); } },   /* placa -> inf. esquerda */
+    { time:8.7,  done:false, fn:function(){ abEl('abLayerCase').classList.add('fly'); } },    /* plástico -> inf. direita */
+    { time:12.0, done:false, fn:function(){ abFgShow('Nenhum desses materiais existe na natureza'); } },
+    { time:17.0, done:false, fn:function(){ abFgHide(); } },
+    { time:18.0, done:false, fn:function(){ abFgShow('Existem por causa da Química'); } },
+    { time:26.0, done:false, fn:function(){ abFgHide(); } },
+    { time:27.5, done:false, fn:function(){ abFgShow('Pra que serve uma ciência?'); } }
   ];
 }
 
