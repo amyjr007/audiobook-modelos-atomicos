@@ -1,5 +1,5 @@
-/* Service Worker — Audiobook Modelos Atômicos (PWA offline) */
-const CACHE = 'audiobook-atomos-v1.0.5';
+/* Service Worker — Audiobook Modelos Atômicos (PWA offline + auto-update) */
+const CACHE = 'audiobook-atomos-b20260614174729'; /* BUILD — carimbado automaticamente pelo git hook */
 
 /* App shell pré-cacheado para funcionar offline. */
 const SHELL = [
@@ -35,7 +35,7 @@ self.addEventListener('install', function (e) {
   );
 });
 
-/* Ativa: remove caches antigos. */
+/* Ativa: remove caches antigos (de builds anteriores). */
 self.addEventListener('activate', function (e) {
   e.waitUntil(
     caches.keys()
@@ -44,19 +44,42 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-/* Busca: cache-first (ignorando ?v=...), com fallback de rede que também
-   popula o cache em tempo de execução (fontes do Google, etc.). */
+function abIsHTML(req) {
+  return req.mode === 'navigate' || (req.headers.get('accept') || '').indexOf('text/html') !== -1;
+}
+
 self.addEventListener('fetch', function (e) {
   var req = e.request;
   if (req.method !== 'GET') return;
+
+  /* HTML (o app): network-first — sempre busca a versão mais nova quando online
+     e cai para o cache quando offline. É isso que faz a PWA instalada se
+     atualizar sozinha a cada deploy. */
+  if (abIsHTML(req)) {
+    e.respondWith(
+      fetch(req).then(function (res) {
+        var copy = res.clone();
+        caches.open(CACHE).then(function (c) { try { c.put(req, copy); } catch (_) {} });
+        return res;
+      }).catch(function () {
+        return caches.match(req, { ignoreSearch: true }).then(function (r) {
+          return r || caches.match('./audiobook_modelos_atomicos.html');
+        });
+      })
+    );
+    return;
+  }
+
+  /* Demais assets (áudio, imagens, ícones, fontes): stale-while-revalidate —
+     responde do cache na hora e atualiza em segundo plano. */
   e.respondWith(
     caches.match(req, { ignoreSearch: true }).then(function (cached) {
-      if (cached) return cached;
-      return fetch(req).then(function (res) {
+      var network = fetch(req).then(function (res) {
         var copy = res.clone();
         caches.open(CACHE).then(function (c) { try { c.put(req, copy); } catch (_) {} });
         return res;
       }).catch(function () { return cached; });
+      return cached || network;
     })
   );
 });

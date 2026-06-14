@@ -1,0 +1,18 @@
+#!/bin/sh
+# Carimba automaticamente a versao do cache do Service Worker (sw.js) sempre que
+# o app ou os assets mudam. Assim, PWAs ja instaladas limpam o cache antigo e
+# pegam a versao nova a cada deploy, sem ninguem precisar editar o sw.js.
+
+changed=$(git diff --cached --name-only)
+
+case "$changed" in
+  *audiobook_modelos_atomicos.html*|*index.html*|*sw.js*|*manifest.webmanifest*|*audio/*|*images/*|*icons/*)
+    if [ -f sw.js ]; then
+      ts=$(date +%Y%m%d%H%M%S)
+      sed -i -E "s/(const CACHE = 'audiobook-atomos-)[^']*(';)/\1b$ts\2/" sw.js
+      git add sw.js
+    fi
+    ;;
+esac
+
+exit 0
