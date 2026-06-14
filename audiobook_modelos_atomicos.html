@@ -643,8 +643,8 @@ function goPage(topicIdx, pageIdx) {
 /* time = null  -> ainda não definido (clique não navega).
    Depois é só preencher time (em segundos) e, se quiser, screen/topic. */
 var timestamps = [
-  { title:'Marcador 1',  sub:'Título provisório', time:null },
-  { title:'Marcador 2',  sub:'Título provisório', time:null },
+  { title:'Introdução',                    sub:'', time:null, seg:0 },
+  { title:'Capítulo 1: O que é a Química',  sub:'', time:null, seg:2 },
   { title:'Marcador 3',  sub:'Título provisório', time:null },
   { title:'Marcador 4',  sub:'Título provisório', time:null },
   { title:'Marcador 5',  sub:'Título provisório', time:null },
@@ -667,7 +667,7 @@ function renderTimestamps(){
       '<span class="ts-item-num">' + (i+1) + '</span>' +
       '<span class="ts-item-txt">' +
         '<span class="ts-item-title">' + ts.title + '</span>' +
-        '<span class="ts-item-sub">' + ts.sub + '</span>' +
+        (ts.sub ? '<span class="ts-item-sub">' + ts.sub + '</span>' : '') +
       '</span>';
     list.appendChild(btn);
   });
@@ -686,11 +686,15 @@ function tsClose(){
   document.getElementById('tsBackdrop').classList.remove('open');
 }
 
-/* Por enquanto não leva a lugar nenhum — será ligado ao tempo do áudio depois. */
+/* Marcador com 'seg' definido pula para aquele segmento do audiobook e toca. */
 function tsGo(i){
   var ts = timestamps[i];
-  if(!ts || ts.time == null){ return; } /* marcador provisório: sem ação */
-  /* (futuro) ir até o ponto: goTo('aprenda'); ab.audio.currentTime = ts.time; ... */
+  if(!ts || ts.seg == null){ return; } /* marcador provisório: sem ação */
+  tsClose();
+  goTo('aprenda');
+  switchTopic(0);
+  abInit();
+  startSegment(ts.seg);
 }
 
 renderTimestamps();
