@@ -808,29 +808,31 @@ function abInitSeg1(){
 }
 
 /* ===== Capítulo 1 ===== */
-/* onStart do segmento 2 (dialogo1): mantém o carrossel na tela e prepara o
-   bloco "Capítulo 1" para entrar (sem limpar o que veio dos diálogos 0). */
+/* onStart do segmento 2 (dialogo1): LOGO NO INÍCIO a Introdução sobe e some
+   e o bloco "Capítulo 1" surge subindo até o topo. */
 function abInitSeg2(){
   abSpotlight(false);
   abNavDemoEnd();
   abEl('abStage').classList.add('with-carousel');
+  /* estado base limpo antes de animar */
   abEl('abStage').classList.remove('chapter-rise');
-  abEl('abContent').style.removeProperty('--rise');
+  var content = abEl('abContent');
+  content.style.removeProperty('--rise');
   var ch = abEl('abChapter');
   ch.style.display = 'flex';
   abEl('abChapterNum').classList.remove('show');
   abEl('abChapterSub').classList.remove('show','orange');
-  void ch.offsetWidth; /* reflow: permite reanimar em replays */
+  void ch.offsetWidth; /* reflow: fixa o estado base antes de animar */
+  /* dispara a subida + entrada dramática de "Capítulo 1" */
+  content.style.setProperty('--rise', Math.max(0, ch.offsetTop) + 'px');
+  abEl('abStage').classList.add('chapter-rise');
+  abEl('abChapterNum').classList.add('show');
 }
 
-/* Ao terminar dialogo1: o conteúdo antigo sai por cima e o "Capítulo 1" sobe
-   até o topo; ao chegar lá, dialogo1.0 começa sozinho. */
+/* Ao terminar dialogo1: a subida já ocorreu no início; só encadeia o
+   dialogo1.0 (que estiliza o subtítulo no laranja da capa). */
 function abEndSeg2(){
-  var content = abEl('abContent');
-  var chapter = abEl('abChapter');
-  content.style.setProperty('--rise', Math.max(0, chapter.offsetTop) + 'px');
-  abEl('abStage').classList.add('chapter-rise');
-  setTimeout(function(){ startSegment(ab.seg + 1); }, 1200);
+  setTimeout(function(){ startSegment(ab.seg + 1); }, 400);
 }
 
 /* onStart do segmento 3 (dialogo1.0): o bloco "Capítulo 1" já está no topo. */
@@ -891,11 +893,11 @@ function abCuesSeg1(){
   ];
 }
 
-/* ---- Cues do segmento 2 (dialogo1): abertura do "Capítulo 1" ---- */
+/* ---- Cues do segmento 2 (dialogo1): subtítulo aos 1s (o "Capítulo 1" e a
+   subida já entram no onStart) ---- */
 function abCuesSeg2(){
   return [
-    { time:0.15, done:false, fn:function(){ abEl('abChapterNum').classList.add('show'); } },
-    { time:1.0,  done:false, fn:function(){ abEl('abChapterSub').classList.add('show'); } }
+    { time:1.0, done:false, fn:function(){ abEl('abChapterSub').classList.add('show'); } }
   ];
 }
 
