@@ -350,6 +350,29 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-fgtext-inner.in{animation:abWordIn .6s cubic-bezier(.22,1,.36,1) both}
 .ab-fgtext-inner.out{animation:abWordOut .95s cubic-bezier(.6,0,.85,0) forwards}
 
+/* ===== Sequência das ciências (dialogo1.2) ===== */
+/* título no topo (Biologia / Física / Astronomia) */
+.ab-sci-title{position:fixed;top:66px;left:0;right:0;text-align:center;z-index:108;pointer-events:none;padding:0 6vw}
+.ab-sci-title-inner{display:inline-block;font-family:'Fraunces',serif;font-weight:900;font-size:clamp(30px,8.5vw,52px);line-height:1.05;letter-spacing:-.5px;background:linear-gradient(135deg,var(--amber),var(--orange) 50%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0}
+.ab-sci-title-inner.in{animation:abWordIn .6s cubic-bezier(.22,1,.36,1) both}
+.ab-sci-title-inner.out{animation:abWordOut .95s cubic-bezier(.6,0,.85,0) forwards}
+
+/* elementos espalhados (emojis) */
+.ab-scatter{position:fixed;inset:0;z-index:106;pointer-events:none}
+.ab-scatter-item{position:absolute;opacity:0;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
+.ab-scatter-item.in{animation:abScatterIn .55s cubic-bezier(.22,1,.36,1) both,abFloat 4s ease-in-out infinite .55s}
+.ab-scatter-item.out{animation:abScatterOut .4s ease forwards}
+@keyframes abScatterIn{0%{opacity:0;transform:translateY(16px) scale(.4)}100%{opacity:1;transform:none}}
+@keyframes abScatterOut{0%{opacity:1}100%{opacity:0;transform:scale(.5)}}
+@keyframes abFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* fecho "E a Química?" */
+.ab-chem{position:fixed;inset:0;z-index:109;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:0 7vw;pointer-events:none;text-align:center}
+.ab-chem-q{font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(34px,9vw,58px);line-height:1.05;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transform:translateY(22px) scale(.9);filter:blur(7px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1),filter .9s ease}
+.ab-chem-q.show{opacity:1;transform:none;filter:blur(0)}
+.ab-chem-s1,.ab-chem-s2{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(17px,4.6vw,26px);line-height:1.32;color:var(--text);max-width:440px;opacity:0;transform:translateY(14px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.ab-chem-s1.show,.ab-chem-s2.show{opacity:1;transform:none}
+
 /* ===== QUIZ ===== */
 #screen-quiz{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px}
 #screen-quiz.active{display:flex}
@@ -473,6 +496,17 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Texto em 1º plano (dialogo1.1) -->
       <div class="ab-fgtext" id="abFgText"><span class="ab-fgtext-inner" id="abFgTextInner"></span></div>
+
+      <!-- Sequência das ciências (dialogo1.2) -->
+      <div class="ab-sci-title" id="abSciTitle"><span class="ab-sci-title-inner" id="abSciTitleInner"></span></div>
+      <div class="ab-scatter" id="abScatter"></div>
+
+      <!-- Fecho "E a Química?" (dialogo1.2) -->
+      <div class="ab-chem" id="abChem">
+        <div class="ab-chem-q" id="abChemQ">E a Química?</div>
+        <div class="ab-chem-s1" id="abChemS1">Do que as coisas são feitas</div>
+        <div class="ab-chem-s2" id="abChemS2">Como podemos transformar a matéria...</div>
+      </div>
 
       <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.3" preload="auto"></audio>
     </div>
@@ -660,7 +694,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.0.4</div>
+<div class="app-version" id="appVersion">v1.0.5</div>
 
 </div>
 <script>
@@ -777,7 +811,8 @@ var ab = {
     { src:'audio/dialogo0.1.mp3?v=1.0.3', build:abCuesSeg1, onStart:abInitSeg1,  next:true  },
     { src:'audio/dialogo1.mp3?v=1.0.3',   build:abCuesSeg2, onStart:abInitSeg2,  onEnd:abEndSeg2, auto:true },
     { src:'audio/dialogo1.0.mp3?v=1.0.3', build:abCuesSeg3, onStart:abInitSeg3,  next:true  },
-    { src:'audio/dialogo1.1.mp3?v=1.0.3', build:abCuesSeg4, onStart:abInitSeg4,  next:false }
+    { src:'audio/dialogo1.1.mp3?v=1.0.3', build:abCuesSeg4, onStart:abInitSeg4,  next:true  },
+    { src:'audio/dialogo1.2.mp3?v=1.0.3', build:abCuesSeg5, onStart:abInitSeg5,  next:false }
   ]
 };
 
@@ -868,6 +903,9 @@ function abResetSeg0(){
   abEl('abChapterHead').classList.remove('show');
   abEl('abChapter').classList.remove('gone');
   abPhoneReset();
+  abEl('abSciTitleInner').classList.remove('in','out');
+  abEl('abScatter').innerHTML = '';
+  abChemReset();
 }
 
 /* Início do segmento 1 (dialogo0.1): mantém na tela tudo do dialogo0,
@@ -937,8 +975,8 @@ function abInitSeg4(){
    animações já usadas antes. */
 function abFgShow(text){
   var el = abEl('abFgTextInner');
+  el.classList.remove('in','out');
   el.textContent = text;
-  el.classList.remove('out');
   void el.offsetWidth; /* reinicia a animação a cada troca de texto */
   el.classList.add('in');
 }
@@ -946,6 +984,71 @@ function abFgHide(){
   var el = abEl('abFgTextInner');
   el.classList.remove('in');
   el.classList.add('out');
+}
+
+/* ===== Sequência das ciências (dialogo1.2) ===== */
+/* título no topo (Biologia / Física / Astronomia) */
+function abSciShow(text){
+  var el = abEl('abSciTitleInner');
+  el.classList.remove('in','out');
+  el.textContent = text;
+  void el.offsetWidth;
+  el.classList.add('in');
+}
+function abSciHide(){
+  var el = abEl('abSciTitleInner');
+  el.classList.remove('in');
+  el.classList.add('out');
+}
+
+/* posições (left%, top%, tamanho px) e conjuntos de emojis espalhados */
+var abScatterPos = [
+  [10,28,42],[82,24,38],[26,52,50],[70,58,44],[46,33,36],[88,46,40],
+  [8,66,46],[58,77,38],[30,83,48],[78,80,42],[16,45,34],[64,42,46]
+];
+var abScatterSets = {
+  bio:   ['🐘','🦋','🌳','🐬','🦜','🐢','🌻','🐝','🐙','🦎','🐅','🍄'],
+  fis:   ['🧲','⚡','🌈','🔥','💧','🌀','🔊','☀️','🪞','🌡️','💡','🎢'],
+  astro: ['🪐','🌍','🌙','⭐','☄️','🚀','🛰️','🔭','🌌','🌠','✨','🌟']
+};
+function abScatter(setName){
+  var box = abEl('abScatter');
+  box.innerHTML = '';
+  var items = abScatterSets[setName] || [];
+  for(var i=0;i<items.length && i<abScatterPos.length;i++){
+    var p = abScatterPos[i];
+    var s = document.createElement('span');
+    s.className = 'ab-scatter-item in';
+    s.style.left = p[0] + '%';
+    s.style.top = p[1] + '%';
+    s.style.fontSize = p[2] + 'px';
+    s.textContent = items[i];
+    box.appendChild(s);
+  }
+}
+function abScatterClear(){
+  abEl('abScatter').querySelectorAll('.ab-scatter-item').forEach(function(it){
+    it.classList.remove('in');
+    it.classList.add('out');
+  });
+}
+
+/* fecho "E a Química?" */
+function abChemShow(){ abEl('abChemQ').classList.add('show'); }
+function abChemReset(){
+  ['abChemQ','abChemS1','abChemS2'].forEach(function(id){ abEl(id).classList.remove('show'); });
+}
+
+/* onStart do segmento 5 (dialogo1.2): some o texto anterior e limpa o palco. */
+function abInitSeg5(){
+  abSpotlight(false);
+  abNavDemoEnd();
+  abEl('abChapter').classList.add('gone');
+  abEl('abPhone').classList.remove('show');
+  abFgHide();        /* some "Pra que serve uma ciência?" */
+  abSciHide();
+  abScatterClear();
+  abChemReset();
 }
 
 /* Define a palavra do "Assunto:" */
@@ -1029,6 +1132,24 @@ function abCuesSeg4(){
     { time:18.0, done:false, fn:function(){ abFgShow('Existem por causa da Química'); } },
     { time:26.0, done:false, fn:function(){ abFgHide(); } },
     { time:27.5, done:false, fn:function(){ abFgShow('Pra que serve uma ciência?'); } }
+  ];
+}
+
+/* ---- Cues do segmento 5 (dialogo1.2): ciências + fecho da Química ---- */
+function abCuesSeg5(){
+  return [
+    { time:1.0,  done:false, fn:function(){ abFgShow('Ciências produzem conhecimento confiável'); } },
+    { time:4.0,  done:false, fn:function(){ abFgHide(); abScatterClear(); abSciShow('Biologia'); } },
+    { time:7.0,  done:false, fn:function(){ abScatter('bio'); } },
+    { time:8.0,  done:false, fn:function(){ abScatterClear(); abSciShow('Física'); } },
+    { time:9.0,  done:false, fn:function(){ abScatter('fis'); } },
+    { time:11.0, done:false, fn:function(){ abScatterClear(); abSciHide(); } },
+    { time:11.3, done:false, fn:function(){ abSciShow('Astronomia'); } },
+    { time:13.0, done:false, fn:function(){ abScatter('astro'); } },
+    { time:15.0, done:false, fn:function(){ abScatterClear(); abSciHide(); } },
+    { time:15.4, done:false, fn:function(){ abChemShow(); } },
+    { time:21.0, done:false, fn:function(){ abEl('abChemS1').classList.add('show'); } },
+    { time:23.0, done:false, fn:function(){ abEl('abChemS2').classList.add('show'); } }
   ];
 }
 
