@@ -295,6 +295,13 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-chapter-sub.show{opacity:1;transform:none}
 .ab-chapter-sub.orange{background:linear-gradient(135deg,var(--amber) 0%,var(--orange) 45%,var(--coral) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.5px;transform:scale(1.06);transition:transform .9s cubic-bezier(.22,1,.36,1),letter-spacing .9s ease}
 
+/* Head text "O que é a Química?" (entra no dialogo1.0) */
+.ab-chapter-head{display:flex;flex-direction:column;align-items:center;gap:15px;margin-top:8px}
+.ab-chapter-head-line{width:0;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--orange),transparent);box-shadow:0 0 16px rgba(255,122,24,.55);transition:width 1s cubic-bezier(.22,1,.36,1) .12s}
+.ab-chapter-head-text{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(31px,8.6vw,52px);line-height:1.07;letter-spacing:-.6px;color:var(--text);text-shadow:0 6px 34px rgba(255,122,24,.3);opacity:0;transform:translateY(22px) scale(.9);filter:blur(8px);transition:opacity .95s cubic-bezier(.22,1,.36,1),transform .95s cubic-bezier(.22,1,.36,1),filter .95s ease}
+.ab-chapter-head.show .ab-chapter-head-line{width:66px}
+.ab-chapter-head.show .ab-chapter-head-text{opacity:1;transform:none;filter:blur(0)}
+
 /* Fase "subir": o conteúdo antigo sai por cima e o "Capítulo 1" sobe ao topo */
 .ab-stage.chapter-rise #abContent{transform:translateY(calc(-1 * var(--rise,0px)));transition:transform 1.15s cubic-bezier(.5,0,.18,1)}
 .ab-stage.chapter-rise #abSeq,.ab-stage.chapter-rise #abJourney,.ab-stage.chapter-rise #abCarousel{opacity:0;transition:opacity .75s ease}
@@ -405,6 +412,10 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ab-chapter" id="abChapter">
           <div class="ab-chapter-num" id="abChapterNum">Capítulo 1</div>
           <div class="ab-chapter-sub" id="abChapterSub">O invisível que constrói o mundo</div>
+          <div class="ab-chapter-head" id="abChapterHead">
+            <span class="ab-chapter-head-line"></span>
+            <span class="ab-chapter-head-text">O que é a Química?</span>
+          </div>
         </div>
       </div>
 
@@ -798,6 +809,7 @@ function abResetSeg0(){
   if(ch){ ch.style.display = 'none'; }
   abEl('abChapterNum').classList.remove('show');
   abEl('abChapterSub').classList.remove('show','orange');
+  abEl('abChapterHead').classList.remove('show');
 }
 
 /* Início do segmento 1 (dialogo0.1): mantém na tela tudo do dialogo0,
@@ -822,6 +834,7 @@ function abInitSeg2(){
   ch.style.display = 'flex';
   abEl('abChapterNum').classList.remove('show');
   abEl('abChapterSub').classList.remove('show','orange');
+  abEl('abChapterHead').classList.remove('show');
   void ch.offsetWidth; /* reflow: fixa o estado base antes de animar */
   /* dispara a subida + entrada dramática de "Capítulo 1" */
   content.style.setProperty('--rise', Math.max(0, ch.offsetTop) + 'px');
@@ -904,7 +917,8 @@ function abCuesSeg2(){
 /* ---- Cues do segmento 3 (dialogo1.0): subtítulo no laranja da capa ---- */
 function abCuesSeg3(){
   return [
-    { time:0.1, done:false, fn:function(){ abEl('abChapterSub').classList.add('orange'); } }
+    { time:0.1, done:false, fn:function(){ abEl('abChapterSub').classList.add('orange'); } },
+    { time:0.5, done:false, fn:function(){ abEl('abChapterHead').classList.add('show'); } }
   ];
 }
 
