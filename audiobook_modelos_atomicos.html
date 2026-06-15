@@ -574,7 +574,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.0.7" alt="Estado físico da matéria" draggable="false">
         </div>
         <div class="ab-state-label" id="abStateLabel">Sólido</div>
         <div class="ab-states-dots" id="abStatesDots">
@@ -585,15 +585,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.0.6" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.0.6" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.0.6" alt="Luz da Lua" draggable="false"><span>Luz da Lua</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.0.7" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.0.7" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.0.7" alt="Luz da Lua" draggable="false"><span>Luz da Lua</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.6" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.7" preload="auto"></audio>
     </div>
   </div>
 
@@ -779,7 +779,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.0.6</div>
+<div class="app-version" id="appVersion">v1.0.7</div>
 
 </div>
 <script>
@@ -892,13 +892,13 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.0.6',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.0.6', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.0.6',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.0.6',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.0.6', build:abCuesSeg3,    onStart:abInitSeg3,   next:true  },
-    { src:'audio/dialogo1.1.mp3?v=1.0.6', build:abCuesSeg4,    onStart:abInitSeg4,   next:true  },
-    { src:'audio/dialogo1.2.mp3?v=1.0.6', build:abCuesSeg5,    onStart:abInitSeg5,   next:false }
+    { src:'audio/dialogo0.mp3?v=1.0.7',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.0.7', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.0.7',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.0.7',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.0.7', build:abCuesSeg3,    onStart:abInitSeg3,   next:true  },
+    { src:'audio/dialogo1.1.mp3?v=1.0.7', build:abCuesSeg4,    onStart:abInitSeg4,   next:true  },
+    { src:'audio/dialogo1.2.mp3?v=1.0.7', build:abCuesSeg5,    onStart:abInitSeg5,   next:false }
   ]
 };
 
@@ -1069,7 +1069,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.0.6'); abSfx('audio/yes.mp3?v=1.0.6');
+    abSfx('audio/applause.mp3?v=1.0.7'); abSfx('audio/yes.mp3?v=1.0.7');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1151,9 +1151,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg', label:'Líquido' },
-  { img:'images/estado-gas.svg',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.0.7',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.0.7', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.0.7',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false;
 
