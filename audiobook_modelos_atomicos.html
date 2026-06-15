@@ -608,7 +608,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.2" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.3" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -636,7 +636,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.2" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.3" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -646,15 +646,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.2" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.2" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.2" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.3" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.3" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.3" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.2" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.3" preload="auto"></audio>
     </div>
   </div>
 
@@ -840,7 +840,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.2</div>
+<div class="app-version" id="appVersion">v1.1.3</div>
 
 </div>
 <script>
@@ -889,9 +889,9 @@ function goPage(topicIdx, pageIdx) {
 /* time = null  -> ainda não definido (clique não navega).
    Depois é só preencher time (em segundos) e, se quiser, screen/topic. */
 var timestamps = [
-  { title:'Introdução',                    sub:'', time:null, seg:0 },
-  { title:'Capítulo 1: O que é a Química',  sub:'', time:null, seg:2 },
-  { title:'Marcador 3',  sub:'Título provisório', time:null },
+  { title:'Introdução',         sub:'', time:null, seg:0 },
+  { title:'O que é matéria',    sub:'', time:null, seg:2 },
+  { title:'A ideia do átomo',   sub:'', time:null, seg:7 },
   { title:'Marcador 4',  sub:'Título provisório', time:null },
   { title:'Marcador 5',  sub:'Título provisório', time:null },
   { title:'Marcador 6',  sub:'Título provisório', time:null },
@@ -953,14 +953,14 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.2',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.2', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.2',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.2',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.2', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.2', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.2', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.2', build:abCuesAtom,    onStart:abInitAtom,        next:false }                          /* o átomo (Demócrito) */
+    { src:'audio/dialogo0.mp3?v=1.1.3',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.3', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.3',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.3',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.3', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.3', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.3', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.3', build:abCuesAtom,    onStart:abInitAtom,        next:false }                          /* o átomo (Demócrito) */
   ]
 };
 
@@ -1134,7 +1134,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.2'); abSfx('audio/yes.mp3?v=1.1.2');
+    abSfx('audio/applause.mp3?v=1.1.3'); abSfx('audio/yes.mp3?v=1.1.3');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1217,9 +1217,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.2',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.2', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.2',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.3',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.3', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.3',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1352,7 +1352,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.2'); abSfx('audio/yes.mp3?v=1.1.2'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.3'); abSfx('audio/yes.mp3?v=1.1.3'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1398,10 +1398,17 @@ function abAtomReset(){
   abEl('abAtomF1').classList.remove('show'); abEl('abAtomF2').classList.remove('show');
   abEl('abAtom').style.display='none';
 }
-/* onStart do dialogo1.3: limpa o que sobrou e prepara a cena do átomo. */
+/* onStart do dialogo1.3: limpa o que sobrou e prepara a cena do átomo.
+   (também cobre o acesso direto pelo marcador "A ideia do átomo".) */
 function abInitAtom(){
   abSpotlight(false); abNavDemoEnd();
   abStatesReset(); abShatterStop(); abMatTopReset(); abLightReset();
+  /* esconde restos de outras cenas (caso venha direto pelo marcador) */
+  abEl('abSeq').style.display='none';
+  abEl('abJourney').classList.remove('show');
+  abEl('abCarousel').classList.remove('show');
+  abEl('abChapter').classList.add('gone');
+  abMateriaReset(); abChemReset(); abPhoneReset();
   abAtomReset();
   abEl('abAtom').style.display='flex';
   abShowFab(true);
