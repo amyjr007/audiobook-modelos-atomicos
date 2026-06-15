@@ -409,12 +409,12 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-states{position:fixed;inset:0;z-index:107;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;pointer-events:none;perspective:1100px}
 .ab-states-card{width:min(74vw,330px);height:min(74vw,330px);max-height:46vh;pointer-events:auto;cursor:grab;touch-action:pan-y;border-radius:26px;background:radial-gradient(circle at 50% 38%,rgba(255,122,24,.10),rgba(22,12,5,.55) 72%);border:1px solid rgba(255,122,24,.26);box-shadow:0 18px 50px rgba(0,0,0,.5);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;will-change:transform,opacity;opacity:0;-webkit-user-select:none;user-select:none}
 .ab-states-card:active{cursor:grabbing}
-.ab-state-img{width:86%;height:86%;object-fit:contain;pointer-events:none;-webkit-user-drag:none}
+.ab-state-img{width:86%;height:86%;object-fit:contain;pointer-events:none;-webkit-user-drag:none;transform-origin:center;transition:transform .35s cubic-bezier(.22,1,.36,1)}
 .ab-state-label{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(20px,5.6vw,30px);background:linear-gradient(135deg,var(--amber),var(--orange) 50%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.3px}
 .ab-states-dots{display:flex;gap:8px}
 .ab-sdot{width:8px;height:8px;border-radius:50%;background:rgba(255,122,24,.3);transition:all .25s}
 .ab-sdot.active{background:var(--orange);width:20px;border-radius:4px}
-.ab-states-hand{top:auto;bottom:18%;margin-top:0}
+.ab-states-hand{top:calc(50% - 38px);bottom:auto;margin-top:-22px}
 
 .ab-quiz{position:fixed;left:50%;top:58%;transform:translateX(-50%);z-index:108;display:flex;gap:11px;width:94%;max-width:450px;justify-content:center;pointer-events:none}
 .ab-card{pointer-events:auto;flex:1 1 0;max-width:135px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px 11px;border-radius:16px;background:rgba(22,12,5,.66);border:1px solid rgba(255,122,24,.28);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text2);backdrop-filter:blur(6px);opacity:0;transform:translateY(18px) scale(.92);transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .25s ease,border-color .2s ease,box-shadow .25s ease,color .2s ease}
@@ -574,7 +574,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.0.7" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.0.8" alt="Estado físico da matéria" draggable="false">
         </div>
         <div class="ab-state-label" id="abStateLabel">Sólido</div>
         <div class="ab-states-dots" id="abStatesDots">
@@ -585,15 +585,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.0.7" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.0.7" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.0.7" alt="Luz da Lua" draggable="false"><span>Luz da Lua</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.0.8" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.0.8" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.0.8" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.7" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.8" preload="auto"></audio>
     </div>
   </div>
 
@@ -779,7 +779,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.0.7</div>
+<div class="app-version" id="appVersion">v1.0.8</div>
 
 </div>
 <script>
@@ -892,18 +892,19 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.0.7',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.0.7', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.0.7',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.0.7',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.0.7', build:abCuesSeg3,    onStart:abInitSeg3,   next:true  },
-    { src:'audio/dialogo1.1.mp3?v=1.0.7', build:abCuesSeg4,    onStart:abInitSeg4,   next:true  },
-    { src:'audio/dialogo1.2.mp3?v=1.0.7', build:abCuesSeg5,    onStart:abInitSeg5,   next:false }
+    { src:'audio/dialogo0.mp3?v=1.0.8',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.0.8', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.0.8',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.0.8',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.0.8', build:abCuesSeg3,    onStart:abInitSeg3,   next:true  },
+    { src:'audio/dialogo1.1.mp3?v=1.0.8', build:abCuesSeg4,    onStart:abInitSeg4,   next:true  },
+    { src:'audio/dialogo1.2.mp3?v=1.0.8', build:abCuesSeg5,    onStart:abInitSeg5,   next:false }
   ]
 };
 
 function abEl(id){ return document.getElementById(id); }
 function abSetFab(playing){ abEl('abFabIcon').textContent = playing ? '⏸' : '▶'; }
+function abShowFab(show){ abEl('abFab').style.display = show ? '' : 'none'; }
 
 function abInit(){
   if(ab.inited) return;
@@ -968,6 +969,7 @@ function startSegment(n){
 /* Reset dos visuais do segmento 0 (dialogo0) */
 function abResetSeg0(){
   ab.index = 0; ab.userInteracted = false;
+  abShowFab(true);
   abEl('abStage').classList.remove('with-carousel');
   abEl('abCredit').classList.remove('show');
   abEl('abSubject').classList.remove('show');
@@ -1012,6 +1014,7 @@ function abInitSeg1(){
 function abInitSeg2(){
   abSpotlight(false);
   abNavDemoEnd();
+  abShowFab(false); /* dialogo1A (intro): sem botão de play */
   abEl('abStage').classList.add('with-carousel');
   /* estado base limpo antes de animar */
   abEl('abStage').classList.remove('chapter-rise');
@@ -1069,7 +1072,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.0.7'); abSfx('audio/yes.mp3?v=1.0.7');
+    abSfx('audio/applause.mp3?v=1.0.8'); abSfx('audio/yes.mp3?v=1.0.8');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1120,6 +1123,7 @@ function abMateriaReset(){
 function abInitMateria(){
   abSpotlight(false);
   abNavDemoEnd();
+  abShowFab(true); /* dialogo1: o botão de play volta */
   abMateriaReset();
 }
 
@@ -1151,23 +1155,39 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.0.7',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.0.7', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.0.7',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.0.8',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.0.8', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.0.8',     label:'Gasoso'  }
 ];
-var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false;
+var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false;
 
 function abStatesReset(){
   var s=abEl('abStates'); s.classList.remove('show'); s.style.display='none';
   abEl('abStatesHand').className='ab-hand ab-states-hand';
-  abStateIdx=0; abStatesShown=false; abStatesUser=false; abStatesFlipping=false;
+  abStateIdx=0; abStatesShown=false; abStatesUser=false; abStatesFlipping=false; abSolidBig=false;
   var card=abEl('abStatesCard');
   card.style.transition='none'; card.style.transform='rotateY(0deg)'; card.style.opacity='0';
+  var img=abEl('abStateImg'); img.style.transition='none'; img.style.transform='scale(1)';
   abStatesDots();
 }
 function abStatesDots(){
   var dots=abEl('abStatesDots').children;
   for(var k=0;k<dots.length;k++){ dots[k].classList.toggle('active', k===abStateIdx); }
+}
+/* sólido selecionado por swipe fica 10% maior; demais estados em tamanho normal */
+function abStateImgScale(){
+  var img=abEl('abStateImg');
+  img.style.transition='transform .35s cubic-bezier(.22,1,.36,1)';
+  img.style.transform=(abStateIdx===0 && abSolidBig) ? 'scale(1.1)' : 'scale(1)';
+}
+/* Continua o dialogo1.0 a partir dos 20s (de onde foi cortado). */
+function abResumeSeg3From20(){
+  if(!ab.audio || !ab.audio.paused) return;   /* já tocando: não reinicia */
+  ab.audio.currentTime = 20;
+  ab.playing=true; ab.ended=false; ab.awaitingNext=false;
+  abShowFab(true); abSetFab(true);
+  var p=ab.audio.play(); if(p && p.catch){ p.catch(function(){}); }
+  if(!ab.raf){ abLoop(); }
 }
 
 /* Mostra o estado `to`. 1ª vez: vira de perfil p/ frente. Demais: virada lateral. */
@@ -1179,7 +1199,7 @@ function abStatesGo(to, user){
   if(!abStatesShown){
     abStatesShown=true; abStateIdx=to;
     var s=abEl('abStates'); s.style.display=''; void s.offsetWidth; s.classList.add('show');
-    img.src=abStateList[to].img; lbl.textContent=abStateList[to].label; abStatesDots();
+    img.src=abStateList[to].img; lbl.textContent=abStateList[to].label; abStatesDots(); abStateImgScale();
     card.style.transition='none'; card.style.transform='rotateY(-92deg)'; card.style.opacity='0';
     void card.offsetWidth;
     card.style.transition='transform .55s cubic-bezier(.22,1,.36,1),opacity .55s ease';
@@ -1187,12 +1207,14 @@ function abStatesGo(to, user){
     return;
   }
   if(to===abStateIdx) return;
+  /* sólido escolhido por swipe: retoma o áudio (20s) e cresce 10% */
+  if(user && to===0){ abSolidBig=true; abResumeSeg3From20(); }
   var dir = to>abStateIdx ? 1 : -1;
   abStateIdx=to; abStatesFlipping=true;
   card.style.transition='transform .24s ease-in,opacity .24s ease-in';
   card.style.transform='rotateY('+(dir*90)+'deg)'; card.style.opacity='0.2';
   setTimeout(function(){
-    img.src=abStateList[to].img; lbl.textContent=abStateList[to].label; abStatesDots();
+    img.src=abStateList[to].img; lbl.textContent=abStateList[to].label; abStatesDots(); abStateImgScale();
     card.style.transition='none'; card.style.transform='rotateY('+(-dir*90)+'deg)';
     void card.offsetWidth;
     card.style.transition='transform .32s cubic-bezier(.22,1,.36,1),opacity .32s ease';
