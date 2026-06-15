@@ -1,5 +1,5 @@
 /* Service Worker — Audiobook Modelos Atômicos (PWA offline + auto-update) */
-const CACHE = 'audiobook-atomos-b20260615184121'; /* BUILD — carimbado automaticamente pelo git hook */
+const CACHE = 'audiobook-atomos-b20260615192151'; /* BUILD — carimbado automaticamente pelo git hook */
 
 /* App shell pré-cacheado para funcionar offline. */
 const SHELL = [
@@ -48,13 +48,46 @@ self.addEventListener('install', function (e) {
   );
 });
 
-/* Ativa: remove caches antigos (de builds anteriores). */
+/* Ativa: remove caches antigos (de builds anteriores) e aquece o áudio. */
 self.addEventListener('activate', function (e) {
   e.waitUntil(
     caches.keys()
       .then(function (keys) { return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); })); })
       .then(function () { return self.clients.claim(); })
+      .then(function () { return warmAudio(); }) /* garante todo o áudio no cache p/ saltos instantâneos/offline */
   );
+});
+
+/* Aquece o cache de áudio de forma RESILIENTE: ao contrário do pré-cache do
+   install (que falha em silêncio), aqui cada mp3 é tentado várias vezes com
+   intervalo, de modo que uma oscilação de rede não deixe um arquivo de fora.
+   É isso que faz um salto direto (ex.: marcador "A ideia do átomo" ->
+   dialogo1.3.mp3, o maior arquivo) tocar na hora em vez de bufferizar. */
+function warmAudio() {
+  var AUDIO = SHELL.filter(function (u) { return /\.mp3$/.test(u); });
+  return caches.open(CACHE).then(function (c) {
+    function ensure(u, tries) {
+      return c.match(u, { ignoreSearch: true }).then(function (hit) {
+        if (hit) return; /* já está no cache */
+        return fetch(u, { cache: 'reload' }).then(function (res) {
+          if (res && (res.ok || res.type === 'opaque')) { return c.put(u, res.clone()); }
+          throw new Error('bad-response');
+        }).catch(function () {
+          if (tries > 0) {
+            return new Promise(function (r) { setTimeout(r, 1500); })
+              .then(function () { return ensure(u, tries - 1); });
+          }
+        });
+      });
+    }
+    return Promise.all(AUDIO.map(function (u) { return ensure(u, 4); }));
+  });
+}
+
+/* Permite que a página peça o aquecimento (cobre SWs já instalados, que não
+   disparam 'activate' de novo). */
+self.addEventListener('message', function (e) {
+  if (e.data && e.data.type === 'warm-audio') { e.waitUntil(warmAudio()); }
 });
 
 function abIsHTML(req) {
