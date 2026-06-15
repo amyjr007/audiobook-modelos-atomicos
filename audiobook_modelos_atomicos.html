@@ -415,6 +415,18 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-sdot{width:8px;height:8px;border-radius:50%;background:rgba(255,122,24,.3);transition:all .25s}
 .ab-sdot.active{background:var(--orange);width:20px;border-radius:4px}
 .ab-states-hand{top:calc(50% - 38px);bottom:auto;margin-top:-22px}
+/* mãozinha de swipe agora desliza p/ a direita (sentido do sólido) */
+.ab-states-hand.hint{animation:abHandSwipeR 1.9s ease-in-out infinite}
+@keyframes abHandSwipeR{0%{transform:translateX(-78px);opacity:0}18%{opacity:1}82%{opacity:1}100%{transform:translateX(92px);opacity:0}}
+/* mãozinha de toque (bate no card com o indicador) */
+.ab-states-hand.tap{font-size:48px;animation:abHandTap 1.05s ease-in-out infinite}
+@keyframes abHandTap{0%,100%{transform:translateX(-22px) translateY(-18px);opacity:.85}45%,55%{transform:translateX(-22px) translateY(10px);opacity:1}}
+/* fissuras sobre a imagem, reveladas em 2 estágios */
+.ab-crack{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.ab-crack g{filter:drop-shadow(0 0 2px rgba(0,0,0,.65))}
+.ab-crack .c1,.ab-crack .c2{opacity:0;transition:opacity .14s ease}
+.ab-crack.s1 .c1{opacity:1}
+.ab-crack.s2 .c1,.ab-crack.s2 .c2{opacity:1}
 
 .ab-quiz{position:fixed;left:50%;top:58%;transform:translateX(-50%);z-index:108;display:flex;gap:11px;width:94%;max-width:450px;justify-content:center;pointer-events:none}
 .ab-card{pointer-events:auto;flex:1 1 0;max-width:135px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px 11px;border-radius:16px;background:rgba(22,12,5,.66);border:1px solid rgba(255,122,24,.28);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text2);backdrop-filter:blur(6px);opacity:0;transform:translateY(18px) scale(.92);transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .25s ease,border-color .2s ease,box-shadow .25s ease,color .2s ease}
@@ -574,7 +586,20 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.0.8" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.0.9" alt="Estado físico da matéria" draggable="false">
+          <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
+              <path d="M150 150 L120 104 L128 74"/>
+              <path d="M150 150 L188 190 L200 218"/>
+            </g>
+            <g class="c2" stroke="#ffffff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".85">
+              <path d="M150 150 L100 160 L74 156"/>
+              <path d="M150 150 L186 114 L214 100"/>
+              <path d="M120 104 L98 110"/>
+              <path d="M188 190 L214 186"/>
+              <path d="M150 150 L148 200 L140 224"/>
+            </g>
+          </svg>
         </div>
         <div class="ab-state-label" id="abStateLabel">Sólido</div>
         <div class="ab-states-dots" id="abStatesDots">
@@ -585,15 +610,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.0.8" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.0.8" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.0.8" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.0.9" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.0.9" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.0.9" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.8" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.9" preload="auto"></audio>
     </div>
   </div>
 
@@ -779,7 +804,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.0.8</div>
+<div class="app-version" id="appVersion">v1.0.9</div>
 
 </div>
 <script>
@@ -892,13 +917,13 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.0.8',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.0.8', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.0.8',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.0.8',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.0.8', build:abCuesSeg3,    onStart:abInitSeg3,   next:true  },
-    { src:'audio/dialogo1.1.mp3?v=1.0.8', build:abCuesSeg4,    onStart:abInitSeg4,   next:true  },
-    { src:'audio/dialogo1.2.mp3?v=1.0.8', build:abCuesSeg5,    onStart:abInitSeg5,   next:false }
+    { src:'audio/dialogo0.mp3?v=1.0.9',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.0.9', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.0.9',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.0.9',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.0.9', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.0.9', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.0.9', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }  /* sobre o gás; fim -> toque no vidro */
   ]
 };
 
@@ -1072,7 +1097,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.0.8'); abSfx('audio/yes.mp3?v=1.0.8');
+    abSfx('audio/applause.mp3?v=1.0.9'); abSfx('audio/yes.mp3?v=1.0.9');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1155,37 +1180,39 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.0.8',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.0.8', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.0.8',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.0.9',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.0.9', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.0.9',     label:'Gasoso'  }
 ];
-var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false;
+var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
 function abStatesReset(){
   var s=abEl('abStates'); s.classList.remove('show'); s.style.display='none';
   abEl('abStatesHand').className='ab-hand ab-states-hand';
-  abStateIdx=0; abStatesShown=false; abStatesUser=false; abStatesFlipping=false; abSolidBig=false;
+  abStateIdx=0; abStatesShown=false; abStatesUser=false; abStatesFlipping=false; abSolidBig=false; abStatesLocked=false;
+  abTapMode=null; abCrackReset(); abShatterStop();
   var card=abEl('abStatesCard');
   card.style.transition='none'; card.style.transform='rotateY(0deg)'; card.style.opacity='0';
   var img=abEl('abStateImg'); img.style.transition='none'; img.style.transform='scale(1)';
+  var lbl=abEl('abStateLabel'); lbl.style.opacity='1';
   abStatesDots();
 }
 function abStatesDots(){
   var dots=abEl('abStatesDots').children;
   for(var k=0;k<dots.length;k++){ dots[k].classList.toggle('active', k===abStateIdx); }
 }
-/* sólido selecionado por swipe fica 10% maior; demais estados em tamanho normal */
+/* sólido selecionado por swipe fica 20% maior; demais estados em tamanho normal */
 function abStateImgScale(){
   var img=abEl('abStateImg');
   img.style.transition='transform .35s cubic-bezier(.22,1,.36,1)';
-  img.style.transform=(abStateIdx===0 && abSolidBig) ? 'scale(1.1)' : 'scale(1)';
+  img.style.transform=(abStateIdx===0 && abSolidBig) ? 'scale(1.2)' : 'scale(1)';
 }
 /* Continua o dialogo1.0 a partir dos 20s (de onde foi cortado). */
 function abResumeSeg3From20(){
   if(!ab.audio || !ab.audio.paused) return;   /* já tocando: não reinicia */
   ab.audio.currentTime = 20;
   ab.playing=true; ab.ended=false; ab.awaitingNext=false;
-  abShowFab(true); abSetFab(true);
+  abSetFab(true);
   var p=ab.audio.play(); if(p && p.catch){ p.catch(function(){}); }
   if(!ab.raf){ abLoop(); }
 }
@@ -1193,7 +1220,7 @@ function abResumeSeg3From20(){
 /* Mostra o estado `to`. 1ª vez: vira de perfil p/ frente. Demais: virada lateral. */
 function abStatesGo(to, user){
   to=Math.max(0, Math.min(abStateList.length-1, to));
-  if(abStatesFlipping) return;
+  if(abStatesFlipping || abStatesLocked) return;
   if(user){ abStatesUser=true; abEl('abStatesHand').className='ab-hand ab-states-hand'; }
   var card=abEl('abStatesCard'), img=abEl('abStateImg'), lbl=abEl('abStateLabel');
   if(!abStatesShown){
@@ -1207,8 +1234,8 @@ function abStatesGo(to, user){
     return;
   }
   if(to===abStateIdx) return;
-  /* sólido escolhido por swipe: retoma o áudio (20s) e cresce 10% */
-  if(user && to===0){ abSolidBig=true; abResumeSeg3From20(); }
+  /* sólido escolhido por swipe: retoma o áudio (20s), cresce 20% e trava o swipe */
+  if(user && to===0){ abSolidBig=true; abStatesLocked=true; abResumeSeg3From20(); }
   var dir = to>abStateIdx ? 1 : -1;
   abStateIdx=to; abStatesFlipping=true;
   card.style.transition='transform .24s ease-in,opacity .24s ease-in';
@@ -1224,7 +1251,19 @@ function abStatesGo(to, user){
 }
 function abStatesIntro(i){ abStatesGo(i, false); }
 
-/* Mãozinha deslizando p/ o lado (igual ao guia do carrossel) */
+/* Troca direta de estado (sem swipe): usada nas transições de quebra. */
+function abShowState(idx){
+  abStateIdx=idx; abSolidBig=false; abCrackReset();
+  var card=abEl('abStatesCard'), img=abEl('abStateImg'), lbl=abEl('abStateLabel');
+  img.src=abStateList[idx].img; lbl.textContent=abStateList[idx].label; abStatesDots();
+  img.style.transition='none'; img.style.transform='scale(1)'; lbl.style.opacity='1';
+  card.style.transition='none'; card.style.transform='rotateY(-80deg) scale(.9)'; card.style.opacity='0';
+  void card.offsetWidth;
+  card.style.transition='transform .5s cubic-bezier(.22,1,.36,1),opacity .5s ease';
+  card.style.transform='rotateY(0deg) scale(1)'; card.style.opacity='1';
+}
+
+/* Mãozinha deslizando p/ a direita (guia do swipe) */
 function abStatesHint(){
   if(abStatesUser) return;
   abEl('abStatesHand').className='ab-hand ab-states-hand hint';
@@ -1234,7 +1273,7 @@ function abStatesHint(){
 var abStDrag=false, abStX=0, abStDX=0;
 function abStatesSetup(){
   var card=abEl('abStatesCard');
-  card.addEventListener('pointerdown', function(e){ if(!abStatesShown) return; abStDrag=true; abStX=e.clientX; abStDX=0; });
+  card.addEventListener('pointerdown', function(e){ if(!abStatesShown || abStatesLocked || abTapMode) return; abStDrag=true; abStX=e.clientX; abStDX=0; });
   window.addEventListener('pointermove', function(e){ if(abStDrag){ abStDX=e.clientX-abStX; } });
   window.addEventListener('pointerup', function(){
     if(!abStDrag) return; abStDrag=false;
@@ -1242,14 +1281,123 @@ function abStatesSetup(){
     if(abStDX < -th){ abStatesGo(abStateIdx+1, true); }      /* swipe esquerda -> próximo */
     else if(abStDX > th){ abStatesGo(abStateIdx-1, true); }  /* swipe direita -> anterior */
   });
+  card.addEventListener('click', function(){ if(abTapMode){ abTapHit(); } });
 }
 
-/* Corta o áudio aos 20s e mostra a mãozinha p/ explorar os estados. */
+/* Corta o áudio aos 20s: esconde o play e mostra a mãozinha de swipe. */
 function abCutSeg3(){
   if(ab.audio){ ab.audio.pause(); }
-  ab.playing=false; ab.ended=true; ab.awaitingNext=true; /* próximo play avança */
-  abSetFab(false);
+  ab.playing=false; ab.ended=false; ab.awaitingNext=false;
+  abShowFab(false);
   abStatesHint();
+}
+
+/* ===== Toque p/ quebrar (gelo / copo / vidro do gás) ===== */
+var abTapMode=null;
+function abCrackReset(){ var c=abEl('abCrack'); if(c){ c.classList.remove('s1','s2'); } }
+function abCrackShow(stage){ var c=abEl('abCrack'); c.classList.remove('s1','s2'); c.classList.add(stage===1?'s1':'s2'); }
+
+/* Liga o modo de toque: mãozinha batendo no card. onBreak roda após a quebra. */
+function abTapInit(kind, onBreak, sfx){
+  abTapMode={ kind:kind, taps:0, onBreak:onBreak, sfx:sfx!==false };
+  abCrackReset(); abShowFab(false);
+  abEl('abStatesHand').className='ab-hand ab-states-hand tap';
+}
+/* Cada toque: 1 e 2 trincam; 3 quebra (sfx + estilhaços) e segue. */
+function abTapHit(){
+  if(!abTapMode) return;
+  abTapMode.taps++;
+  var card=abEl('abStatesCard');
+  card.style.transition='transform .12s ease'; card.style.transform='scale(.96)';
+  setTimeout(function(){ card.style.transform='scale(1)'; }, 110);
+  if(abTapMode.taps===1){ abCrackShow(1); }
+  else if(abTapMode.taps===2){ abCrackShow(2); }
+  else {
+    var m=abTapMode; abTapMode=null;
+    abEl('abStatesHand').className='ab-hand ab-states-hand';
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.0.9'); abSfx('audio/yes.mp3?v=1.0.9'); }
+    abBreakNow(m.kind, m.onBreak);
+  }
+}
+/* Quebra: estilhaça (canvas), some o card e chama onBreak. */
+function abBreakNow(kind, onBreak){
+  var card=abEl('abStatesCard'), lbl=abEl('abStateLabel');
+  abShatter(kind);
+  card.style.transition='opacity .35s ease,transform .35s ease';
+  card.style.opacity='0'; card.style.transform='rotateY(0deg) scale(1.08)';
+  lbl.style.opacity='0';
+  setTimeout(function(){ abCrackReset(); if(onBreak){ onBreak(); } }, 820);
+}
+
+/* Transições após cada quebra */
+function abIceBroken(){   abShowState(1); setTimeout(function(){ startSegment(5); }, 650); } /* líquido + dialogo1.1 */
+function abGlassBroken(){ abShowState(2); setTimeout(function(){ startSegment(6); }, 650); } /* gás + dialogo1.2 */
+function abGasFinale(){   /* o vidro quebrou e o gás se espalhou pela tela: fim do Cap.1 */ }
+
+/* Fins de áudio (dialogo1.0/1.1/1.2): liga o toque correspondente. */
+function abSolidAudioEnded(){ if(abSolidBig){ abTapInit('ice',    abIceBroken,   true);  } }
+function abLiquidAudioEnded(){            abTapInit('liquid', abGlassBroken, true);  }
+function abGasAudioEnded(){               abTapInit('gas',    abGasFinale,   false); }
+
+/* onStart de dialogo1.1/1.2: preserva o card de estados (líquido/gás), sem play. */
+function abInitStatesAudio(){ abSpotlight(false); abNavDemoEnd(); abShowFab(false); }
+function abCuesNone(){ return []; }
+
+/* ===== Estilhaços no canvas (gelo / líquido / gás) ===== */
+var abShatterRaf=null;
+function abShatterStop(){
+  if(abShatterRaf){ cancelAnimationFrame(abShatterRaf); abShatterRaf=null; }
+  var cv=abEl('abConfetti'); if(cv){ var c=cv.getContext('2d'); if(c) c.clearRect(0,0,cv.width,cv.height); }
+}
+function abShatter(kind){
+  var cv=abEl('abConfetti'), ctx=cv.getContext('2d');
+  var W=cv.width=window.innerWidth, H=cv.height=window.innerHeight;
+  var cx=W/2, cy=H*0.45, parts=[], i, dur, a, sp;
+  if(kind==='ice'){
+    dur=1500;
+    for(i=0;i<16;i++){ a=Math.random()*6.28; sp=2+Math.random()*5;
+      parts.push({k:'shard',x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3,g:0.24,
+        r:Math.random()*6.28,vr:(Math.random()-.5)*.22,s:24+Math.random()*34,
+        c:Math.random()<.5?'#dff3ff':'#a9e2f4'}); }
+  } else if(kind==='liquid'){
+    dur=1400;
+    for(i=0;i<64;i++){ a=Math.random()*6.28; sp=2+Math.random()*8;
+      parts.push({k:'drop',x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,g:0.32,
+        rad:4+Math.random()*11,c:Math.random()<.5?'#7fd2f5':'#2b86c5'}); }
+  } else { /* gas: nuvem amarela que toma a tela */
+    dur=2300;
+    for(i=0;i<52;i++){ a=Math.random()*6.28; sp=1+Math.random()*4;
+      parts.push({k:'gas',x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,
+        rad:22+Math.random()*70,grow:0.7+Math.random()*1.4,c:'#ffe57a'}); }
+  }
+  var start=performance.now();
+  function frame(t){
+    var el=t-start, fade=Math.max(0,1-el/dur);
+    ctx.clearRect(0,0,W,H);
+    for(var j=0;j<parts.length;j++){
+      var p=parts[j];
+      if(p.k==='shard'){
+        p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.vx*=.99;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r);
+        ctx.globalAlpha=fade; ctx.fillStyle=p.c;
+        ctx.beginPath(); ctx.moveTo(0,-p.s/2); ctx.lineTo(p.s/2,p.s/3); ctx.lineTo(-p.s/3,p.s/2); ctx.closePath(); ctx.fill();
+        ctx.restore();
+      } else if(p.k==='drop'){
+        p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.vx*=.99;
+        ctx.globalAlpha=fade; ctx.fillStyle=p.c;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.rad,0,6.2832); ctx.fill();
+      } else {
+        p.x+=p.vx; p.y+=p.vy; p.rad+=p.grow;
+        ctx.globalAlpha=fade*0.5; ctx.fillStyle=p.c;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.rad,0,6.2832); ctx.fill();
+      }
+    }
+    ctx.globalAlpha=1;
+    if(el<dur){ abShatterRaf=requestAnimationFrame(frame); }
+    else { ctx.clearRect(0,0,W,H); abShatterRaf=null; }
+  }
+  if(abShatterRaf) cancelAnimationFrame(abShatterRaf);
+  abShatterRaf=requestAnimationFrame(frame);
 }
 
 /* ===== Cena do celular (dialogo1.1) ===== */
