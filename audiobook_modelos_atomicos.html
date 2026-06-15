@@ -428,6 +428,28 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-crack.s1 .c1{opacity:1}
 .ab-crack.s2 .c1,.ab-crack.s2 .c2{opacity:1}
 
+/* ===== Cena do átomo (dialogo1.3) ===== */
+.ab-atom{position:fixed;inset:0;z-index:108;display:none;flex-direction:column;align-items:center;justify-content:center;padding:0 7vw;pointer-events:none;text-align:center}
+.ab-atom-stack{display:flex;flex-direction:column;align-items:center;gap:16px;transition:transform 4.6s cubic-bezier(.4,0,.2,1),filter .8s ease,opacity .8s ease}
+.ab-atom-stack.rise{transform:translateY(-15vh)}
+.ab-atom-stack.blur{filter:blur(7px) brightness(.55)}
+.ab-atom-q1,.ab-atom-q2,.ab-atom-q3{opacity:0;transform:translateY(16px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1),max-height .7s ease,margin .7s ease}
+.ab-atom-q1.show,.ab-atom-q2.show,.ab-atom-q3.show{opacity:1;transform:none}
+.ab-atom-q1,.ab-atom-q3{font-family:'Fraunces',serif;font-style:italic;font-weight:900;line-height:1.1;letter-spacing:-.3px;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ab-atom-q1{font-size:clamp(25px,6.6vw,40px);max-width:480px}
+.ab-atom-q3{font-size:clamp(28px,7.6vw,46px)}
+.ab-atom-q2{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(18px,5vw,28px);line-height:1.3;color:var(--text);max-width:440px}
+/* no momento da subida, q1/q2 somem indo p/ cima e liberam espaço */
+.ab-atom-q1.up,.ab-atom-q2.up{opacity:0;transform:translateY(-34px);max-height:0;margin:-9px 0;overflow:hidden}
+.ab-atom-img{margin-top:8px;width:min(56vw,224px);max-height:44vh;object-fit:contain;border-radius:18px;box-shadow:0 16px 44px rgba(0,0,0,.5);opacity:0;transform:translateY(96px) scale(.9);transition:opacity 4.6s ease,transform 4.6s cubic-bezier(.4,0,.2,1)}
+.ab-atom-img.show{opacity:1;transform:translateY(0) scale(1)}
+/* texto final, sobre o conteúdo embaçado */
+.ab-atom-final{position:fixed;inset:0;z-index:109;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:0 8vw;pointer-events:none;text-align:center;opacity:0;transition:opacity .6s ease}
+.ab-atom-final.show{opacity:1}
+.ab-atom-f1,.ab-atom-f2{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(20px,5.6vw,31px);line-height:1.3;color:var(--text);max-width:470px;text-shadow:0 4px 26px rgba(0,0,0,.6);opacity:0;transform:translateY(14px);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1)}
+.ab-atom-f2{font-weight:900;background:linear-gradient(135deg,var(--amber),var(--orange) 50%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ab-atom-f1.show,.ab-atom-f2.show{opacity:1;transform:none}
+
 .ab-quiz{position:fixed;left:50%;top:58%;transform:translateX(-50%);z-index:108;display:flex;gap:11px;width:94%;max-width:450px;justify-content:center;pointer-events:none}
 .ab-card{pointer-events:auto;flex:1 1 0;max-width:135px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px 11px;border-radius:16px;background:rgba(22,12,5,.66);border:1px solid rgba(255,122,24,.28);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text2);backdrop-filter:blur(6px);opacity:0;transform:translateY(18px) scale(.92);transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .25s ease,border-color .2s ease,box-shadow .25s ease,color .2s ease}
 .ab-quiz.show .ab-card{opacity:1;transform:none}
@@ -586,7 +608,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.0" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.1" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -608,17 +630,31 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ab-hand ab-states-hand" id="abStatesHand">👆</div>
       </div>
 
+      <!-- Átomo (dialogo1.3) -->
+      <div class="ab-atom" id="abAtom" style="display:none">
+        <div class="ab-atom-stack" id="abAtomStack">
+          <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
+          <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
+          <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.1" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+        </div>
+      </div>
+      <div class="ab-atom-final" id="abAtomFinal">
+        <div class="ab-atom-f1" id="abAtomF1">A matéria não pode ser dividida infinitamente</div>
+        <div class="ab-atom-f2" id="abAtomF2">Existe um limite mínimo de tamanho chamado átomo</div>
+      </div>
+
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.0" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.0" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.0" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.1" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.1" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.1" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.0" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.1" preload="auto"></audio>
     </div>
   </div>
 
@@ -804,7 +840,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.0</div>
+<div class="app-version" id="appVersion">v1.1.1</div>
 
 </div>
 <script>
@@ -917,13 +953,14 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.0',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.0', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.0',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.0',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.0', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.0', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.0', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }  /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo0.mp3?v=1.1.1',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.1', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.1',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.1',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.1', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.1', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.1', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.1', build:abCuesAtom,    onStart:abInitAtom,        next:false }                          /* o átomo (Demócrito) */
   ]
 };
 
@@ -1097,7 +1134,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.0'); abSfx('audio/yes.mp3?v=1.1.0');
+    abSfx('audio/applause.mp3?v=1.1.1'); abSfx('audio/yes.mp3?v=1.1.1');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1180,9 +1217,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.0',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.0', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.0',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.1',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.1', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.1',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1315,7 +1352,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.0'); abSfx('audio/yes.mp3?v=1.1.0'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.1'); abSfx('audio/yes.mp3?v=1.1.1'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1334,7 +1371,14 @@ function abBreakNow(kind, onBreak){
 /* Transições após cada quebra */
 function abIceBroken(){   abShowState(1); setTimeout(function(){ startSegment(5); }, 650); } /* líquido + dialogo1.1 */
 function abGlassBroken(){ abShowState(2); setTimeout(function(){ startSegment(6); }, 650); } /* gás + dialogo1.2 */
-function abGasFinale(){   /* o vidro quebrou e o gás se espalhou pela tela: fim do Cap.1 */ }
+/* Vidro quebrou e o gás tomou a tela. Ao fim da animação, mostra ▶:
+   clicar toca o dialogo1.3 (segmento 7). */
+function abGasFinale(){
+  setTimeout(function(){
+    abShowFab(true); abSetFab(false);
+    ab.ended=true; ab.awaitingNext=true;   /* próximo play -> dialogo1.3 */
+  }, 1700);
+}
 
 /* Fins de áudio (dialogo1.0/1.1/1.2): liga o toque correspondente. */
 function abSolidAudioEnded(){ if(abSolidBig){ abTapInit('ice',    abIceBroken,   true);  } }
@@ -1344,6 +1388,48 @@ function abGasAudioEnded(){               abTapInit('gas',    abGasFinale,   fal
 /* onStart de dialogo1.1/1.2: preserva o card de estados (líquido/gás), sem play. */
 function abInitStatesAudio(){ abSpotlight(false); abNavDemoEnd(); abShowFab(false); }
 function abCuesNone(){ return []; }
+
+/* ===== Cena do átomo (dialogo1.3) ===== */
+function abAtomReset(){
+  ['abAtomQ1','abAtomQ2','abAtomQ3'].forEach(function(id){ abEl(id).classList.remove('show','up'); });
+  var st=abEl('abAtomStack'); st.classList.remove('rise','blur');
+  abEl('abAtomImg').classList.remove('show');
+  abEl('abAtomFinal').classList.remove('show');
+  abEl('abAtomF1').classList.remove('show'); abEl('abAtomF2').classList.remove('show');
+  abEl('abAtom').style.display='none';
+}
+/* onStart do dialogo1.3: limpa o que sobrou e prepara a cena do átomo. */
+function abInitAtom(){
+  abSpotlight(false); abNavDemoEnd();
+  abStatesReset(); abShatterStop(); abMatTopReset(); abLightReset();
+  abAtomReset();
+  abEl('abAtom').style.display='flex';
+  abShowFab(true);
+}
+function abAtomShow(id){ abEl(id).classList.add('show'); }
+/* 17s: sobe tudo; q1/q2 somem p/ cima e a img7 sobe debaixo até o topo. */
+function abAtomRise(){
+  abEl('abAtomQ1').classList.add('up');
+  abEl('abAtomQ2').classList.add('up');
+  abEl('abAtomStack').classList.add('rise');
+  abEl('abAtomImg').classList.add('show');
+}
+/* 26s/31s: embaça o fundo e mostra os textos finais. */
+function abAtomFinal(n){
+  abEl('abAtomStack').classList.add('blur');
+  abEl('abAtomFinal').classList.add('show');
+  abEl(n===1?'abAtomF1':'abAtomF2').classList.add('show');
+}
+function abCuesAtom(){
+  return [
+    { time:3.0,  done:false, fn:function(){ abAtomShow('abAtomQ1'); } },
+    { time:9.8,  done:false, fn:function(){ abAtomShow('abAtomQ2'); } },
+    { time:14.0, done:false, fn:function(){ abAtomShow('abAtomQ3'); } },
+    { time:17.0, done:false, fn:function(){ abAtomRise(); } },
+    { time:26.0, done:false, fn:function(){ abAtomFinal(1); } },
+    { time:31.0, done:false, fn:function(){ abAtomFinal(2); } }
+  ];
+}
 
 /* ===== Estilhaços no canvas (gelo / líquido / gás) ===== */
 var abShatterRaf=null;
