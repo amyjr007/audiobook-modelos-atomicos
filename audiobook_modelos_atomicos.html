@@ -449,6 +449,25 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-atom-f1,.ab-atom-f2{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(20px,5.6vw,31px);line-height:1.3;color:var(--text);max-width:470px;text-shadow:0 4px 26px rgba(0,0,0,.6);opacity:0;transform:translateY(14px);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1)}
 .ab-atom-f2{font-weight:900;background:linear-gradient(135deg,var(--amber),var(--orange) 50%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .ab-atom-f1.show,.ab-atom-f2.show{opacity:1;transform:none}
+/* fade-out geral da cena do átomo (início do dialogo1.4) */
+.ab-atom.fade,.ab-atom-final.fade{opacity:0!important;transition:opacity 1.1s ease}
+
+/* ===== A maçã (dialogo1.4) ===== */
+.ab-apple{position:fixed;inset:0;z-index:108;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:0 7vw;text-align:center;touch-action:none}
+.ab-apple.shake{animation:abShake2 .42s ease}
+@keyframes abShake2{0%,100%{transform:translate(0,0)}14%{transform:translate(-10px,5px)}28%{transform:translate(9px,-6px)}42%{transform:translate(-8px,-4px)}58%{transform:translate(7px,5px)}74%{transform:translate(-5px,3px)}88%{transform:translate(4px,-2px)}}
+.ab-apple-title{font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(30px,8.5vw,52px);line-height:1.05;letter-spacing:-.4px;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transform:translateY(16px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.ab-apple-title.show{opacity:1;transform:none}
+.ab-apple-stage{position:relative;width:min(72vw,320px);height:min(72vw,320px);display:flex;align-items:center;justify-content:center}
+.ab-apple-img{width:100%;height:100%;object-fit:contain;pointer-events:none;-webkit-user-drag:none;opacity:0;transform:scale(.6);transition:opacity .7s ease,transform .55s cubic-bezier(.34,1.4,.5,1)}
+.ab-apple-img.show{opacity:1;transform:scale(1)}
+.ab-apple-half{position:absolute;object-fit:contain;pointer-events:none;-webkit-user-drag:none;opacity:1;transition:transform .9s cubic-bezier(.3,.6,.4,1),opacity .9s ease;will-change:transform,opacity;z-index:2}
+.ab-juice{position:absolute;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff6b5e,#c50d12);transform:translate(-50%,-50%);pointer-events:none;transition:transform .7s cubic-bezier(.3,.7,.4,1),opacity .7s ease;z-index:1}
+.ab-apple-atom{position:absolute;top:calc(50% + 44px);left:50%;transform:translateX(-50%) translateY(6px);font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--orange2);opacity:0;transition:opacity .5s ease,transform .5s ease;white-space:nowrap}
+.ab-apple-atom.show{opacity:.95;transform:translateX(-50%) translateY(0)}
+.ab-apple-hint{font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text2);opacity:0;transition:opacity .5s ease}
+.ab-apple-hint.show{opacity:.7;animation:abHintPulse 1.8s ease-in-out infinite}
+@keyframes abHintPulse{0%,100%{opacity:.4}50%{opacity:.85}}
 
 .ab-quiz{position:fixed;left:50%;top:58%;transform:translateX(-50%);z-index:108;display:flex;gap:11px;width:94%;max-width:450px;justify-content:center;pointer-events:none}
 .ab-card{pointer-events:auto;flex:1 1 0;max-width:135px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px 11px;border-radius:16px;background:rgba(22,12,5,.66);border:1px solid rgba(255,122,24,.28);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text2);backdrop-filter:blur(6px);opacity:0;transform:translateY(18px) scale(.92);transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .25s ease,border-color .2s ease,box-shadow .25s ease,color .2s ease}
@@ -608,7 +627,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.3" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.4" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -636,7 +655,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.3" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.4" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -644,17 +663,27 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ab-atom-f2" id="abAtomF2">Existe um limite mínimo de tamanho chamado átomo</div>
       </div>
 
+      <!-- A maçã (dialogo1.4) -->
+      <div class="ab-apple" id="abApple" style="display:none">
+        <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
+        <div class="ab-apple-stage" id="abAppleStage">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.4" alt="Maçã" draggable="false">
+          <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
+        </div>
+        <div class="ab-apple-hint" id="abAppleHint">deslize para cortar</div>
+      </div>
+
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.3" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.3" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.3" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.4" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.4" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.4" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.3" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.4" preload="auto"></audio>
     </div>
   </div>
 
@@ -840,7 +869,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.3</div>
+<div class="app-version" id="appVersion">v1.1.4</div>
 
 </div>
 <script>
@@ -953,14 +982,15 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.3',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.3', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.3',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.3',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.3', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.3', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.3', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.3', build:abCuesAtom,    onStart:abInitAtom,        next:false }                          /* o átomo (Demócrito) */
+    { src:'audio/dialogo0.mp3?v=1.1.4',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.4', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.4',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.4',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.4', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.4', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.4', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.4', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.1.4', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false } /* A maçã: cortar até o átomo */
   ]
 };
 
@@ -974,6 +1004,7 @@ function abInit(){
   ab.audio = abEl('abAudio');
   abSetupCarousel();
   abStatesSetup();
+  abAppleSetup();
   ab.audio.addEventListener('ended', abOnEnded);
 }
 
@@ -1134,7 +1165,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.3'); abSfx('audio/yes.mp3?v=1.1.3');
+    abSfx('audio/applause.mp3?v=1.1.4'); abSfx('audio/yes.mp3?v=1.1.4');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1217,9 +1248,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.3',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.3', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.3',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.4',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.4', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.4',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1352,7 +1383,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.3'); abSfx('audio/yes.mp3?v=1.1.3'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.4'); abSfx('audio/yes.mp3?v=1.1.4'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1394,6 +1425,7 @@ function abAtomReset(){
   ['abAtomQ1','abAtomQ2','abAtomQ3'].forEach(function(id){ abEl(id).classList.remove('show','up'); });
   var st=abEl('abAtomStack'); st.classList.remove('rise','blur');
   abEl('abAtomImg').classList.remove('show');
+  abEl('abAtom').classList.remove('fade'); abEl('abAtomFinal').classList.remove('fade');
   abEl('abAtomFinal').classList.remove('show');
   abEl('abAtomF1').classList.remove('show'); abEl('abAtomF2').classList.remove('show');
   abEl('abAtom').style.display='none';
@@ -1437,6 +1469,164 @@ function abCuesAtom(){
     { time:31.0, done:false, fn:function(){ abAtomFinal(2); } }
   ];
 }
+
+/* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
+var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleMin=0.2;
+
+function abAppleReset(){
+  abAppleCut=false; abAppleScale=1; abAtomReached=false;
+  var ap=abEl('abApple'); ap.classList.remove('shake');
+  abEl('abAppleTitle').classList.remove('show');
+  var img=abEl('abAppleImg'); img.classList.remove('show'); img.style.transform='scale(.6)';
+  abEl('abAppleAtom').classList.remove('show');
+  abEl('abAppleHint').classList.remove('show');
+  /* remove cacos/sucos que tenham sobrado */
+  var st=abEl('abAppleStage');
+  [].slice.call(st.querySelectorAll('.ab-apple-half,.ab-juice')).forEach(function(n){ n.remove(); });
+  abBladeStop();
+  ap.style.display='none';
+}
+/* onStart do dialogo1.4: a cena do átomo ainda está na tela (some no cue de 2s). */
+function abInitApple(){
+  abSpotlight(false); abNavDemoEnd();
+  abAppleReset();
+  abShowFab(true);
+}
+/* 2s: some tudo (cena do átomo) em fade out. */
+function abAppleFadeOut(){
+  abEl('abAtom').classList.add('fade');
+  abEl('abAtomFinal').classList.add('fade');
+}
+/* 3.7s: aparece o título "A maçã" + a imagem. */
+function abAppleReveal(){
+  abAtomReset();                 /* esconde de vez a cena do átomo */
+  abMatTopReset(); abLightReset();
+  var ap=abEl('abApple'); ap.style.display='flex';
+  void ap.offsetWidth;
+  abEl('abAppleTitle').classList.add('show');
+  abEl('abAppleImg').classList.add('show');
+}
+/* fim do áudio: libera o corte. */
+function abAppleAudioEnded(){
+  abAppleCut=true;
+  abShowFab(false);
+  abEl('abAppleHint').classList.add('show');
+}
+function abCuesApple(){
+  return [
+    { time:2.0, done:false, fn:function(){ abAppleFadeOut(); } },
+    { time:3.7, done:false, fn:function(){ abAppleReveal(); } }
+  ];
+}
+
+/* distância de um ponto ao segmento (p/ saber se o talho cruzou a maçã) */
+function abSegDist(px,py,x1,y1,x2,y2){
+  var dx=x2-x1, dy=y2-y1, L2=dx*dx+dy*dy;
+  if(L2===0) return Math.hypot(px-x1,py-y1);
+  var u=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/L2));
+  return Math.hypot(px-(x1+u*dx), py-(y1+u*dy));
+}
+/* Executa um corte (ou sacode, se já chegou no átomo). */
+function abAppleDoCut(){
+  abEl('abAppleHint').classList.remove('show');
+  if(abAtomReached){ abScreenShake(); return; }
+  abAppleSliceHalves();
+  abAppleJuice();
+  abAppleScale *= 0.64;
+  if(abAppleScale <= abAppleMin){
+    abAppleScale = abAppleMin; abAtomReached = true;
+    abEl('abAppleAtom').classList.add('show');
+  }
+  abEl('abAppleImg').style.transform='scale('+abAppleScale+')';
+}
+/* Duas metades voam para os lados e caem. */
+function abAppleSliceHalves(){
+  var img=abEl('abAppleImg'), st=abEl('abAppleStage');
+  var r=img.getBoundingClientRect(), sr=st.getBoundingClientRect();
+  for(var i=0;i<2;i++){
+    var h=document.createElement('img'); h.className='ab-apple-half'; h.src=img.src;
+    h.style.width=r.width+'px'; h.style.height=r.height+'px';
+    h.style.left=(r.left-sr.left)+'px'; h.style.top=(r.top-sr.top)+'px';
+    h.style.clipPath = (i===0) ? 'inset(0 50% 0 0)' : 'inset(0 0 0 50%)';
+    st.appendChild(h);
+    (function(half,dir){
+      requestAnimationFrame(function(){
+        half.style.transform='translate('+(dir*130)+'px,210px) rotate('+(dir*48)+'deg)';
+        half.style.opacity='0';
+      });
+      setTimeout(function(){ if(half.parentNode){ half.parentNode.removeChild(half); } }, 950);
+    })(h, i===0?-1:1);
+  }
+}
+/* Respingos de suco (DOM). */
+function abAppleJuice(){
+  var img=abEl('abAppleImg'), st=abEl('abAppleStage');
+  var r=img.getBoundingClientRect(), sr=st.getBoundingClientRect();
+  var cx=r.left-sr.left+r.width/2, cy=r.top-sr.top+r.height/2;
+  for(var i=0;i<14;i++){
+    var d=document.createElement('div'); d.className='ab-juice';
+    var sz=6+Math.random()*11; d.style.width=d.style.height=sz+'px';
+    d.style.left=cx+'px'; d.style.top=cy+'px'; d.style.transform='translate(-50%,-50%)';
+    st.appendChild(d);
+    (function(el){
+      var ang=Math.random()*6.2832, dist=30+Math.random()*95, dyf=Math.sin(ang)*dist+80;
+      requestAnimationFrame(function(){
+        el.style.transform='translate(-50%,-50%) translate('+(Math.cos(ang)*dist)+'px,'+dyf+'px)';
+        el.style.opacity='0';
+      });
+      setTimeout(function(){ if(el.parentNode){ el.parentNode.removeChild(el); } }, 750);
+    })(d);
+  }
+}
+/* Sacode a tela (quando o pedaço já é o "átomo" e não corta mais). */
+function abScreenShake(){
+  var s=abEl('abApple'); s.classList.remove('shake'); void s.offsetWidth; s.classList.add('shake');
+}
+
+/* Rastro da lâmina (estilo fruit ninja) no canvas. */
+var abBladeOn=false, abBladePts=[], abBladeRaf=null;
+function abBladeStop(){
+  abBladeOn=false; abBladePts=[];
+  if(abBladeRaf){ cancelAnimationFrame(abBladeRaf); abBladeRaf=null; }
+  var cv=abEl('abConfetti'); if(cv){ var c=cv.getContext('2d'); if(c) c.clearRect(0,0,cv.width,cv.height); }
+}
+function abBladeFrame(){
+  var cv=abEl('abConfetti'), ctx=cv.getContext('2d');
+  if(cv.width!==window.innerWidth) cv.width=window.innerWidth;
+  if(cv.height!==window.innerHeight) cv.height=window.innerHeight;
+  ctx.clearRect(0,0,cv.width,cv.height);
+  var now=performance.now();
+  abBladePts=abBladePts.filter(function(p){ return now-p.t<150; });
+  for(var i=1;i<abBladePts.length;i++){
+    var a=abBladePts[i-1], b=abBladePts[i], age=(now-b.t)/150, al=1-age;
+    ctx.strokeStyle='rgba(255,255,255,'+(al*0.9)+')'; ctx.lineWidth=(1-age)*10+1.5; ctx.lineCap='round';
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  if(abBladeOn || abBladePts.length){ abBladeRaf=requestAnimationFrame(abBladeFrame); }
+  else { abBladeRaf=null; ctx.clearRect(0,0,cv.width,cv.height); }
+}
+function abAppleSetup(){
+  window.addEventListener('pointerdown', function(e){
+    if(!abAppleCut) return;
+    abApDrag=true; abApStart={x:e.clientX,y:e.clientY};
+    abBladePts=[{x:e.clientX,y:e.clientY,t:performance.now()}]; abBladeOn=true;
+    if(!abBladeRaf){ abBladeRaf=requestAnimationFrame(abBladeFrame); }
+  });
+  window.addEventListener('pointermove', function(e){
+    if(!abApDrag) return;
+    abBladePts.push({x:e.clientX,y:e.clientY,t:performance.now()});
+  });
+  window.addEventListener('pointerup', function(e){
+    if(!abApDrag) return; abApDrag=false; abBladeOn=false;
+    var s=abApStart, ex=e.clientX, ey=e.clientY;
+    var len=Math.hypot(ex-s.x, ey-s.y);
+    if(len<34) return;
+    var r=abEl('abAppleImg').getBoundingClientRect();
+    var cx=r.left+r.width/2, cy=r.top+r.height/2, rad=Math.max(r.width,r.height)*0.52;
+    if(abSegDist(cx,cy,s.x,s.y,ex,ey) < rad){ abAppleDoCut(); }
+  });
+}
+var abApDrag=false, abApStart=null;
 
 /* ===== Estilhaços no canvas (gelo / líquido / gás) ===== */
 var abShatterRaf=null;
