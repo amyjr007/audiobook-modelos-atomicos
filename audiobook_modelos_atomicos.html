@@ -306,7 +306,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-chapter-sub.orange{background:linear-gradient(135deg,var(--amber) 0%,var(--orange) 45%,var(--coral) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-.5px;transform:scale(1.06);transition:transform .9s cubic-bezier(.22,1,.36,1),letter-spacing .9s ease}
 
 /* Head text "O que é a Química?" (entra no dialogo1.0) */
-.ab-chapter-head{display:flex;flex-direction:column;align-items:center;gap:15px;margin-top:8px}
+.ab-chapter-head{display:none;flex-direction:column;align-items:center;gap:15px;margin-top:8px}
+.ab-chapter-head.show{display:flex}
 .ab-chapter-head-line{width:0;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--orange),transparent);box-shadow:0 0 16px rgba(255,122,24,.55);transition:width 1s cubic-bezier(.22,1,.36,1) .12s}
 .ab-chapter-head-text{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(31px,8.6vw,52px);line-height:1.07;letter-spacing:-.6px;color:var(--text);text-shadow:0 6px 34px rgba(255,122,24,.3);opacity:0;transform:translateY(22px) scale(.9);filter:blur(8px);transition:opacity .95s cubic-bezier(.22,1,.36,1),transform .95s cubic-bezier(.22,1,.36,1),filter .95s ease}
 .ab-chapter-head.show .ab-chapter-head-line{width:66px}
@@ -384,6 +385,26 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-chem-q.show{opacity:1;transform:none;filter:blur(0)}
 .ab-chem-s1,.ab-chem-s2{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(17px,4.6vw,26px);line-height:1.32;color:var(--text);max-width:440px;opacity:0;transform:translateY(14px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
 .ab-chem-s1.show,.ab-chem-s2.show{opacity:1;transform:none}
+
+/* ===== Matéria + Quiz (dialogo1) ===== */
+.ab-mat{margin-top:8px;font-family:'Fraunces',serif;font-weight:900;font-style:italic;font-size:clamp(30px,8vw,46px);line-height:1.05;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0}
+.ab-mat.show{animation:abMatPop .7s cubic-bezier(.22,1,.36,1) both}
+@keyframes abMatPop{0%{opacity:0;transform:translateY(14px) scale(.85);filter:blur(5px)}55%{opacity:1;transform:translateY(0) scale(1.09);filter:blur(0)}100%{opacity:1;transform:none}}
+.ab-def{margin-top:10px;max-width:420px;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(16px,4.4vw,24px);line-height:1.34;color:var(--text);opacity:0;transform:translateY(12px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.ab-def.show{opacity:1;transform:none}
+
+.ab-quiz{position:fixed;left:50%;top:58%;transform:translateX(-50%);z-index:108;display:flex;gap:11px;width:94%;max-width:450px;justify-content:center;pointer-events:none}
+.ab-card{pointer-events:auto;flex:1 1 0;max-width:135px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px 11px;border-radius:16px;background:rgba(22,12,5,.66);border:1px solid rgba(255,122,24,.28);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text2);backdrop-filter:blur(6px);opacity:0;transform:translateY(18px) scale(.92);transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .25s ease,border-color .2s ease,box-shadow .25s ease,color .2s ease}
+.ab-quiz.show .ab-card{opacity:1;transform:none}
+.ab-card img{width:100%;height:88px;object-fit:contain;pointer-events:none;-webkit-user-drag:none}
+.ab-card span{font-size:11px;font-weight:700;letter-spacing:.3px;text-align:center}
+.ab-card:hover{border-color:rgba(255,122,24,.6);transform:translateY(-3px)}
+.ab-card:active{transform:translateY(-1px) scale(.98)}
+.ab-card.correct{border-color:#46d39a;box-shadow:0 0 0 2px #46d39a,0 0 28px rgba(70,211,154,.5);color:#bdfbe2;transform:translateY(-4px) scale(1.04)}
+.ab-card.wrong{animation:abShake .42s ease}
+@keyframes abShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+
+.ab-confetti{position:fixed;inset:0;z-index:115;pointer-events:none}
 
 /* ===== QUIZ ===== */
 #screen-quiz{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px}
@@ -491,6 +512,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ab-chapter" id="abChapter">
           <div class="ab-chapter-num" id="abChapterNum">Capítulo 1</div>
           <div class="ab-chapter-sub" id="abChapterSub">O invisível que constrói o mundo</div>
+          <div class="ab-mat" id="abMat" style="display:none">Matéria</div>
+          <div class="ab-def" id="abDef" style="display:none">É tudo que tem massa e ocupa lugar no espaço</div>
           <div class="ab-chapter-head" id="abChapterHead">
             <span class="ab-chapter-head-line"></span>
             <span class="ab-chapter-head-text">O que é a Química?</span>
@@ -520,7 +543,17 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ab-chem-s2" id="abChemS2">Como podemos transformar a matéria...</div>
       </div>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.3" preload="auto"></audio>
+      <!-- Quiz de cards (dialogo1) -->
+      <div class="ab-quiz" id="abQuiz" style="display:none">
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/quiz-rocha.png?v=1.0.6" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/quiz-agua.png?v=1.0.6" alt="Copo com água" draggable="false"><span>Copo com água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/quiz-lua.png?v=1.0.6" alt="Luz da Lua" draggable="false"><span>Luz da Lua</span></button>
+      </div>
+
+      <!-- Confete da comemoração -->
+      <canvas class="ab-confetti" id="abConfetti"></canvas>
+
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.0.6" preload="auto"></audio>
     </div>
   </div>
 
@@ -706,7 +739,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.0.5</div>
+<div class="app-version" id="appVersion">v1.0.6</div>
 
 </div>
 <script>
@@ -819,12 +852,13 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.0.3',   build:abCuesSeg0, onStart:abResetSeg0, next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.0.3', build:abCuesSeg1, onStart:abInitSeg1,  next:true  },
-    { src:'audio/dialogo1.mp3?v=1.0.3',   build:abCuesSeg2, onStart:abInitSeg2,  onEnd:abEndSeg2, auto:true },
-    { src:'audio/dialogo1.0.mp3?v=1.0.3', build:abCuesSeg3, onStart:abInitSeg3,  next:true  },
-    { src:'audio/dialogo1.1.mp3?v=1.0.3', build:abCuesSeg4, onStart:abInitSeg4,  next:true  },
-    { src:'audio/dialogo1.2.mp3?v=1.0.3', build:abCuesSeg5, onStart:abInitSeg5,  next:false }
+    { src:'audio/dialogo0.mp3?v=1.0.6',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.0.6', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.0.6',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.0.6',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.0.6', build:abCuesSeg3,    onStart:abInitSeg3,   next:true  },
+    { src:'audio/dialogo1.1.mp3?v=1.0.6', build:abCuesSeg4,    onStart:abInitSeg4,   next:true  },
+    { src:'audio/dialogo1.2.mp3?v=1.0.6', build:abCuesSeg5,    onStart:abInitSeg5,   next:false }
   ]
 };
 
@@ -918,6 +952,7 @@ function abResetSeg0(){
   abEl('abSciTitleInner').classList.remove('in','out');
   abEl('abScatter').innerHTML = '';
   abChemReset();
+  abMateriaReset();
 }
 
 /* Início do segmento 1 (dialogo0.1): mantém na tela tudo do dialogo0,
@@ -943,7 +978,7 @@ function abInitSeg2(){
   ch.classList.remove('gone');
   abEl('abChapterNum').classList.remove('show');
   abEl('abChapterSub').classList.remove('show','orange');
-  abEl('abChapterHead').classList.remove('show');
+  abMateriaReset();
   void ch.offsetWidth; /* reflow: fixa o estado base antes de animar */
   /* dispara a subida + entrada dramática de "Capítulo 1" */
   content.style.setProperty('--rise', Math.max(0, ch.offsetTop) + 'px');
@@ -951,16 +986,102 @@ function abInitSeg2(){
   abEl('abChapterNum').classList.add('show');
 }
 
-/* Ao terminar dialogo1: a subida já ocorreu no início; só encadeia o
-   dialogo1.0 (que estiliza o subtítulo no laranja da capa). */
+/* Ao terminar o dialogo1A (intro do Capítulo 1): dá 2s e encadeia o dialogo1
+   (Matéria + quiz). */
 function abEndSeg2(){
-  setTimeout(function(){ startSegment(ab.seg + 1); }, 400);
+  setTimeout(function(){ startSegment(ab.seg + 1); }, 2000);
 }
 
-/* onStart do segmento 3 (dialogo1.0): o bloco "Capítulo 1" já está no topo. */
+/* onStart do dialogo1.0 (após o quiz): limpa Matéria/quiz e segue. */
 function abInitSeg3(){
   abSpotlight(false);
   abNavDemoEnd();
+  abMateriaReset();
+}
+
+/* ===== Matéria + Quiz (dialogo1) ===== */
+function abMatReveal(id){ var el=abEl(id); el.style.display=''; void el.offsetWidth; el.classList.add('show'); }
+
+var abQuizLock = true;
+function abQuizShow(){
+  var q=abEl('abQuiz'); q.style.display=''; void q.offsetWidth; q.classList.add('show'); abQuizLock=false;
+}
+function abQuizReset(){
+  var q=abEl('abQuiz'); q.classList.remove('show'); q.style.display='none';
+  q.querySelectorAll('.ab-card').forEach(function(c){ c.classList.remove('correct','wrong'); });
+  abQuizLock=true;
+}
+/* card 2 (índice 2 = "Luz da Lua") é a resposta certa: luz não é matéria. */
+function abQuizAnswer(i){
+  if(abQuizLock) return;
+  var cards=abEl('abQuiz').querySelectorAll('.ab-card');
+  if(i===2){
+    abQuizLock=true;
+    if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
+    cards[2].classList.add('correct');
+    abConfetti();
+    abSfx('audio/applause.mp3?v=1.0.6'); abSfx('audio/yes.mp3?v=1.0.6');
+    setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
+  } else {
+    var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
+  }
+}
+function abSfx(src){ try{ var a=new Audio(src); a.play().catch(function(){}); }catch(_){} }
+
+var abConfettiRaf=null;
+function abConfetti(){
+  var cv=abEl('abConfetti'); var ctx=cv.getContext('2d');
+  var W=cv.width=window.innerWidth, H=cv.height=window.innerHeight;
+  var colors=['#ff7a18','#ffc777','#46d39a','#ff5436','#fbeee2','#6fc0f2'];
+  var parts=[];
+  for(var i=0;i<150;i++){
+    parts.push({x:W/2+(Math.random()-.5)*140, y:H*0.42, vx:(Math.random()-.5)*9, vy:Math.random()*-12-4,
+      g:0.26+Math.random()*0.12, r:Math.random()*6.28, vr:(Math.random()-.5)*.34, s:5+Math.random()*7,
+      c:colors[(Math.random()*colors.length)|0]});
+  }
+  var start=performance.now();
+  function frame(t){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<parts.length;i++){
+      var p=parts[i]; p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr; p.vx*=0.99;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.r); ctx.fillStyle=p.c;
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.62); ctx.restore();
+    }
+    if(t-start<2600){ abConfettiRaf=requestAnimationFrame(frame); }
+    else { ctx.clearRect(0,0,W,H); abConfettiRaf=null; }
+  }
+  if(abConfettiRaf) cancelAnimationFrame(abConfettiRaf);
+  abConfettiRaf=requestAnimationFrame(frame);
+}
+function abConfettiStop(){
+  if(abConfettiRaf){ cancelAnimationFrame(abConfettiRaf); abConfettiRaf=null; }
+  var cv=abEl('abConfetti'); if(cv){ var ctx=cv.getContext('2d'); if(ctx) ctx.clearRect(0,0,cv.width,cv.height); }
+}
+
+function abMateriaReset(){
+  var m=abEl('abMat'); m.classList.remove('show'); m.style.display='none';
+  var d=abEl('abDef'); d.classList.remove('show'); d.style.display='none';
+  abEl('abChapterHead').classList.remove('show');
+  abQuizReset();
+  abConfettiStop();
+}
+
+/* onStart do dialogo1: mantém "Capítulo 1"+subtítulo (do dialogo1A) e prepara
+   Matéria/definição/quiz. */
+function abInitMateria(){
+  abSpotlight(false);
+  abNavDemoEnd();
+  abMateriaReset();
+}
+
+/* Cues do dialogo1: Matéria (3.9s), definição (7s, some 9.5s), cards (12s). */
+function abCuesMateria(){
+  return [
+    { time:3.9,  done:false, fn:function(){ abMatReveal('abMat'); } },
+    { time:7.0,  done:false, fn:function(){ abMatReveal('abDef'); } },
+    { time:9.5,  done:false, fn:function(){ abEl('abDef').classList.remove('show'); } },
+    { time:12.0, done:false, fn:function(){ abQuizShow(); } }
+  ];
 }
 
 /* ===== Cena do celular (dialogo1.1) ===== */
