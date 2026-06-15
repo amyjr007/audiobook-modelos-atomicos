@@ -627,7 +627,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.6" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.7" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -655,7 +655,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.6" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.7" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -667,7 +667,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-apple" id="abApple" style="display:none">
         <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
         <div class="ab-apple-stage" id="abAppleStage">
-          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.6" alt="Maçã" draggable="false">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.7" alt="Maçã" draggable="false">
           <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
         </div>
         <div class="ab-apple-hint" id="abAppleHint">deslize para cortar</div>
@@ -675,15 +675,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.6" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.6" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.6" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.7" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.7" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.7" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.6" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.7" preload="auto"></audio>
     </div>
   </div>
 
@@ -869,7 +869,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.6</div>
+<div class="app-version" id="appVersion">v1.1.7</div>
 
 </div>
 <script>
@@ -982,15 +982,15 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.6',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.6', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.6',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.6',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.6', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.6', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.6', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.6', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.1.6', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false } /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo0.mp3?v=1.1.7',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.7', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.7',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.7',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.7', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.7', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.7', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.7', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.1.7', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false } /* A maçã: cortar até o átomo */
   ]
 };
 
@@ -1168,7 +1168,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.6'); abSfx('audio/yes.mp3?v=1.1.6');
+    abSfx('audio/applause.mp3?v=1.1.7'); abSfx('audio/yes.mp3?v=1.1.7');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1251,9 +1251,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.6',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.6', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.6',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.7',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.7', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.7',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1386,7 +1386,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.6'); abSfx('audio/yes.mp3?v=1.1.6'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.7'); abSfx('audio/yes.mp3?v=1.1.7'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1475,8 +1475,8 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0;
-var abAppleWhole='images/apple.svg?v=1.1.6', abApplePiece='images/apple-piece.svg?v=1.1.6';
-var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.78;
+var abAppleWhole='images/apple.svg?v=1.1.7', abApplePiece='images/apple-piece.svg?v=1.1.7';
+var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
 
 function abAppleReset(){
   abAppleCut=false; abAppleScale=1; abAtomReached=false; abAppleCuts=0;
@@ -1524,13 +1524,6 @@ function abCuesApple(){
   ];
 }
 
-/* distância de um ponto ao segmento (p/ saber se o talho cruzou a maçã) */
-function abSegDist(px,py,x1,y1,x2,y2){
-  var dx=x2-x1, dy=y2-y1, L2=dx*dx+dy*dy;
-  if(L2===0) return Math.hypot(px-x1,py-y1);
-  var u=Math.max(0,Math.min(1,((px-x1)*dx+(py-y1)*dy)/L2));
-  return Math.hypot(px-(x1+u*dx), py-(y1+u*dy));
-}
 /* Executa um corte (ou sacode, se já chegou no átomo). */
 function abAppleDoCut(){
   abEl('abAppleHint').classList.remove('show');
@@ -1627,10 +1620,17 @@ function abAppleSetup(){
     var s=abApStart, ex=e.clientX, ey=e.clientY;
     var len=Math.hypot(ex-s.x, ey-s.y);
     if(len<34) return;
-    var r=abEl('abAppleImg').getBoundingClientRect();
-    var cx=r.left+r.width/2, cy=r.top+r.height/2, rad=Math.max(r.width,r.height)*0.52;
-    if(abSegDist(cx,cy,s.x,s.y,ex,ey) < rad){ abAppleDoCut(); }
+    /* área de corte fixa: do topo até onde fica a "versão" (assim o pedaço
+       minúsculo continua fácil de cortar). */
+    var ver=abEl('appVersion'); var yLim = ver ? ver.getBoundingClientRect().top : (window.innerHeight-50);
+    if(abSegInRect(s.x,s.y,ex,ey, 0,0, window.innerWidth, yLim)){ abAppleDoCut(); }
   });
+}
+/* o talho cruza o retângulo [rl,rt]-[rr,rb]? (amostra pontos do segmento) */
+function abSegInRect(x1,y1,x2,y2,rl,rt,rr,rb){
+  for(var i=0;i<=14;i++){ var t=i/14, x=x1+(x2-x1)*t, y=y1+(y2-y1)*t;
+    if(x>=rl && x<=rr && y>=rt && y<=rb) return true; }
+  return false;
 }
 var abApDrag=false, abApStart=null;
 
