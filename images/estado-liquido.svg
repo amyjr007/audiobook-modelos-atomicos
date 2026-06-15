@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fd2f5"/>
+      <stop offset="1" stop-color="#2b86c5"/>
+    </linearGradient>
+    <linearGradient id="glassBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.30"/>
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.22"/>
+    </linearGradient>
+    <filter id="wGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <ellipse cx="200" cy="356" rx="92" ry="20" fill="#0a2f44" opacity="0.45"/>
+  <g filter="url(#wGlow)">
+    <!-- glass walls (slightly tapered tumbler) -->
+    <path d="M132 70 L150 350 Q200 366 250 350 L268 70 Z" fill="url(#glassBody)" stroke="#dff3ff" stroke-width="3" stroke-opacity="0.7"/>
+    <!-- water -->
+    <path d="M141 150 L150 350 Q200 366 250 350 L259 150 Q200 172 141 150 Z" fill="url(#water)" opacity="0.92"/>
+    <!-- water surface ellipse -->
+    <ellipse cx="200" cy="150" rx="59" ry="13" fill="#aee6ff" opacity="0.9"/>
+    <ellipse cx="200" cy="150" rx="59" ry="13" fill="none" stroke="#ffffff" stroke-width="2" stroke-opacity="0.6"/>
+    <!-- rim of glass -->
+    <ellipse cx="200" cy="70" rx="68" ry="15" fill="none" stroke="#eaf8ff" stroke-width="3" stroke-opacity="0.85"/>
+    <!-- highlight streak -->
+    <path d="M165 95 L156 330" fill="none" stroke="#ffffff" stroke-width="7" stroke-opacity="0.5" stroke-linecap="round"/>
+    <!-- bubbles -->
+    <circle cx="180" cy="250" r="6" fill="#ffffff" opacity="0.55"/>
+    <circle cx="220" cy="290" r="4" fill="#ffffff" opacity="0.5"/>
+    <circle cx="205" cy="215" r="3.5" fill="#ffffff" opacity="0.5"/>
+  </g>
+</svg>

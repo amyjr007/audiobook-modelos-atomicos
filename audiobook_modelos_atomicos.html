@@ -393,6 +393,29 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-def{margin-top:10px;max-width:420px;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(16px,4.4vw,24px);line-height:1.34;color:var(--text);opacity:0;transform:translateY(12px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
 .ab-def.show{opacity:1;transform:none}
 
+/* ===== Luz / estados físicos (dialogo1.0) ===== */
+/* dois textos centralizados: "A luz não é matéria" / "Luz é energia" */
+.ab-light{position:fixed;inset:0;z-index:108;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 8vw;pointer-events:none;text-align:center}
+.ab-light-a{font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(30px,8vw,50px);line-height:1.08;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transform:translateY(16px) scale(.92);filter:blur(6px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1),filter .7s ease}
+.ab-light-b{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(18px,5vw,28px);line-height:1.3;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+.ab-light-a.show,.ab-light-b.show{opacity:1;transform:none;filter:blur(0)}
+.ab-light.out .ab-light-a,.ab-light.out .ab-light-b{opacity:0;transform:translateY(-18px) scale(.96);filter:blur(4px);transition:opacity .55s cubic-bezier(.5,0,.75,0),transform .55s cubic-bezier(.5,0,.75,0),filter .55s ease}
+
+/* "Matéria" no topo (mesmo laranja já usado) */
+.ab-mat-top{position:fixed;top:62px;left:0;right:0;text-align:center;z-index:108;pointer-events:none;padding:0 6vw;font-family:'Fraunces',serif;font-weight:900;font-style:italic;font-size:clamp(30px,8.5vw,52px);line-height:1.05;letter-spacing:-.5px;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0}
+.ab-mat-top.show{animation:abMatPop .7s cubic-bezier(.22,1,.36,1) both}
+
+/* carrossel de estados (sólido/líquido/gás) com virada 3D */
+.ab-states{position:fixed;inset:0;z-index:107;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;pointer-events:none;perspective:1100px}
+.ab-states-card{width:min(74vw,330px);height:min(74vw,330px);max-height:46vh;pointer-events:auto;cursor:grab;touch-action:pan-y;border-radius:26px;background:radial-gradient(circle at 50% 38%,rgba(255,122,24,.10),rgba(22,12,5,.55) 72%);border:1px solid rgba(255,122,24,.26);box-shadow:0 18px 50px rgba(0,0,0,.5);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;transform-style:preserve-3d;will-change:transform,opacity;opacity:0;-webkit-user-select:none;user-select:none}
+.ab-states-card:active{cursor:grabbing}
+.ab-state-img{width:86%;height:86%;object-fit:contain;pointer-events:none;-webkit-user-drag:none}
+.ab-state-label{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(20px,5.6vw,30px);background:linear-gradient(135deg,var(--amber),var(--orange) 50%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.3px}
+.ab-states-dots{display:flex;gap:8px}
+.ab-sdot{width:8px;height:8px;border-radius:50%;background:rgba(255,122,24,.3);transition:all .25s}
+.ab-sdot.active{background:var(--orange);width:20px;border-radius:4px}
+.ab-states-hand{top:auto;bottom:18%;margin-top:0}
+
 .ab-quiz{position:fixed;left:50%;top:58%;transform:translateX(-50%);z-index:108;display:flex;gap:11px;width:94%;max-width:450px;justify-content:center;pointer-events:none}
 .ab-card{pointer-events:auto;flex:1 1 0;max-width:135px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px 11px;border-radius:16px;background:rgba(22,12,5,.66);border:1px solid rgba(255,122,24,.28);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:var(--text2);backdrop-filter:blur(6px);opacity:0;transform:translateY(18px) scale(.92);transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .25s ease,border-color .2s ease,box-shadow .25s ease,color .2s ease}
 .ab-quiz.show .ab-card{opacity:1;transform:none}
@@ -541,6 +564,23 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ab-chem-q" id="abChemQ">E a Química?</div>
         <div class="ab-chem-s1" id="abChemS1">Do que as coisas são feitas</div>
         <div class="ab-chem-s2" id="abChemS2">Como podemos transformar a matéria...</div>
+      </div>
+
+      <!-- Luz / estados físicos (dialogo1.0) -->
+      <div class="ab-light" id="abLight">
+        <div class="ab-light-a" id="abLightA">A luz não é matéria</div>
+        <div class="ab-light-b" id="abLightB">Luz é energia</div>
+      </div>
+      <div class="ab-mat-top" id="abMatTop">Matéria</div>
+      <div class="ab-states" id="abStates" style="display:none">
+        <div class="ab-states-card" id="abStatesCard">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg" alt="Estado físico da matéria" draggable="false">
+        </div>
+        <div class="ab-state-label" id="abStateLabel">Sólido</div>
+        <div class="ab-states-dots" id="abStatesDots">
+          <span class="ab-sdot"></span><span class="ab-sdot"></span><span class="ab-sdot"></span>
+        </div>
+        <div class="ab-hand ab-states-hand" id="abStatesHand">👆</div>
       </div>
 
       <!-- Quiz de cards (dialogo1) -->
@@ -870,6 +910,7 @@ function abInit(){
   ab.inited = true;
   ab.audio = abEl('abAudio');
   abSetupCarousel();
+  abStatesSetup();
   ab.audio.addEventListener('ended', abOnEnded);
 }
 
@@ -953,6 +994,9 @@ function abResetSeg0(){
   abEl('abScatter').innerHTML = '';
   abChemReset();
   abMateriaReset();
+  abLightReset();
+  abMatTopReset();
+  abStatesReset();
 }
 
 /* Início do segmento 1 (dialogo0.1): mantém na tela tudo do dialogo0,
@@ -997,6 +1041,11 @@ function abInitSeg3(){
   abSpotlight(false);
   abNavDemoEnd();
   abMateriaReset();
+  /* o bloco "Capítulo 1" some: dialogo1.0 tem cena própria (luz/estados) */
+  abEl('abChapter').classList.add('gone');
+  abLightReset();
+  abMatTopReset();
+  abStatesReset();
 }
 
 /* ===== Matéria + Quiz (dialogo1) ===== */
@@ -1074,14 +1123,111 @@ function abInitMateria(){
   abMateriaReset();
 }
 
-/* Cues do dialogo1: Matéria (3.9s), definição (7s, some 9.5s), cards (12s). */
+/* Cues do dialogo1: Matéria (3.9s), definição (7s, permanece até avançar), cards (12s). */
 function abCuesMateria(){
   return [
     { time:3.9,  done:false, fn:function(){ abMatReveal('abMat'); } },
     { time:7.0,  done:false, fn:function(){ abMatReveal('abDef'); } },
-    { time:9.5,  done:false, fn:function(){ abEl('abDef').classList.remove('show'); } },
     { time:12.0, done:false, fn:function(){ abQuizShow(); } }
   ];
+}
+
+/* ===== Luz / estados físicos (dialogo1.0) ===== */
+/* Dois textos: 'A' = "A luz não é matéria", 'B' = "Luz é energia". */
+function abLightShow(which){
+  abEl('abLight').classList.remove('out');
+  abEl(which === 'A' ? 'abLightA' : 'abLightB').classList.add('show');
+}
+function abLightHide(){ abEl('abLight').classList.add('out'); }       /* some com efeito */
+function abLightReset(){
+  var l=abEl('abLight'); l.classList.remove('out');
+  abEl('abLightA').classList.remove('show');
+  abEl('abLightB').classList.remove('show');
+}
+
+/* "Matéria" no topo (laranja já usado) */
+function abMatTopShow(){ var m=abEl('abMatTop'); m.classList.remove('show'); void m.offsetWidth; m.classList.add('show'); }
+function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
+
+/* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
+var abStateList = [
+  { img:'images/estado-solido.svg',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg', label:'Líquido' },
+  { img:'images/estado-gas.svg',     label:'Gasoso'  }
+];
+var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false;
+
+function abStatesReset(){
+  var s=abEl('abStates'); s.classList.remove('show'); s.style.display='none';
+  abEl('abStatesHand').className='ab-hand ab-states-hand';
+  abStateIdx=0; abStatesShown=false; abStatesUser=false; abStatesFlipping=false;
+  var card=abEl('abStatesCard');
+  card.style.transition='none'; card.style.transform='rotateY(0deg)'; card.style.opacity='0';
+  abStatesDots();
+}
+function abStatesDots(){
+  var dots=abEl('abStatesDots').children;
+  for(var k=0;k<dots.length;k++){ dots[k].classList.toggle('active', k===abStateIdx); }
+}
+
+/* Mostra o estado `to`. 1ª vez: vira de perfil p/ frente. Demais: virada lateral. */
+function abStatesGo(to, user){
+  to=Math.max(0, Math.min(abStateList.length-1, to));
+  if(abStatesFlipping) return;
+  if(user){ abStatesUser=true; abEl('abStatesHand').className='ab-hand ab-states-hand'; }
+  var card=abEl('abStatesCard'), img=abEl('abStateImg'), lbl=abEl('abStateLabel');
+  if(!abStatesShown){
+    abStatesShown=true; abStateIdx=to;
+    var s=abEl('abStates'); s.style.display=''; void s.offsetWidth; s.classList.add('show');
+    img.src=abStateList[to].img; lbl.textContent=abStateList[to].label; abStatesDots();
+    card.style.transition='none'; card.style.transform='rotateY(-92deg)'; card.style.opacity='0';
+    void card.offsetWidth;
+    card.style.transition='transform .55s cubic-bezier(.22,1,.36,1),opacity .55s ease';
+    card.style.transform='rotateY(0deg)'; card.style.opacity='1';
+    return;
+  }
+  if(to===abStateIdx) return;
+  var dir = to>abStateIdx ? 1 : -1;
+  abStateIdx=to; abStatesFlipping=true;
+  card.style.transition='transform .24s ease-in,opacity .24s ease-in';
+  card.style.transform='rotateY('+(dir*90)+'deg)'; card.style.opacity='0.2';
+  setTimeout(function(){
+    img.src=abStateList[to].img; lbl.textContent=abStateList[to].label; abStatesDots();
+    card.style.transition='none'; card.style.transform='rotateY('+(-dir*90)+'deg)';
+    void card.offsetWidth;
+    card.style.transition='transform .32s cubic-bezier(.22,1,.36,1),opacity .32s ease';
+    card.style.transform='rotateY(0deg)'; card.style.opacity='1';
+    setTimeout(function(){ abStatesFlipping=false; }, 320);
+  }, 240);
+}
+function abStatesIntro(i){ abStatesGo(i, false); }
+
+/* Mãozinha deslizando p/ o lado (igual ao guia do carrossel) */
+function abStatesHint(){
+  if(abStatesUser) return;
+  abEl('abStatesHand').className='ab-hand ab-states-hand hint';
+}
+
+/* Swipe lateral troca o estado (só virada por enquanto, sem arrastar ao vivo). */
+var abStDrag=false, abStX=0, abStDX=0;
+function abStatesSetup(){
+  var card=abEl('abStatesCard');
+  card.addEventListener('pointerdown', function(e){ if(!abStatesShown) return; abStDrag=true; abStX=e.clientX; abStDX=0; });
+  window.addEventListener('pointermove', function(e){ if(abStDrag){ abStDX=e.clientX-abStX; } });
+  window.addEventListener('pointerup', function(){
+    if(!abStDrag) return; abStDrag=false;
+    var th=40;
+    if(abStDX < -th){ abStatesGo(abStateIdx+1, true); }      /* swipe esquerda -> próximo */
+    else if(abStDX > th){ abStatesGo(abStateIdx-1, true); }  /* swipe direita -> anterior */
+  });
+}
+
+/* Corta o áudio aos 20s e mostra a mãozinha p/ explorar os estados. */
+function abCutSeg3(){
+  if(ab.audio){ ab.audio.pause(); }
+  ab.playing=false; ab.ended=true; ab.awaitingNext=true; /* próximo play avança */
+  abSetFab(false);
+  abStatesHint();
 }
 
 /* ===== Cena do celular (dialogo1.1) ===== */
@@ -1101,6 +1247,9 @@ function abInitSeg4(){
   abSpotlight(false);
   abNavDemoEnd();
   abEl('abChapter').classList.add('gone');
+  abLightReset();
+  abMatTopReset();
+  abStatesReset();
   abPhoneReset();
 }
 
@@ -1244,11 +1393,19 @@ function abCuesSeg2(){
   ];
 }
 
-/* ---- Cues do segmento 3 (dialogo1.0): subtítulo no laranja da capa ---- */
+/* ---- Cues do segmento 3 (dialogo1.0): luz não é matéria -> estados físicos ----
+   4.8s "A luz não é matéria"; 7s "Luz é energia"; 9s some tudo; 10s "Matéria";
+   13.6/14/14.8s entram os 3 estados (gelo/água/gás) com virada; 20s corta. */
 function abCuesSeg3(){
   return [
-    { time:0.1, done:false, fn:function(){ abEl('abChapterSub').classList.add('orange'); } },
-    { time:0.5, done:false, fn:function(){ abEl('abChapterHead').classList.add('show'); } }
+    { time:4.8,  done:false, fn:function(){ abLightShow('A'); } },
+    { time:7.0,  done:false, fn:function(){ abLightShow('B'); } },
+    { time:9.0,  done:false, fn:function(){ abLightHide(); } },
+    { time:10.0, done:false, fn:function(){ abMatTopShow(); } },
+    { time:13.6, done:false, fn:function(){ abStatesIntro(0); } }, /* gelo (sólido) */
+    { time:14.0, done:false, fn:function(){ abStatesIntro(1); } }, /* água (líquido) */
+    { time:14.8, done:false, fn:function(){ abStatesIntro(2); } }, /* gás */
+    { time:20.0, done:false, fn:function(){ abCutSeg3(); } }        /* corta o áudio aqui */
   ];
 }
 

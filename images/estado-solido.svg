@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="iceTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eafcff"/>
+      <stop offset="1" stop-color="#bfeefb"/>
+    </linearGradient>
+    <linearGradient id="iceLeft" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a9e2f4"/>
+      <stop offset="1" stop-color="#6fc0e6"/>
+    </linearGradient>
+    <linearGradient id="iceRight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7fcbe8"/>
+      <stop offset="1" stop-color="#4a9fcf"/>
+    </linearGradient>
+    <filter id="iceGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <ellipse cx="200" cy="330" rx="120" ry="26" fill="#0a2f44" opacity="0.45"/>
+  <g filter="url(#iceGlow)" opacity="0.95">
+    <!-- top face -->
+    <polygon points="200,70 318,128 200,186 82,128" fill="url(#iceTop)" stroke="#ffffff" stroke-width="2" stroke-opacity="0.6"/>
+    <!-- left face -->
+    <polygon points="82,128 200,186 200,312 82,254" fill="url(#iceLeft)" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.35"/>
+    <!-- right face -->
+    <polygon points="318,128 200,186 200,312 318,254" fill="url(#iceRight)" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.35"/>
+    <!-- inner highlights / cracks -->
+    <polyline points="120,150 150,200 135,240" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.45" stroke-linecap="round"/>
+    <polyline points="265,160 250,205 270,250" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.4" stroke-linecap="round"/>
+    <polygon points="200,96 250,120 200,144 150,120" fill="#ffffff" opacity="0.35"/>
+    <circle cx="160" cy="225" r="7" fill="#ffffff" opacity="0.5"/>
+    <circle cx="240" cy="270" r="5" fill="#ffffff" opacity="0.4"/>
+  </g>
+</svg>
