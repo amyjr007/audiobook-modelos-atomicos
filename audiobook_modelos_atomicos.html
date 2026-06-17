@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Three.js (local) — usado só na cena do barco de Lego (dialogo1.7). 'defer' p/ não bloquear o 1º paint. -->
-<script defer src="three.min.js?v=1.1.34"></script>
+<script defer src="three.min.js?v=1.1.35"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -294,6 +294,33 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch2-name{margin-top:-8px;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(18px,5.2vw,26px);line-height:1.1;color:#fff;text-shadow:0 4px 22px rgba(0,0,0,.55);opacity:0;transform:translateY(14px) scale(.9);filter:blur(8px);transition:opacity .9s cubic-bezier(.22,1,.36,1) .12s,transform .9s cubic-bezier(.22,1,.36,1) .12s,filter .9s ease .12s}
 .ch2-name.in{opacity:1;transform:none;filter:blur(0)}
 .ch2-name.out{opacity:0;transform:translateY(-10px) scale(1.08);filter:blur(10px);transition:opacity .7s ease,transform .7s ease,filter .7s ease}
+
+/* Ken Burns na imagem (dialogo2.1): zoom/pan lento ~10s */
+@keyframes ch2KenBurns{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.26) translate(-3.5%,-3%)}}
+.ch2-imgwrap.kenburns img{animation:ch2KenBurns 10s ease-out both;transform-origin:50% 40%}
+
+/* Áreas de estudo (dialogo2.1): textos acumulando acima da imagem */
+.ch2-fields{display:flex;flex-direction:column;align-items:center;gap:5px;transition:opacity .6s ease,transform .6s ease}
+.ch2-fields.out{opacity:0;transform:translateY(-12px);filter:blur(6px)}
+.ch2-field{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(16px,4.6vw,22px);line-height:1.15;background:linear-gradient(135deg,var(--amber),var(--orange) 55%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transform:translateY(12px);filter:blur(7px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1),filter .6s ease}
+.ch2-field.in{opacity:1;transform:none;filter:blur(0)}
+
+/* Daltonismo: três bolas (cores reais) + rótulos que Dalton enxergava */
+.ch2-balls{display:none;flex-direction:column;align-items:center;gap:24px;opacity:0;transition:opacity .55s ease}
+.ch2-balls.in{opacity:1}
+.ch2-balls-row{display:flex;gap:54px;justify-content:center}
+.ch2-ball{display:flex;flex-direction:column;align-items:center;gap:11px;opacity:0;transform:scale(.35);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.34,1.56,.64,1)}
+.ch2-balls.in .ch2-ball{opacity:1;transform:none}
+.ch2-balls.in .ch2-top{transition-delay:.02s}
+.ch2-balls.in .ch2-bl{transition-delay:.16s}
+.ch2-balls.in .ch2-br{transition-delay:.3s}
+.ch2-dot{width:clamp(60px,20vw,80px);height:clamp(60px,20vw,80px);border-radius:50%;box-shadow:0 12px 30px rgba(0,0,0,.5),inset 0 -9px 18px rgba(0,0,0,.4),inset 0 9px 16px rgba(255,255,255,.22)}
+.ch2-dot.green{background:radial-gradient(circle at 35% 30%,#67e89a,#1f9d4d 72%)}
+.ch2-dot.black{background:radial-gradient(circle at 35% 30%,#5a5a5a,#080808 72%)}
+.ch2-dot.red{background:radial-gradient(circle at 35% 30%,#ff7468,#c41f12 72%)}
+.ch2-lbl{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(15px,4.4vw,20px);color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.5)}
+.ch2-dalton{margin-top:8px;font-family:'Fraunces',serif;font-weight:700;font-size:clamp(23px,6.6vw,34px);letter-spacing:-.3px;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-shadow:0 6px 30px rgba(255,122,24,.25);opacity:0;transform:translateY(14px) scale(.9);filter:blur(9px);transition:opacity .85s cubic-bezier(.22,1,.36,1),transform .85s cubic-bezier(.22,1,.36,1),filter .85s ease}
+.ch2-dalton.in{opacity:1;transform:none;filter:blur(0)}
 
 /* Sequência de texto */
 .ab-seq{display:flex;flex-direction:column;align-items:center;gap:18px}
@@ -738,7 +765,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.34" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.35" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -766,7 +793,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.34" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.35" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -778,7 +805,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-apple" id="abApple" style="display:none">
         <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
         <div class="ab-apple-stage" id="abAppleStage">
-          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.34" alt="Maçã" draggable="false">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.35" alt="Maçã" draggable="false">
           <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
           <svg class="ab-particle-arrow" id="abParticleArrow" viewBox="0 0 80 92" width="62" height="72" aria-hidden="true">
             <path d="M16 8 C56 16 64 44 46 78" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
@@ -819,15 +846,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.34" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.34" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.34" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.35" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.35" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.35" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.34" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.35" preload="auto"></audio>
     </div>
   </div>
 
@@ -845,14 +872,26 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <span class="ab-fab-icon" id="ch2FabIcon">▶</span>
       </button>
 
-      <!-- Linha do tempo: ano em cima + imagem -->
+      <!-- Linha do tempo: ano em cima + imagem; depois áreas de estudo e as bolas -->
       <div class="ch2-scene" id="ch2Scene">
         <div class="ch2-year" id="ch2Year"></div>
+        <div class="ch2-fields" id="ch2Fields"></div>
         <div class="ch2-imgwrap" id="ch2ImgWrap"><img id="ch2ImgEl" src="" alt="" draggable="false"></div>
         <div class="ch2-name" id="ch2Name"></div>
+        <!-- Daltonismo: 3 bolas (cores reais) com os rótulos que Dalton enxergava -->
+        <div class="ch2-balls" id="ch2Balls">
+          <div class="ch2-balls-row">
+            <div class="ch2-ball ch2-top"><span class="ch2-dot green"></span><span class="ch2-lbl">Marrom</span></div>
+          </div>
+          <div class="ch2-balls-row">
+            <div class="ch2-ball ch2-bl"><span class="ch2-dot black"></span><span class="ch2-lbl">vermelho</span></div>
+            <div class="ch2-ball ch2-br"><span class="ch2-dot red"></span><span class="ch2-lbl">azul</span></div>
+          </div>
+          <div class="ch2-dalton" id="ch2Dalton">Daltonismo</div>
+        </div>
       </div>
 
-      <audio id="ch2Audio" src="audio/dialogo2.mp3?v=1.1.34" preload="auto"></audio>
+      <audio id="ch2Audio" src="audio/dialogo2.mp3?v=1.1.35" preload="auto"></audio>
     </div>
   </div>
 
@@ -1066,7 +1105,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.34</div>
+<div class="app-version" id="appVersion">v1.1.35</div>
 
 </div>
 <script>
@@ -1275,22 +1314,22 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.34',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.34', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.34',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.34',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.34', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.34', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.34', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.34', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.1.34', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
-    { src:'audio/dialogo1.5.mp3?v=1.1.34', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
-    { src:'audio/dialogo1.6A.mp3?v=1.1.34', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
-    { src:'audio/dialogo1.6B.mp3?v=1.1.34', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
-    { src:'audio/dialogo1.7.mp3?v=1.1.34', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
-    { src:'audio/dialogo1.7A.mp3?v=1.1.34', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
-    { src:'audio/dialogo1.7B.mp3?v=1.1.34', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
-    { src:'audio/dialogo1.7C.mp3?v=1.1.34', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
+    { src:'audio/dialogo0.mp3?v=1.1.35',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.35', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.35',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.35',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.35', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.35', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.35', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.35', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.1.35', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo1.5.mp3?v=1.1.35', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
+    { src:'audio/dialogo1.6A.mp3?v=1.1.35', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
+    { src:'audio/dialogo1.6B.mp3?v=1.1.35', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
+    { src:'audio/dialogo1.7.mp3?v=1.1.35', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
+    { src:'audio/dialogo1.7A.mp3?v=1.1.35', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
+    { src:'audio/dialogo1.7B.mp3?v=1.1.35', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
+    { src:'audio/dialogo1.7C.mp3?v=1.1.35', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
   ]
 };
 
@@ -1486,7 +1525,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.34'); abSfx('audio/yes.mp3?v=1.1.34');
+    abSfx('audio/applause.mp3?v=1.1.35'); abSfx('audio/yes.mp3?v=1.1.35');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1569,9 +1608,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.34',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.34', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.34',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.35',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.35', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.35',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1704,7 +1743,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.34'); abSfx('audio/yes.mp3?v=1.1.34'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.35'); abSfx('audio/yes.mp3?v=1.1.35'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1793,7 +1832,7 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
-var abAppleWhole='images/apple.svg?v=1.1.34', abApplePiece='images/apple-piece.svg?v=1.1.34';
+var abAppleWhole='images/apple.svg?v=1.1.35', abApplePiece='images/apple-piece.svg?v=1.1.35';
 var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
 
 function abAppleReset(){
@@ -2493,7 +2532,7 @@ function abRedoCelebrate(){
   abShowFab(false);
   abAppleRedo(function(){                            /* ao completar a maçã... */
     abAppleCut=false;
-    abSfx('audio/yes.mp3?v=1.1.34'); abSfx('audio/applause.mp3?v=1.1.34'); /* ...comemora */
+    abSfx('audio/yes.mp3?v=1.1.35'); abSfx('audio/applause.mp3?v=1.1.35'); /* ...comemora */
     abConfetti();
     setTimeout(function(){ startSegment(11); }, 1600); /* depois segue p/ dialogo1.6B */
   });
@@ -2508,7 +2547,7 @@ function abAppleDoCut(){
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.1.34'); abSfx('audio/applause.mp3?v=1.1.34');
+    abSfx('audio/yes.mp3?v=1.1.35'); abSfx('audio/applause.mp3?v=1.1.35');
     abEl('abAppleRedo').classList.remove('show');
     setTimeout(function(){ startSegment(9); }, 1500); /* -> dialogo1.5 */
     return;
@@ -2973,10 +3012,18 @@ function abLoop(){
   ab.raf = requestAnimationFrame(abLoop);
 }
 
-/* ===================== CAPÍTULO 2 (dialogo2) =====================
-   Player próprio e leve: play embaixo; ao tocar dialogo2 dispara eventos
-   cronometrados (ano + imagem com entradas/saídas dramáticas). */
-var ch2 = { audio:null, inited:false, started:false, ended:false, playing:false, raf:null, cues:[] };
+/* ===================== CAPÍTULO 2 (dialogo2 / dialogo2.1) =====================
+   Player próprio e leve, multi-segmento: play embaixo; cada segmento dispara
+   seus eventos cronometrados. Ao terminar um segmento com next:true, o ▶
+   reaparece e leva ao próximo (continuação contínua, sem trocar a cena). */
+var ch2 = {
+  audio:null, inited:false, started:false, ended:false, playing:false,
+  awaitingNext:false, raf:null, seg:0, cues:[],
+  segments:[
+    { src:'audio/dialogo2.mp3?v=1.1.35',   build:ch2CuesSeg0, onStart:ch2InitSeg0, next:true  }, /* linha do tempo: 450 A.C. -> 1800 -> John Dalton */
+    { src:'audio/dialogo2.1.mp3?v=1.1.35', build:ch2CuesSeg1, onStart:ch2InitSeg1, next:false }  /* ken burns + áreas de estudo; depois as 3 bolas do daltonismo */
+  ]
+};
 function ch2El(id){ return document.getElementById(id); }
 function ch2SetFab(playing){ ch2El('ch2FabIcon').textContent = playing ? '⏸' : '▶'; }
 function ch2SetLoading(on){ var f=ch2El('ch2Fab'); if(f){ f.classList.toggle('loading', !!on); } }
@@ -2996,24 +3043,71 @@ function ch2HideImg(){
   var w=ch2El('ch2ImgWrap'); w.classList.remove('in'); w.classList.add('out');
   var n=ch2El('ch2Name'); if(n.textContent){ n.classList.remove('in'); n.classList.add('out'); }
 }
+/* Áreas de estudo (dialogo2.1): textos que vão se acumulando acima da imagem. */
+function ch2AddField(txt){
+  var c=ch2El('ch2Fields'); c.style.display=''; c.classList.remove('out');
+  var d=document.createElement('div'); d.className='ch2-field'; d.textContent=txt;
+  c.appendChild(d); void d.offsetWidth; d.classList.add('in');
+}
+/* Some a imagem + nome + áreas (e colapsa o espaço pra dar lugar às bolas). */
+function ch2HidePortrait(){
+  ch2HideImg(); ch2HideYear();
+  var f=ch2El('ch2Fields'); if(f){ f.classList.add('out'); }
+  setTimeout(function(){
+    ['ch2ImgWrap','ch2Name','ch2Fields','ch2Year'].forEach(function(id){ var e=ch2El(id); if(e){ e.style.display='none'; } });
+  }, 850);
+}
+/* As três bolas do daltonismo entram (escalonadas). */
+function ch2ShowBalls(){ var b=ch2El('ch2Balls'); b.style.display='flex'; void b.offsetWidth; b.classList.add('in'); }
 
-/* Eventos cronometrados do dialogo2. */
-function ch2BuildCues(){
+/* ----- Segmento 0: dialogo2 (linha do tempo) ----- */
+function ch2InitSeg0(){ ch2SceneReset(); }
+function ch2CuesSeg0(){
   return [
-    { t:3.0,  done:false, fn:function(){ ch2ShowYear('450 A.C.'); ch2ShowImg('images/img1.jpg?v=1.1.34'); } }, /* entra img1 + ano */
+    { t:3.0,  done:false, fn:function(){ ch2ShowYear('450 A.C.'); ch2ShowImg('images/img1.jpg?v=1.1.35'); } }, /* entra img1 + ano */
     { t:11.0, done:false, fn:function(){ ch2HideImg(); ch2HideYear(); } },                                     /* some a imagem (e o ano daquela era) */
     { t:17.7, done:false, fn:function(){ ch2ShowYear('1800'); } },                                             /* entra o ano 1800 em cima */
-    { t:22.8, done:false, fn:function(){ ch2ShowImg('images/john_dalton.jpeg?v=1.1.34', 'John Dalton'); } }     /* entra John Dalton + nome */
+    { t:22.8, done:false, fn:function(){ ch2ShowImg('images/john_dalton.jpeg?v=1.1.35', 'John Dalton'); } }     /* entra John Dalton + nome */
   ];
+}
+
+/* ----- Segmento 1: dialogo2.1 (ken burns + áreas; depois as bolas) ----- */
+function ch2InitSeg1(){
+  /* mantém a foto do Dalton (vinda do fim do dialogo2) e aplica o ken burns;
+     limpa o ano e prepara as áreas/bolas. */
+  ch2HideYear();
+  ch2El('ch2Fields').innerHTML=''; ch2El('ch2Fields').classList.remove('out'); ch2El('ch2Fields').style.display='';
+  var b=ch2El('ch2Balls'); b.classList.remove('in'); b.style.display='none';
+  ch2El('ch2Dalton').classList.remove('in');
+  ch2El('ch2ImgWrap').classList.add('kenburns'); /* zoom/pan lento até ~10s */
+}
+function ch2CuesSeg1(){
+  return [
+    { t:6.0,  done:false, fn:function(){ ch2AddField('Física'); } },
+    { t:7.0,  done:false, fn:function(){ ch2AddField('Química'); } },
+    { t:7.7,  done:false, fn:function(){ ch2AddField('Meteorologia'); } },
+    { t:9.2,  done:false, fn:function(){ ch2AddField('Medicina'); } },
+    { t:12.0, done:false, fn:function(){ ch2HidePortrait(); } },                               /* some imagem + textos */
+    { t:16.0, done:false, fn:function(){ ch2ShowBalls(); } },                                  /* 3 bolas (verde / preto / vermelho) */
+    { t:23.5, done:false, fn:function(){ ch2El('ch2Dalton').classList.add('in'); } }           /* "Daltonismo" embaixo */
+  ];
+}
+
+/* Limpa TODOS os visuais da cena do Capítulo 2 (estado inicial). */
+function ch2SceneReset(){
+  var y=ch2El('ch2Year'); if(y){ y.classList.remove('in','out'); y.textContent=''; y.style.display=''; }
+  var w=ch2El('ch2ImgWrap'); if(w){ w.classList.remove('in','out','kenburns'); w.style.display=''; }
+  var img=ch2El('ch2ImgEl'); if(img){ img.removeAttribute('src'); }
+  var n=ch2El('ch2Name'); if(n){ n.classList.remove('in','out'); n.textContent=''; n.style.display=''; }
+  var f=ch2El('ch2Fields'); if(f){ f.classList.remove('out'); f.innerHTML=''; f.style.display=''; }
+  var b=ch2El('ch2Balls'); if(b){ b.classList.remove('in'); b.style.display='none'; }
+  var d=ch2El('ch2Dalton'); if(d){ d.classList.remove('in'); }
 }
 
 /* Volta o capítulo ao estado inicial (só o play visível). */
 function ch2Reset(){
-  ch2.started=false; ch2.ended=false; ch2.playing=false;
-  var y=ch2El('ch2Year'); if(y){ y.classList.remove('in','out'); y.textContent=''; }
-  var w=ch2El('ch2ImgWrap'); if(w){ w.classList.remove('in','out'); }
-  var n=ch2El('ch2Name'); if(n){ n.classList.remove('in','out'); n.textContent=''; }
-  var img=ch2El('ch2ImgEl'); if(img){ img.removeAttribute('src'); }
+  ch2.started=false; ch2.ended=false; ch2.playing=false; ch2.awaitingNext=false; ch2.seg=0;
+  ch2SceneReset();
   if(ch2.audio){ try{ ch2.audio.pause(); ch2.audio.currentTime=0; }catch(_){} }
   ch2SetFab(false); ch2SetLoading(false);
 }
@@ -3022,30 +3116,46 @@ function ch2Init(){
   if(!ch2.inited){
     ch2.inited=true;
     ch2.audio=ch2El('ch2Audio');
-    ch2.audio.addEventListener('ended', function(){ ch2.playing=false; ch2.ended=true; ch2SetLoading(false); ch2SetFab(false); });
+    ch2.audio.addEventListener('ended', ch2OnEnded);
     ch2.audio.addEventListener('waiting', function(){ if(ch2.playing){ ch2SetLoading(true); } });
     ch2.audio.addEventListener('playing', function(){ ch2SetLoading(false); });
     ch2.audio.addEventListener('canplay', function(){ ch2SetLoading(false); });
   }
 }
 
-/* Começa o dialogo2 do início (reinicia eventos). */
-function ch2Start(){
+/* Fim de um segmento: mostra ▶; se houver next, arma o avanço. */
+function ch2OnEnded(){
+  ch2.playing=false; ch2.ended=true; ch2.awaitingNext=false; ch2SetLoading(false);
+  var seg=ch2.segments[ch2.seg];
+  if(seg.onEnd){ seg.onEnd(); }
+  ch2SetFab(false);
+  if(seg.next){ ch2.awaitingNext=true; }
+}
+
+/* Toca um segmento do Capítulo 2 do começo. */
+function ch2StartSegment(n){
   ch2Init();
-  ch2Reset();
-  ch2.cues=ch2BuildCues();
-  ch2.started=true; ch2.ended=false;
-  ch2.audio.currentTime=0;
+  if(n>=ch2.segments.length){ n=ch2.segments.length-1; }
+  var seg=ch2.segments[n];
+  ch2.seg=n; ch2.started=true; ch2.ended=false; ch2.awaitingNext=false;
+  ch2.cues=seg.build(); ch2.cues.forEach(function(c){ c.done=false; });
+  if(seg.onStart){ seg.onStart(); }
+  if(ch2.audio.getAttribute('src')!==seg.src){ ch2.audio.src=seg.src; ch2SetLoading(true); }
+  else { ch2.audio.currentTime=0; }
   ch2.playing=true; ch2SetFab(true);
   var p=ch2.audio.play(); if(p && p.catch){ p.catch(function(){}); }
   if(!ch2.raf){ ch2Loop(); }
 }
 
+/* Começa o Capítulo 2 do início (dialogo2). */
+function ch2Start(){ ch2Reset(); ch2StartSegment(0); }
+
 /* Play/Pause do Capítulo 2. */
 function ch2Toggle(){
   ch2Init();
-  if(!ch2.started){ ch2Start(); return; }
-  if(ch2.ended){ ch2Start(); return; }      /* replay */
+  if(!ch2.started){ ch2StartSegment(0); return; }
+  if(ch2.awaitingNext){ ch2StartSegment(ch2.seg+1); return; }
+  if(ch2.ended){ ch2StartSegment(ch2.seg); return; }      /* replay do segmento atual */
   if(ch2.audio.paused){
     ch2.playing=true; ch2.audio.play(); ch2SetFab(true);
     if(!ch2.raf){ ch2Loop(); }
