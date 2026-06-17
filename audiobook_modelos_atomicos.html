@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Three.js (local) — usado só na cena do barco de Lego (dialogo1.7). 'defer' p/ não bloquear o 1º paint. -->
-<script defer src="three.min.js?v=1.1.30"></script>
+<script defer src="three.min.js?v=1.1.31"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -34,9 +34,11 @@
   --text:#fbeee2;
   --text2:#cbb29c;
 }
-body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+/* App em tela cheia (full), sem scroll: a página é sempre uma só. */
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;height:100%;overflow:hidden}
 
-.app{width:100%;max-width:720px;margin:0 auto;min-height:100vh;position:relative}
+.app{width:100%;max-width:720px;margin:0 auto;height:100%;position:relative;overflow:hidden}
 
 /* NAV */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;background:rgba(22,12,5,0.95);backdrop-filter:blur(20px);border-top:1px solid rgba(255,122,24,0.22);display:flex;z-index:100}
@@ -90,6 +92,11 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch-soon .ch-soon-num{font-family:'Fraunces',serif;font-size:13px;font-weight:700;letter-spacing:3px;color:var(--orange);opacity:.85}
 .ch-soon .ch-soon-title{font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(26px,7vw,42px);line-height:1.1;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .ch-soon .ch-soon-msg{font-size:13px;color:var(--text2);opacity:.7}
+/* Cabeçalho fixo no topo: número + nome do capítulo */
+.chapter-top{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;z-index:118;display:none;align-items:center;gap:11px;padding:calc(10px + env(safe-area-inset-top,0px)) 18px 10px;background:rgba(22,12,5,0.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,122,24,0.14)}
+.chapter-top.show{display:flex}
+.chapter-top-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:12px;color:#160c05;background:linear-gradient(135deg,var(--orange),var(--coral))}
+.chapter-top-name{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ts-sheet-handle{flex-shrink:0;display:flex;justify-content:center;padding:12px 0 4px;cursor:pointer}
 .ts-sheet-handle span{width:42px;height:5px;border-radius:3px;background:rgba(255,122,24,0.4)}
 .ts-sheet-header{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:6px 22px 14px}
@@ -108,7 +115,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ts-empty{padding:26px 16px;color:var(--text2);opacity:.7;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;text-align:center}
 
 /* SCREENS */
-.screen{display:none;min-height:calc(100vh - 56px);padding-bottom:80px}
+.screen{display:none;height:100%;overflow:hidden}
 .screen.active{display:block}
 
 /* ===== CAPA ===== */
@@ -169,7 +176,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
 /* Páginas */
 .topic-content{display:none}
-.topic-content.active{display:block}
+.topic-content.active{display:block;height:100%}
 
 /* Page slide effect */
 .pages-wrapper{position:relative;overflow:hidden}
@@ -256,7 +263,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .page-theme-teal .page-inner{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cg fill='none' stroke='%23ff5436' stroke-width='3' opacity='0.5'%3E%3Cellipse cx='200' cy='200' rx='162' ry='60'/%3E%3Cellipse cx='200' cy='200' rx='162' ry='60' transform='rotate(60 200 200)'/%3E%3Cellipse cx='200' cy='200' rx='162' ry='60' transform='rotate(120 200 200)'/%3E%3C/g%3E%3Ccircle cx='200' cy='200' r='20' fill='%23ff7a18' opacity='0.55'/%3E%3Ccircle cx='362' cy='200' r='8' fill='%23ffab4d' opacity='0.65'/%3E%3Ccircle cx='118' cy='74' r='7' fill='%23ffc777' opacity='0.65'/%3E%3C/svg%3E")}
 
 /* ===== AUDIOBOOK (Introdução à Química) ===== */
-.ab-stage{position:relative;min-height:calc(100vh - 120px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 26px 40px;text-align:center;overflow:hidden;background-position:center 82%;background-repeat:no-repeat;background-size:min(80%,360px)}
+.ab-stage{position:relative;height:100%;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 26px 56px;text-align:center;overflow:hidden;background-position:center 82%;background-repeat:no-repeat;background-size:min(80%,360px)}
 /* Quando o carrossel aparece, sobe o conteúdo p/ dar espaço à imagem inteira */
 .ab-stage.with-carousel{justify-content:flex-start;padding-top:40px}
 .ab-stage.with-carousel .ab-relative{gap:18px}
@@ -715,7 +722,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.30" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.31" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -743,7 +750,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.30" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.31" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -755,7 +762,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-apple" id="abApple" style="display:none">
         <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
         <div class="ab-apple-stage" id="abAppleStage">
-          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.30" alt="Maçã" draggable="false">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.31" alt="Maçã" draggable="false">
           <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
           <svg class="ab-particle-arrow" id="abParticleArrow" viewBox="0 0 80 92" width="62" height="72" aria-hidden="true">
             <path d="M16 8 C56 16 64 44 46 78" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
@@ -796,15 +803,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.30" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.30" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.30" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.31" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.31" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.31" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.30" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.31" preload="auto"></audio>
     </div>
   </div>
 
@@ -978,6 +985,12 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 <!-- Mãozinha ilustrativa da barra de navegação -->
 <div class="nav-hand" id="navHand">👆</div>
 
+<!-- Cabeçalho do capítulo (topo): número + nome -->
+<div class="chapter-top" id="chapterTop">
+  <span class="chapter-top-num" id="chapterTopNum">1</span>
+  <span class="chapter-top-name" id="chapterTopName">Os filósofos do invisível</span>
+</div>
+
 <!-- Navegação rápida (marcadores) — aba na lateral direita -->
 <div class="ts-bar" id="tsBar" onclick="tsToggle()" aria-label="Abrir navegação rápida" style="display:none">
   <span class="ts-grabber"></span>
@@ -1012,7 +1025,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.30</div>
+<div class="app-version" id="appVersion">v1.1.31</div>
 
 </div>
 <script>
@@ -1026,12 +1039,20 @@ function goTo(screen) {
   if(el){ el.classList.add('active'); }
   var nb = document.getElementById('nav-' + screen);
   if(nb){ nb.classList.add('active'); }
-  /* barras de navegação (capítulos + navegação rápida) só na tela de aprendizado */
+  /* barras de navegação + cabeçalho do capítulo só na tela de aprendizado */
   var showNav = (screen === 'aprenda');
-  var tb = document.getElementById('tsBar'), cb = document.getElementById('chBar');
+  var tb = document.getElementById('tsBar'), cb = document.getElementById('chBar'), ct = document.getElementById('chapterTop');
   if(tb){ tb.style.display = showNav ? '' : 'none'; }
   if(cb){ cb.style.display = showNav ? '' : 'none'; }
+  if(ct){ ct.classList.toggle('show', showNav); }
+  if(showNav){ updateChapterTop(); }
   if(!showNav){ if(typeof tsClose==='function'){ tsClose(); } if(typeof chClose==='function'){ chClose(); } }
+}
+/* Atualiza o cabeçalho do topo com o número + nome do capítulo atual. */
+function updateChapterTop(){
+  var n=document.getElementById('chapterTopNum'), nm=document.getElementById('chapterTopName');
+  if(n){ n.textContent = (currentChapter+1); }
+  if(nm){ nm.textContent = chapters[currentChapter].title; }
 }
 
 function switchTopic(idx) {
@@ -1187,6 +1208,7 @@ function goChapter(i){
   }
   renderTimestamps();
   renderChapters();
+  updateChapterTop();
   chClose();
 }
 
@@ -1201,22 +1223,22 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.30',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.30', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.30',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.30',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.30', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.30', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.30', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.30', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.1.30', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
-    { src:'audio/dialogo1.5.mp3?v=1.1.30', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
-    { src:'audio/dialogo1.6A.mp3?v=1.1.30', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
-    { src:'audio/dialogo1.6B.mp3?v=1.1.30', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
-    { src:'audio/dialogo1.7.mp3?v=1.1.30', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
-    { src:'audio/dialogo1.7A.mp3?v=1.1.30', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
-    { src:'audio/dialogo1.7B.mp3?v=1.1.30', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
-    { src:'audio/dialogo1.7C.mp3?v=1.1.30', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
+    { src:'audio/dialogo0.mp3?v=1.1.31',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.31', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.31',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.31',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.31', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.31', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.31', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.31', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.1.31', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo1.5.mp3?v=1.1.31', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
+    { src:'audio/dialogo1.6A.mp3?v=1.1.31', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
+    { src:'audio/dialogo1.6B.mp3?v=1.1.31', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
+    { src:'audio/dialogo1.7.mp3?v=1.1.31', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
+    { src:'audio/dialogo1.7A.mp3?v=1.1.31', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
+    { src:'audio/dialogo1.7B.mp3?v=1.1.31', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
+    { src:'audio/dialogo1.7C.mp3?v=1.1.31', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
   ]
 };
 
@@ -1412,7 +1434,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.30'); abSfx('audio/yes.mp3?v=1.1.30');
+    abSfx('audio/applause.mp3?v=1.1.31'); abSfx('audio/yes.mp3?v=1.1.31');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1495,9 +1517,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.30',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.30', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.30',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.31',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.31', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.31',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1630,7 +1652,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.30'); abSfx('audio/yes.mp3?v=1.1.30'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.31'); abSfx('audio/yes.mp3?v=1.1.31'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1719,7 +1741,7 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
-var abAppleWhole='images/apple.svg?v=1.1.30', abApplePiece='images/apple-piece.svg?v=1.1.30';
+var abAppleWhole='images/apple.svg?v=1.1.31', abApplePiece='images/apple-piece.svg?v=1.1.31';
 var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
 
 function abAppleReset(){
@@ -2417,7 +2439,7 @@ function abRedoCelebrate(){
   abShowFab(false);
   abAppleRedo(function(){                            /* ao completar a maçã... */
     abAppleCut=false;
-    abSfx('audio/yes.mp3?v=1.1.30'); abSfx('audio/applause.mp3?v=1.1.30'); /* ...comemora */
+    abSfx('audio/yes.mp3?v=1.1.31'); abSfx('audio/applause.mp3?v=1.1.31'); /* ...comemora */
     abConfetti();
     setTimeout(function(){ startSegment(11); }, 1600); /* depois segue p/ dialogo1.6B */
   });
@@ -2432,7 +2454,7 @@ function abAppleDoCut(){
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.1.30'); abSfx('audio/applause.mp3?v=1.1.30');
+    abSfx('audio/yes.mp3?v=1.1.31'); abSfx('audio/applause.mp3?v=1.1.31');
     abEl('abAppleRedo').classList.remove('show');
     setTimeout(function(){ startSegment(9); }, 1500); /* -> dialogo1.5 */
     return;
