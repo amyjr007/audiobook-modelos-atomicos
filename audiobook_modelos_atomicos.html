@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Three.js (local) — usado só na cena do barco de Lego (dialogo1.7). 'defer' p/ não bloquear o 1º paint. -->
-<script defer src="three.min.js?v=1.1.25"></script>
+<script defer src="three.min.js?v=1.1.26"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -684,7 +684,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.25" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.26" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -712,7 +712,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.25" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.26" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -724,7 +724,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-apple" id="abApple" style="display:none">
         <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
         <div class="ab-apple-stage" id="abAppleStage">
-          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.25" alt="Maçã" draggable="false">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.26" alt="Maçã" draggable="false">
           <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
           <svg class="ab-particle-arrow" id="abParticleArrow" viewBox="0 0 80 92" width="62" height="72" aria-hidden="true">
             <path d="M16 8 C56 16 64 44 46 78" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
@@ -762,15 +762,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.25" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.25" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.25" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.26" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.26" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.26" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.25" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.26" preload="auto"></audio>
     </div>
   </div>
 
@@ -956,7 +956,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.25</div>
+<div class="app-version" id="appVersion">v1.1.26</div>
 
 </div>
 <script>
@@ -1008,7 +1008,7 @@ var timestamps = [
   { title:'Introdução',         sub:'', time:null, seg:0 },
   { title:'O que é matéria',    sub:'', time:null, seg:2 },
   { title:'A ideia do átomo',   sub:'', time:null, seg:7 },
-  { title:'Marcador 4',  sub:'Título provisório', time:null },
+  { title:'A analogia com lego', sub:'', time:null, seg:12 },
   { title:'Marcador 5',  sub:'Título provisório', time:null },
   { title:'Marcador 6',  sub:'Título provisório', time:null },
   { title:'Marcador 7',  sub:'Título provisório', time:null },
@@ -1069,20 +1069,20 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.25',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.25', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.25',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.25',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.25', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.25', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.25', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.25', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.1.25', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
-    { src:'audio/dialogo1.5.mp3?v=1.1.25', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
-    { src:'audio/dialogo1.6A.mp3?v=1.1.25', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
-    { src:'audio/dialogo1.6B.mp3?v=1.1.25', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
-    { src:'audio/dialogo1.7.mp3?v=1.1.25', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
-    { src:'audio/dialogo1.7A.mp3?v=1.1.25', build:abCues17A,   onStart:abInit17A,         next:false }  /* mesmo barco: segurar 1s p/ explodir (peças se espalham) */
+    { src:'audio/dialogo0.mp3?v=1.1.26',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.26', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.26',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.26',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.26', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.26', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.26', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.26', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.1.26', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo1.5.mp3?v=1.1.26', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
+    { src:'audio/dialogo1.6A.mp3?v=1.1.26', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
+    { src:'audio/dialogo1.6B.mp3?v=1.1.26', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
+    { src:'audio/dialogo1.7.mp3?v=1.1.26', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
+    { src:'audio/dialogo1.7A.mp3?v=1.1.26', build:abCues17A,   onStart:abInit17A,         next:false }  /* mesmo barco: segurar 1s p/ explodir (peças se espalham) */
   ]
 };
 
@@ -1278,7 +1278,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.25'); abSfx('audio/yes.mp3?v=1.1.25');
+    abSfx('audio/applause.mp3?v=1.1.26'); abSfx('audio/yes.mp3?v=1.1.26');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1361,9 +1361,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.25',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.25', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.25',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.26',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.26', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.26',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1496,7 +1496,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.25'); abSfx('audio/yes.mp3?v=1.1.25'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.26'); abSfx('audio/yes.mp3?v=1.1.26'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1585,7 +1585,7 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
-var abAppleWhole='images/apple.svg?v=1.1.25', abApplePiece='images/apple-piece.svg?v=1.1.25';
+var abAppleWhole='images/apple.svg?v=1.1.26', abApplePiece='images/apple-piece.svg?v=1.1.26';
 var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
 
 function abAppleReset(){
@@ -2130,6 +2130,15 @@ function legoRiseOutPrev(){
    Pode girar tocando na tela; ainda NÃO explode (isso é o 1.7A). */
 function abInit17(){
   abSpotlight(false); abNavDemoEnd();
+  /* Salto direto pelo marcador "A analogia com lego": garante tela limpa de
+     QUALQUER outra cena do tópico 0 antes do barco. No fluxo normal (1.6B->1.7)
+     essas cenas já estão escondidas, então aqui é no-op e não afeta a transição;
+     o grupo da maçã NÃO é resetado aqui (sobe animado via legoRiseOutPrev). */
+  abAtomReset(); abMatTopReset(); abLightReset(); abStatesReset();
+  abMateriaReset(); abChemReset(); abPhoneReset(); abQuizReset();
+  abEl('abChapter').classList.add('gone');
+  abEl('abSciTitleInner').classList.remove('in','out');
+  abEl('abScatter').innerHTML='';
   legoRiseOutPrev();
   var ov=abEl('abLego');
   abEl('abLegoLabel').classList.remove('show');
@@ -2179,7 +2188,7 @@ function abRedoCelebrate(){
   abShowFab(false);
   abAppleRedo(function(){                            /* ao completar a maçã... */
     abAppleCut=false;
-    abSfx('audio/yes.mp3?v=1.1.25'); abSfx('audio/applause.mp3?v=1.1.25'); /* ...comemora */
+    abSfx('audio/yes.mp3?v=1.1.26'); abSfx('audio/applause.mp3?v=1.1.26'); /* ...comemora */
     abConfetti();
     setTimeout(function(){ startSegment(11); }, 1600); /* depois segue p/ dialogo1.6B */
   });
@@ -2194,7 +2203,7 @@ function abAppleDoCut(){
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.1.25'); abSfx('audio/applause.mp3?v=1.1.25');
+    abSfx('audio/yes.mp3?v=1.1.26'); abSfx('audio/applause.mp3?v=1.1.26');
     abEl('abAppleRedo').classList.remove('show');
     setTimeout(function(){ startSegment(9); }, 1500); /* -> dialogo1.5 */
     return;
