@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Three.js (local) — usado só na cena do barco de Lego (dialogo1.7). 'defer' p/ não bloquear o 1º paint. -->
-<script defer src="three.min.js?v=1.1.29"></script>
+<script defer src="three.min.js?v=1.1.30"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -48,11 +48,12 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 /* Selo de versão (canto inferior esquerdo) */
 .app-version{position:fixed;z-index:120;left:12px;bottom:46px;font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--text2);opacity:.55;pointer-events:none;background:rgba(22,12,5,.55);padding:3px 9px;border-radius:10px;backdrop-filter:blur(4px);border:1px solid rgba(255,122,24,.18)}
 
-/* Barra de navegação rápida (marcadores) — discreta, na base */
-.ts-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;z-index:112;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px 10px;background:rgba(22,12,5,0.72);backdrop-filter:blur(14px);border-top:1px solid rgba(255,122,24,0.12);color:var(--text2);font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;opacity:.75;transition:opacity .25s,background .25s}
-.ts-bar:hover{opacity:1;background:rgba(31,17,8,0.92)}
-.ts-bar .ts-grabber{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:34px;height:3.5px;border-radius:2px;background:rgba(255,122,24,0.4)}
-.ts-bar .ts-bar-icon{font-size:12px}
+/* Navegação rápida (marcadores) — aba na lateral DIREITA; gaveta abre p/ o centro */
+.ts-bar{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:112;display:flex;flex-direction:column;align-items:center;gap:9px;padding:16px 7px 16px 10px;background:rgba(22,12,5,0.74);backdrop-filter:blur(14px);border:1px solid rgba(255,122,24,0.18);border-right:none;border-top-left-radius:15px;border-bottom-left-radius:15px;color:var(--text2);font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;opacity:.82;transition:opacity .25s,background .25s}
+.ts-bar:hover{opacity:1;background:rgba(31,17,8,0.94)}
+.ts-bar .ts-grabber{position:absolute;left:4px;top:50%;transform:translateY(-50%);width:3.5px;height:34px;border-radius:2px;background:rgba(255,122,24,0.4)}
+.ts-bar .ts-bar-icon{font-size:15px}
+.ts-bar .ts-bar-label{writing-mode:vertical-rl;text-orientation:mixed;font-size:10px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase}
 
 /* Destaque escurecido com pergunta centralizada (dialogo0.1) */
 .ab-spotlight{position:fixed;inset:0;z-index:115;display:flex;align-items:center;justify-content:center;padding:36px;background:rgba(8,5,2,0);opacity:0;visibility:hidden;transition:background .7s ease,opacity .7s ease,visibility .7s ease}
@@ -70,9 +71,25 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ts-backdrop{position:fixed;inset:0;z-index:190;background:rgba(0,0,0,0.55);opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
 .ts-backdrop.open{opacity:1;visibility:visible}
 
-/* Painel deslizante de marcadores */
-.ts-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:720px;max-height:72vh;z-index:200;background:var(--surface);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid rgba(255,122,24,0.25);box-shadow:0 -16px 50px rgba(0,0,0,0.5);transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;overflow:hidden}
-.ts-sheet.open{transform:translateX(-50%) translateY(0)}
+/* Gaveta lateral de marcadores (entra da direita p/ o centro) */
+.ts-sheet{position:fixed;top:0;right:0;height:100%;width:min(360px,86vw);z-index:200;background:var(--surface);border-left:1px solid rgba(255,122,24,0.25);box-shadow:-16px 0 50px rgba(0,0,0,0.5);transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;overflow:hidden}
+.ts-sheet.open{transform:translateX(0)}
+.ts-sheet-header{padding-top:18px}
+
+/* Menu de capítulos — barra embaixo (onde ficava a navegação rápida) */
+.ch-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;z-index:112;display:flex;align-items:center;justify-content:center;gap:9px;padding:11px 16px 12px;background:rgba(22,12,5,0.8);backdrop-filter:blur(14px);border-top:1px solid rgba(255,122,24,0.16);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;transition:background .25s}
+.ch-bar:hover{background:rgba(31,17,8,0.96)}
+.ch-bar .ts-grabber{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:34px;height:3.5px;border-radius:2px;background:rgba(255,122,24,0.4)}
+.ch-bar .ch-bar-icon{font-size:14px}
+/* painel de capítulos (sobe de baixo, como era a navegação rápida) */
+.ch-sheet{position:fixed;bottom:0;left:50%;transform:translateX(-50%) translateY(100%);width:100%;max-width:720px;max-height:72vh;z-index:200;background:var(--surface);border-top-left-radius:22px;border-top-right-radius:22px;border-top:1px solid rgba(255,122,24,0.25);box-shadow:0 -16px 50px rgba(0,0,0,0.5);transition:transform .35s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;overflow:hidden}
+.ch-sheet.open{transform:translateX(-50%) translateY(0)}
+/* placeholder dos capítulos ainda não prontos */
+.ch-soon{display:none;min-height:calc(100vh - 160px);flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:40px 28px}
+.ch-soon.active{display:flex}
+.ch-soon .ch-soon-num{font-family:'Fraunces',serif;font-size:13px;font-weight:700;letter-spacing:3px;color:var(--orange);opacity:.85}
+.ch-soon .ch-soon-title{font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(26px,7vw,42px);line-height:1.1;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ch-soon .ch-soon-msg{font-size:13px;color:var(--text2);opacity:.7}
 .ts-sheet-handle{flex-shrink:0;display:flex;justify-content:center;padding:12px 0 4px;cursor:pointer}
 .ts-sheet-handle span{width:42px;height:5px;border-radius:3px;background:rgba(255,122,24,0.4)}
 .ts-sheet-header{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:6px 22px 14px}
@@ -86,6 +103,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ts-item-txt{display:flex;flex-direction:column;gap:2px}
 .ts-item-title{font-size:14px;font-weight:600}
 .ts-item-sub{font-size:11px;color:var(--text2);opacity:.7}
+.ts-item.active-ch{background:rgba(255,122,24,0.10)}
+.ts-item.active-ch .ts-item-num{background:var(--orange);color:#160c05;border-color:var(--orange)}
+.ts-empty{padding:26px 16px;color:var(--text2);opacity:.7;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;text-align:center}
 
 /* SCREENS */
 .screen{display:none;min-height:calc(100vh - 56px);padding-bottom:80px}
@@ -600,8 +620,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
 <!-- APRENDA -->
 <div id="screen-aprenda" class="screen">
-  <!-- Carrossel de tópicos -->
-  <div class="topic-carousel">
+  <!-- Carrossel de tópicos (antigo menu superior) — substituído pela barra de
+       capítulos embaixo (#chBar). Mantido oculto p/ não quebrar switchTopic. -->
+  <div class="topic-carousel" style="display:none">
     <div class="carousel-track" id="carouselTrack">
       <button class="topic-tab active" data-topic="0" onclick="switchTopic(0)">1. Introdução à Química</button>
       <button class="topic-tab" data-topic="1" onclick="switchTopic(1)">2. Os filósofos do invisível</button>
@@ -694,7 +715,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.29" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.30" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -722,7 +743,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.29" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.30" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -734,7 +755,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-apple" id="abApple" style="display:none">
         <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
         <div class="ab-apple-stage" id="abAppleStage">
-          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.29" alt="Maçã" draggable="false">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.30" alt="Maçã" draggable="false">
           <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
           <svg class="ab-particle-arrow" id="abParticleArrow" viewBox="0 0 80 92" width="62" height="72" aria-hidden="true">
             <path d="M16 8 C56 16 64 44 46 78" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
@@ -775,15 +796,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.29" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.29" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.29" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.30" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.30" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.30" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.29" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.30" preload="auto"></audio>
     </div>
   </div>
 
@@ -932,6 +953,13 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
     </div>
   </div>
+
+  <!-- Placeholder dos capítulos 2-4 (em construção) -->
+  <div class="ch-soon" id="chSoon">
+    <div class="ch-soon-num" id="chSoonNum">Capítulo 2</div>
+    <div class="ch-soon-title" id="chSoonTitle">—</div>
+    <div class="ch-soon-msg">Capítulo em construção. Em breve!</div>
+  </div>
 </div>
 
 <!-- QUIZ -->
@@ -950,26 +978,41 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 <!-- Mãozinha ilustrativa da barra de navegação -->
 <div class="nav-hand" id="navHand">👆</div>
 
-<!-- Barra de marcadores (time stamps) -->
-<div class="ts-bar" id="tsBar" onclick="tsToggle()">
+<!-- Navegação rápida (marcadores) — aba na lateral direita -->
+<div class="ts-bar" id="tsBar" onclick="tsToggle()" aria-label="Abrir navegação rápida" style="display:none">
   <span class="ts-grabber"></span>
   <span class="ts-bar-icon">⏱</span>
-  <span>Navegação Rápida</span>
+  <span class="ts-bar-label">Navegação rápida</span>
 </div>
 
-<!-- Backdrop + Painel -->
+<!-- Gaveta de marcadores (direita) -->
 <div class="ts-backdrop" id="tsBackdrop" onclick="tsClose()"></div>
 <div class="ts-sheet" id="tsSheet" role="dialog" aria-label="Navegação Rápida do audiobook">
-  <div class="ts-sheet-handle" onclick="tsClose()"><span></span></div>
   <div class="ts-sheet-header">
-    <div class="ts-sheet-title">Navegação Rápida</div>
+    <div class="ts-sheet-title" id="tsSheetTitle">Navegação Rápida</div>
     <button class="ts-sheet-close" onclick="tsClose()" aria-label="Fechar">✕</button>
   </div>
   <div class="ts-list" id="tsList"></div>
 </div>
 
+<!-- Menu de capítulos — barra embaixo -->
+<div class="ch-bar" id="chBar" onclick="chToggle()" aria-label="Navegue pelos capítulos" style="display:none">
+  <span class="ts-grabber"></span>
+  <span class="ch-bar-icon">📖</span>
+  <span>Navegue pelos Capítulos</span>
+</div>
+<div class="ts-backdrop" id="chBackdrop" onclick="chClose()"></div>
+<div class="ch-sheet" id="chSheet" role="dialog" aria-label="Capítulos">
+  <div class="ts-sheet-handle" onclick="chClose()"><span></span></div>
+  <div class="ts-sheet-header">
+    <div class="ts-sheet-title">Capítulos</div>
+    <button class="ts-sheet-close" onclick="chClose()" aria-label="Fechar">✕</button>
+  </div>
+  <div class="ts-list" id="chList"></div>
+</div>
+
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.29</div>
+<div class="app-version" id="appVersion">v1.1.30</div>
 
 </div>
 <script>
@@ -983,6 +1026,12 @@ function goTo(screen) {
   if(el){ el.classList.add('active'); }
   var nb = document.getElementById('nav-' + screen);
   if(nb){ nb.classList.add('active'); }
+  /* barras de navegação (capítulos + navegação rápida) só na tela de aprendizado */
+  var showNav = (screen === 'aprenda');
+  var tb = document.getElementById('tsBar'), cb = document.getElementById('chBar');
+  if(tb){ tb.style.display = showNav ? '' : 'none'; }
+  if(cb){ cb.style.display = showNav ? '' : 'none'; }
+  if(!showNav){ if(typeof tsClose==='function'){ tsClose(); } if(typeof chClose==='function'){ chClose(); } }
 }
 
 function switchTopic(idx) {
@@ -1030,11 +1079,29 @@ var timestamps = [
   { title:'Marcador 10', sub:'Título provisório', time:null }
 ];
 
+/* Capítulos: cada um tem a SUA barra lateral de marcadores. Hoje só o capítulo 1
+   tem conteúdo (o audiobook = topic-0); 2-4 entram depois (placeholder). */
+var chapters = [
+  { title:'Os filósofos do invisível', topic:0,    timestamps: timestamps },
+  { title:'O átomo de John Dalton',    topic:null, timestamps: [] },
+  { title:'A eletricidade e o átomo',  topic:null, timestamps: [] },
+  { title:'E. Rutherford',             topic:null, timestamps: [] }
+];
+var currentChapter = 0;
+
+/* ----- Navegação rápida (barra lateral direita), marcadores do capítulo atual ----- */
 function renderTimestamps(){
   var list = document.getElementById('tsList');
   if(!list) return;
+  var items = chapters[currentChapter].timestamps;
+  var titleEl = document.getElementById('tsSheetTitle');
+  if(titleEl){ titleEl.textContent = (currentChapter+1) + '. ' + chapters[currentChapter].title; }
   list.innerHTML = '';
-  timestamps.forEach(function(ts, i){
+  if(!items.length){
+    list.innerHTML = '<div class="ts-empty">Sem marcadores neste capítulo ainda.</div>';
+    return;
+  }
+  items.forEach(function(ts, i){
     var btn = document.createElement('button');
     btn.className = 'ts-item';
     btn.onclick = function(){ tsGo(i); };
@@ -1047,12 +1114,12 @@ function renderTimestamps(){
     list.appendChild(btn);
   });
 }
-
 function tsToggle(){
   var sheet = document.getElementById('tsSheet');
   if(sheet.classList.contains('open')){ tsClose(); } else { tsOpen(); }
 }
 function tsOpen(){
+  renderTimestamps();
   document.getElementById('tsSheet').classList.add('open');
   document.getElementById('tsBackdrop').classList.add('open');
 }
@@ -1060,19 +1127,71 @@ function tsClose(){
   document.getElementById('tsSheet').classList.remove('open');
   document.getElementById('tsBackdrop').classList.remove('open');
 }
-
 /* Marcador com 'seg' definido pula para aquele segmento do audiobook e toca. */
 function tsGo(i){
-  var ts = timestamps[i];
+  var ts = chapters[currentChapter].timestamps[i];
   if(!ts || ts.seg == null){ return; } /* marcador provisório: sem ação */
   tsClose();
   goTo('aprenda');
-  switchTopic(0);
+  goChapter(0);                 /* marcadores são do capítulo 1 (audiobook) */
   abInit();
   startSegment(ts.seg);
 }
 
+/* ----- Menu de capítulos (barra inferior) ----- */
+function renderChapters(){
+  var list = document.getElementById('chList');
+  if(!list) return;
+  list.innerHTML = '';
+  chapters.forEach(function(ch, i){
+    var btn = document.createElement('button');
+    btn.className = 'ts-item' + (i===currentChapter ? ' active-ch' : '');
+    btn.onclick = function(){ goChapter(i); };
+    btn.innerHTML =
+      '<span class="ts-item-num">' + (i+1) + '</span>' +
+      '<span class="ts-item-txt">' +
+        '<span class="ts-item-title">' + ch.title + '</span>' +
+        '<span class="ts-item-sub">' + (ch.topic===0 ? 'Capítulo atual' : 'Em construção') + '</span>' +
+      '</span>';
+    list.appendChild(btn);
+  });
+}
+function chToggle(){
+  var sheet = document.getElementById('chSheet');
+  if(sheet.classList.contains('open')){ chClose(); } else { chOpen(); }
+}
+function chOpen(){
+  renderChapters();
+  document.getElementById('chSheet').classList.add('open');
+  document.getElementById('chBackdrop').classList.add('open');
+}
+function chClose(){
+  document.getElementById('chSheet').classList.remove('open');
+  document.getElementById('chBackdrop').classList.remove('open');
+}
+/* Troca de capítulo: mostra o conteúdo e atualiza a barra lateral de marcadores. */
+function goChapter(i){
+  currentChapter = i;
+  document.querySelectorAll('.topic-content').forEach(function(s){ s.classList.remove('active'); });
+  var soon = document.getElementById('chSoon');
+  if(soon){ soon.classList.remove('active'); }
+  if(chapters[i].topic === 0){
+    document.getElementById('topic-0').classList.add('active');
+    abInit();
+  } else {
+    document.getElementById('chSoonNum').textContent = 'Capítulo ' + (i+1);
+    document.getElementById('chSoonTitle').textContent = chapters[i].title;
+    if(soon){ soon.classList.add('active'); }
+    if(typeof legoHide === 'function'){ legoHide(); }
+    if(ab && ab.audio){ ab.audio.pause(); ab.playing = false; }
+  }
+  renderTimestamps();
+  renderChapters();
+  chClose();
+}
+
 renderTimestamps();
+renderChapters();
 
 /* ===================== AUDIOBOOK (multi-segmento) ===================== */
 var ab = {
@@ -1082,22 +1201,22 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.29',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.29', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.29',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.29',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.29', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.29', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.29', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.29', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.1.29', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
-    { src:'audio/dialogo1.5.mp3?v=1.1.29', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
-    { src:'audio/dialogo1.6A.mp3?v=1.1.29', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
-    { src:'audio/dialogo1.6B.mp3?v=1.1.29', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
-    { src:'audio/dialogo1.7.mp3?v=1.1.29', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
-    { src:'audio/dialogo1.7A.mp3?v=1.1.29', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
-    { src:'audio/dialogo1.7B.mp3?v=1.1.29', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
-    { src:'audio/dialogo1.7C.mp3?v=1.1.29', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
+    { src:'audio/dialogo0.mp3?v=1.1.30',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.30', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.30',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.30',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.30', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.30', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.30', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.30', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.1.30', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo1.5.mp3?v=1.1.30', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
+    { src:'audio/dialogo1.6A.mp3?v=1.1.30', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
+    { src:'audio/dialogo1.6B.mp3?v=1.1.30', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
+    { src:'audio/dialogo1.7.mp3?v=1.1.30', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
+    { src:'audio/dialogo1.7A.mp3?v=1.1.30', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
+    { src:'audio/dialogo1.7B.mp3?v=1.1.30', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
+    { src:'audio/dialogo1.7C.mp3?v=1.1.30', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
   ]
 };
 
@@ -1293,7 +1412,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.29'); abSfx('audio/yes.mp3?v=1.1.29');
+    abSfx('audio/applause.mp3?v=1.1.30'); abSfx('audio/yes.mp3?v=1.1.30');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1376,9 +1495,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.29',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.29', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.29',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.30',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.30', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.30',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1511,7 +1630,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.29'); abSfx('audio/yes.mp3?v=1.1.29'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.30'); abSfx('audio/yes.mp3?v=1.1.30'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1600,7 +1719,7 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
-var abAppleWhole='images/apple.svg?v=1.1.29', abApplePiece='images/apple-piece.svg?v=1.1.29';
+var abAppleWhole='images/apple.svg?v=1.1.30', abApplePiece='images/apple-piece.svg?v=1.1.30';
 var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
 
 function abAppleReset(){
@@ -2298,7 +2417,7 @@ function abRedoCelebrate(){
   abShowFab(false);
   abAppleRedo(function(){                            /* ao completar a maçã... */
     abAppleCut=false;
-    abSfx('audio/yes.mp3?v=1.1.29'); abSfx('audio/applause.mp3?v=1.1.29'); /* ...comemora */
+    abSfx('audio/yes.mp3?v=1.1.30'); abSfx('audio/applause.mp3?v=1.1.30'); /* ...comemora */
     abConfetti();
     setTimeout(function(){ startSegment(11); }, 1600); /* depois segue p/ dialogo1.6B */
   });
@@ -2313,7 +2432,7 @@ function abAppleDoCut(){
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.1.29'); abSfx('audio/applause.mp3?v=1.1.29');
+    abSfx('audio/yes.mp3?v=1.1.30'); abSfx('audio/applause.mp3?v=1.1.30');
     abEl('abAppleRedo').classList.remove('show');
     setTimeout(function(){ startSegment(9); }, 1500); /* -> dialogo1.5 */
     return;
@@ -2424,7 +2543,7 @@ function abAppleSetup(){
     var yLim = window.innerHeight - 90;
     var redo=abEl('abAppleRedo');
     if(redo && redo.offsetParent!==null){ yLim = redo.getBoundingClientRect().top - 10; }
-    else { var bar=abEl('tsBar'); if(bar){ yLim = bar.getBoundingClientRect().top - 16; } }
+    else { var bar=abEl('chBar'); if(bar && bar.offsetParent!==null){ yLim = bar.getBoundingClientRect().top - 16; } }
     if(abSegInRect(s.x,s.y,ex,ey, 0,0, window.innerWidth, yLim)){ abAppleDoCut(); }
   });
 }
@@ -2739,8 +2858,9 @@ function abSpotlight(on){
 /* Demonstração da barra de navegação (mãozinha) */
 function abNavDemoStart(){
   var h = abEl('navHand');
-  h.style.top = 'calc(100vh - 92px)';   /* sobre a barra discreta */
-  h.classList.add('show', 'tap');
+  h.style.left = 'auto'; h.style.right = '14px';
+  h.style.top = '50%'; h.style.transform = 'translateY(-50%)';   /* sobre a aba da direita */
+  h.classList.add('show');
   tsOpen();
 }
 function abNavHandTo(top){
