@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Three.js (local) — usado só na cena do barco de Lego (dialogo1.7). 'defer' p/ não bloquear o 1º paint. -->
-<script defer src="three.min.js?v=1.1.27"></script>
+<script defer src="three.min.js?v=1.1.28"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -522,6 +522,16 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 /* anel de progresso do hold-to-explode */
 .ab-lego-ring{position:fixed;top:50%;left:50%;width:80px;height:80px;margin:-40px 0 0 -40px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:111}
 .ab-lego-ring.on{opacity:1}
+/* botão "Refazer" do barco (1.7B) — mesmo visual do Refazer da maçã */
+.ab-lego-redo{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);z-index:116;display:none;align-items:center;gap:7px;padding:9px 18px;border-radius:30px;border:1px solid rgba(255,122,24,.45);background:rgba(22,12,5,.74);backdrop-filter:blur(6px);color:var(--orange2);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.4px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);touch-action:manipulation}
+.ab-lego-redo.show{display:inline-flex}
+.ab-lego-redo:hover{border-color:rgba(255,122,24,.75);color:#ffd9a8}
+.ab-lego-redo:active{transform:translateX(-50%) scale(.95)}
+/* botão de quiz no lugar do play (fim do 1.7C) — mesma posição/forma do FAB */
+.ab-lego-quiz{position:fixed;z-index:121;bottom:50px;left:50%;transform:translateX(calc(min(360px,50vw) - 62px));width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--orange),var(--coral));color:#160c05;display:none;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:12px;letter-spacing:.3px;box-shadow:0 10px 30px rgba(255,122,24,0.5);animation:abQuizPulse 1.8s ease-in-out infinite}
+.ab-lego-quiz.show{display:flex}
+.ab-lego-quiz:active{animation:none;transform:translateX(calc(min(360px,50vw) - 62px)) scale(.94)}
+@keyframes abQuizPulse{0%,100%{box-shadow:0 10px 30px rgba(255,122,24,0.5)}50%{box-shadow:0 10px 38px rgba(255,122,24,0.85)}}
 /* rótulo "Construtor básico" ao lado da pecinha em destaque */
 .ab-lego-label{position:fixed;z-index:110;transform:translateY(-50%);white-space:nowrap;font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(20px,5.8vw,32px);letter-spacing:-.3px;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transition:opacity .55s ease;pointer-events:none}
 .ab-lego-label.show{opacity:1}
@@ -684,7 +694,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.27" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.28" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -712,7 +722,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.27" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.28" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -724,7 +734,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-apple" id="abApple" style="display:none">
         <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
         <div class="ab-apple-stage" id="abAppleStage">
-          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.27" alt="Maçã" draggable="false">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.28" alt="Maçã" draggable="false">
           <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
           <svg class="ab-particle-arrow" id="abParticleArrow" viewBox="0 0 80 92" width="62" height="72" aria-hidden="true">
             <path d="M16 8 C56 16 64 44 46 78" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
@@ -734,6 +744,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ab-apple-hint" id="abAppleHint">deslize para cortar</div>
       </div>
       <button type="button" class="ab-apple-redo" id="abAppleRedo">↺ Refazer</button>
+      <!-- dialogo1.7B: refazer o barco; 1.7C(fim): quiz no lugar do play -->
+      <button type="button" class="ab-lego-redo" id="abLegoRedo" onclick="legoRedoClick()">↺ Refazer</button>
+      <button type="button" class="ab-lego-quiz" id="abLegoQuiz" onclick="legoGoQuiz()" aria-label="Ir para o quiz">Quiz</button>
 
       <!-- Átomo / indivisível (dialogo1.5) — textos empilhados do topo p/ baixo -->
       <div class="ab-at2" id="abAt2" style="display:none">
@@ -762,15 +775,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.27" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.27" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.27" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.28" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.28" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.28" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.27" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.28" preload="auto"></audio>
     </div>
   </div>
 
@@ -956,7 +969,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.27</div>
+<div class="app-version" id="appVersion">v1.1.28</div>
 
 </div>
 <script>
@@ -1069,20 +1082,22 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.27',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.27', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.27',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.27',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.27', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.27', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.27', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.27', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.1.27', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
-    { src:'audio/dialogo1.5.mp3?v=1.1.27', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
-    { src:'audio/dialogo1.6A.mp3?v=1.1.27', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
-    { src:'audio/dialogo1.6B.mp3?v=1.1.27', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
-    { src:'audio/dialogo1.7.mp3?v=1.1.27', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
-    { src:'audio/dialogo1.7A.mp3?v=1.1.27', build:abCues17A,   onStart:abInit17A,         next:false }  /* mesmo barco: segurar 1s p/ explodir (peças se espalham) */
+    { src:'audio/dialogo0.mp3?v=1.1.28',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.28', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.28',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.28',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.28', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.28', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.28', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.28', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.1.28', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo1.5.mp3?v=1.1.28', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
+    { src:'audio/dialogo1.6A.mp3?v=1.1.28', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
+    { src:'audio/dialogo1.6B.mp3?v=1.1.28', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
+    { src:'audio/dialogo1.7.mp3?v=1.1.28', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
+    { src:'audio/dialogo1.7A.mp3?v=1.1.28', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
+    { src:'audio/dialogo1.7B.mp3?v=1.1.28', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
+    { src:'audio/dialogo1.7C.mp3?v=1.1.28', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
   ]
 };
 
@@ -1159,7 +1174,7 @@ function startSegment(n){
   var abAppleStart = 8; /* índice fixo do 1.4; grupo da maçã = 1.4/1.5/1.6A/1.6B (8..11) */
   if(n < abAppleStart){ abAppleReset(); }
   if(n < abAppleStart - 1){ abAtomReset(); } /* não reseta o átomo (penúltimo antes do grupo) nem o grupo */
-  if(n !== 12 && n !== 13){ legoHide(); } /* mantém a cena do barco nos segmentos 1.7/1.7A; esconde nos demais */
+  if(n < 12 || n > 15){ legoHide(); } /* mantém a cena do barco em 1.7/1.7A/1.7B/1.7C (12..15); esconde nos demais */
   if(seg.onStart){ seg.onStart(); }
 
   if(ab.audio.getAttribute('src') !== seg.src){ ab.audio.src = seg.src; abSetLoading(true); } /* novo áudio começa em 0 */
@@ -1278,7 +1293,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.27'); abSfx('audio/yes.mp3?v=1.1.27');
+    abSfx('audio/applause.mp3?v=1.1.28'); abSfx('audio/yes.mp3?v=1.1.28');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1361,9 +1376,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.27',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.27', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.27',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.28',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.28', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.28',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1496,7 +1511,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.27'); abSfx('audio/yes.mp3?v=1.1.27'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.28'); abSfx('audio/yes.mp3?v=1.1.28'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1585,7 +1600,7 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
-var abAppleWhole='images/apple.svg?v=1.1.27', abApplePiece='images/apple-piece.svg?v=1.1.27';
+var abAppleWhole='images/apple.svg?v=1.1.28', abApplePiece='images/apple-piece.svg?v=1.1.28';
 var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
 
 function abAppleReset(){
@@ -1820,9 +1835,10 @@ var lego = {
   /* rotação por toque */
   rotX:-0.2, rotY:0.4, autoR:true,
   dragging:false, lx:0, ly:0, movedDist:0,
-  /* interação de explosão */
+  /* interação de explosão + remontagem */
   interactive:false, canExplode:false,
   pressing:false, pStart:0, hProg:0, shake:0, exploded:false,
+  rewinding:false, rewindDone:null, REWIND_DUR:1.2, REWIND_STAGGER:0.6,
   C:{ RED:0xdc2626, BLUE:0x2563eb, DKBLUE:0x1e3a8a, YELLOW:0xfacc15,
       WHITE:0xf0eeea, BROWN:0x92400e, GREEN:0x16a34a, ORANGE:0xea580c, CYAN:0x06b6d4 }
 };
@@ -1853,7 +1869,8 @@ function legoAddBrick(x, y, z, w, h, d, c){
   b.position.set(x, y, z);
   lego.boat.add(b);
   lego.bricks.push({ mesh:b, origPos:new THREE.Vector3(x, y, z), dropping:false, t:0,
-    vel:new THREE.Vector3(), rotVel:new THREE.Vector3(), landed:false, halfH:h/2 });
+    vel:new THREE.Vector3(), rotVel:new THREE.Vector3(), landed:false, halfH:h/2,
+    scatterPos:new THREE.Vector3(), scatterQuat:new THREE.Quaternion(), rewindT:0, rewindDelay:0 });
   return lego.bricks.length - 1;
 }
 function legoBuildBoat(){
@@ -2004,7 +2021,7 @@ function legoTick(){
   if(!lego.inited){ legoInit(); legoResize(); legoResetScene(); }
   if(!lego.boat){ return; }
   // barco intacto: gira (auto até o 1º toque, depois pelo arrasto) e flutua de leve
-  if(!lego.exploded){
+  if(!lego.exploded && !lego.rewinding){
     if(lego.autoR){ lego.rotY += dt*0.3; }
     lego.boat.rotation.x = lego.rotX;
     lego.boat.rotation.y = lego.rotY;
@@ -2049,6 +2066,23 @@ function legoTick(){
       }
     });
   }
+  // remontagem do barco (Refazer, 1.7B): peças voltam às posições originais
+  if(lego.rewinding){
+    var allDone=true;
+    lego.boat.updateMatrixWorld(true);
+    var bq=new THREE.Quaternion(); lego.boat.getWorldQuaternion(bq);
+    lego.bricks.forEach(function(bk){
+      bk.rewindDelay -= dt;
+      if(bk.rewindDelay > 0){ allDone=false; return; }
+      bk.rewindT += dt/lego.REWIND_DUR;
+      if(bk.rewindT >= 1){ bk.rewindT=1; } else { allDone=false; }
+      var tt=legoEaseInOut(Math.min(bk.rewindT, 1));
+      var target=bk.origPos.clone(); lego.boat.localToWorld(target);
+      bk.mesh.position.lerpVectors(bk.scatterPos, target, tt);
+      bk.mesh.quaternion.slerpQuaternions(bk.scatterQuat, bq, tt);
+    });
+    if(allDone){ legoFinishRewind(); }
+  }
   lego.camera.position.set(lego.shake*(Math.random()-0.5), lego.CAM_Y + lego.shake*(Math.random()-0.5), lego.CAM_Z);
   lego.camera.lookAt(0, lego.LOOK_Y, 0);
   lego.renderer.render(lego.scene, lego.camera);
@@ -2073,6 +2107,40 @@ function legoExplode(){
     bk.rotVel.set((Math.random()-0.5)*8, (Math.random()-0.5)*8, (Math.random()-0.5)*8);
     bk.landed=false;
   });
+  lego.canExplode=false; /* já explodiu */
+  /* após explodir, encadeia o dialogo1.7B (narração pós-explosão) */
+  setTimeout(function(){ if(lego.exploded && ab.seg===13){ startSegment(14); } }, 1200);
+}
+/* Remontagem animada (Refazer): cada peça volta da posição espalhada p/ a original. */
+function legoStartRewind(onDone){
+  if(lego.rewinding){ return; }
+  lego.rewindDone = (typeof onDone==='function') ? onDone : null;
+  lego.boat.rotation.set(lego.rotX, lego.rotY, 0);
+  lego.boat.position.y=lego.boatBaseY;
+  lego.boat.updateMatrixWorld(true);
+  lego.bricks.forEach(function(bk){
+    bk.scatterPos.copy(bk.mesh.position);
+    bk.scatterQuat.copy(bk.mesh.quaternion);
+    bk.rewindT=0;
+    var dist=Math.sqrt(bk.origPos.x*bk.origPos.x + bk.origPos.z*bk.origPos.z);
+    bk.rewindDelay=(bk.origPos.y*0.7 + dist*0.1)*lego.REWIND_STAGGER;
+  });
+  lego.exploded=false;   /* para a física de queda */
+  lego.rewinding=true;
+  abVibe(AB_VTXT);
+}
+function legoFinishRewind(){
+  lego.rewinding=false; lego.exploded=false;
+  lego.bricks.forEach(function(bk){
+    if(bk.mesh.parent !== lego.boat){ lego.scene.remove(bk.mesh); lego.boat.add(bk.mesh); }
+    bk.mesh.position.copy(bk.origPos);
+    bk.mesh.rotation.set(0,0,0);
+    bk.mesh.quaternion.identity();
+    bk.mesh.scale.set(1,1,1);
+    bk.landed=false; bk.vel.set(0,0,0); bk.rotVel.set(0,0,0);
+  });
+  var cb=lego.rewindDone; lego.rewindDone=null;
+  if(cb){ cb(); }
 }
 /* 12.3s: destaca UMA peça — desacopla do barco e a leva p/ baixo, à frente. */
 function legoEmitBrick(){
@@ -2181,6 +2249,44 @@ function abInit17A(){
   abShowFab(true);
 }
 function abCues17A(){ return []; }
+/* onStart do dialogo1.7B (pós-explosão): MANTÉM as peças espalhadas na tela.
+   Narração automática; ao terminar, surge o botão "Refazer". */
+function abInit17B(){
+  abSpotlight(false); abNavDemoEnd();
+  var ov=abEl('abLego'); ov.style.display='block'; ov.classList.add('show','in');
+  abEl('abLegoLabel').classList.remove('show');
+  abEl('abLegoRedo').classList.remove('show');
+  abEl('abLegoQuiz').classList.remove('show');
+  lego.interactive=false; lego.canExplode=false; /* não gira/explode mais; peças já no chão */
+  requestAnimationFrame(function(){ legoInit(); legoResize(); legoStartLoop(); }); /* garante render contínuo */
+  abShowFab(false); /* sem play: o Refazer conduz */
+}
+/* fim do 1.7B: mostra o botão Refazer. */
+function abShow17BRedo(){ abEl('abLegoRedo').classList.add('show'); }
+/* clique no Refazer: remonta o barco e, ao completar, toca o dialogo1.7C. */
+function legoRedoClick(){
+  abEl('abLegoRedo').classList.remove('show');
+  abShowFab(false);
+  legoStartRewind(function(){ startSegment(15); }); /* barco refeito -> 1.7C */
+}
+/* onStart do dialogo1.7C: barco inteiro de novo; narração automática.
+   Ao terminar, o botão de quiz aparece no lugar do play. */
+function abInit17C(){
+  abSpotlight(false); abNavDemoEnd();
+  abEl('abLegoRedo').classList.remove('show');
+  abEl('abLegoQuiz').classList.remove('show');
+  lego.interactive=true; lego.canExplode=false; /* pode girar; não explode */
+  abShowFab(false);
+}
+/* fim do 1.7C: botão de quiz no lugar do play. */
+function abShow17CQuiz(){ abShowFab(false); abEl('abLegoQuiz').classList.add('show'); }
+/* clique no botão de quiz: pausa a narração e vai para a tela de quiz. */
+function legoGoQuiz(){
+  if(ab.audio){ ab.audio.pause(); } ab.playing=false;
+  abEl('abLegoQuiz').classList.remove('show');
+  legoHide();
+  goTo('quiz');
+}
 /* Clique no Refazer (no dialogo1.6A): some a seta, a maçã se refaz e SÓ AO
    COMPLETAR a remontagem toca yes/applause + confete; depois segue p/ 1.6B. */
 function abRedoCelebrate(){
@@ -2189,7 +2295,7 @@ function abRedoCelebrate(){
   abShowFab(false);
   abAppleRedo(function(){                            /* ao completar a maçã... */
     abAppleCut=false;
-    abSfx('audio/yes.mp3?v=1.1.27'); abSfx('audio/applause.mp3?v=1.1.27'); /* ...comemora */
+    abSfx('audio/yes.mp3?v=1.1.28'); abSfx('audio/applause.mp3?v=1.1.28'); /* ...comemora */
     abConfetti();
     setTimeout(function(){ startSegment(11); }, 1600); /* depois segue p/ dialogo1.6B */
   });
@@ -2204,7 +2310,7 @@ function abAppleDoCut(){
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.1.27'); abSfx('audio/applause.mp3?v=1.1.27');
+    abSfx('audio/yes.mp3?v=1.1.28'); abSfx('audio/applause.mp3?v=1.1.28');
     abEl('abAppleRedo').classList.remove('show');
     setTimeout(function(){ startSegment(9); }, 1500); /* -> dialogo1.5 */
     return;
