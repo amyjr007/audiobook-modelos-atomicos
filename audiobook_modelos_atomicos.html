@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Three.js (local) — usado só na cena do barco de Lego (dialogo1.7). 'defer' p/ não bloquear o 1º paint. -->
-<script defer src="three.min.js?v=1.1.24"></script>
+<script defer src="three.min.js?v=1.1.25"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -516,7 +516,12 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-lego{position:fixed;inset:0;z-index:109;display:none;transform:translateY(130vh);transition:transform 1.6s cubic-bezier(.22,1,.36,1);pointer-events:none}
 .ab-lego.show{display:block}
 .ab-lego.in{transform:translateY(0)}
-.ab-lego canvas{display:block;width:100%;height:100%;touch-action:none}
+/* o canvas captura o toque (girar o barco / segurar p/ explodir), mesmo com o overlay pointer-events:none */
+.ab-lego canvas{display:block;width:100%;height:100%;touch-action:none;pointer-events:auto;cursor:grab}
+.ab-lego canvas:active{cursor:grabbing}
+/* anel de progresso do hold-to-explode */
+.ab-lego-ring{position:fixed;top:50%;left:50%;width:80px;height:80px;margin:-40px 0 0 -40px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:111}
+.ab-lego-ring.on{opacity:1}
 /* rótulo "Construtor básico" ao lado da pecinha em destaque */
 .ab-lego-label{position:fixed;z-index:110;transform:translateY(-50%);white-space:nowrap;font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(20px,5.8vw,32px);letter-spacing:-.3px;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transition:opacity .55s ease;pointer-events:none}
 .ab-lego-label.show{opacity:1}
@@ -679,7 +684,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.24" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.1.25" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -707,7 +712,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.24" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.1.25" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -719,7 +724,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-apple" id="abApple" style="display:none">
         <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
         <div class="ab-apple-stage" id="abAppleStage">
-          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.24" alt="Maçã" draggable="false">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.1.25" alt="Maçã" draggable="false">
           <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
           <svg class="ab-particle-arrow" id="abParticleArrow" viewBox="0 0 80 92" width="62" height="72" aria-hidden="true">
             <path d="M16 8 C56 16 64 44 46 78" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
@@ -741,23 +746,31 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat16b" id="abMat16B"></div>
       <div class="ab-atom-label" id="abAtomLabel">Átomo</div>
 
-      <!-- dialogo1.7: barco de Lego (cena 3D) + rótulo "Construtor básico" -->
+      <!-- dialogo1.7 / 1.7A: barco de Lego (cena 3D) + rótulo "Construtor básico" -->
       <div class="ab-lego" id="abLego" style="display:none">
         <canvas id="abLegoCanvas"></canvas>
+        <!-- anel de progresso do "segurar 1s para explodir" (1.7A) -->
+        <svg class="ab-lego-ring" id="abLegoRing" viewBox="0 0 80 80" aria-hidden="true">
+          <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="3"/>
+          <circle id="abLegoRingFill" cx="40" cy="40" r="34" fill="none" stroke="#ff7a18" stroke-width="3.5"
+                  stroke-dasharray="213.6" stroke-dashoffset="213.6" transform="rotate(-90 40 40)" stroke-linecap="round"/>
+          <text id="abLegoRingText" x="40" y="44" text-anchor="middle" fill="rgba(255,255,255,0.85)"
+                font-size="12" font-family="'Plus Jakarta Sans',sans-serif"></text>
+        </svg>
       </div>
       <div class="ab-lego-label" id="abLegoLabel">Construtor básico</div>
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.24" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.24" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.24" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.1.25" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.1.25" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.1.25" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.24" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.1.25" preload="auto"></audio>
     </div>
   </div>
 
@@ -943,7 +956,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.1.24</div>
+<div class="app-version" id="appVersion">v1.1.25</div>
 
 </div>
 <script>
@@ -1056,19 +1069,20 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.1.24',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.1.24', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.1.24',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.1.24',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.1.24', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.1.24', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.1.24', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.1.24', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.1.24', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
-    { src:'audio/dialogo1.5.mp3?v=1.1.24', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
-    { src:'audio/dialogo1.6A.mp3?v=1.1.24', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
-    { src:'audio/dialogo1.6B.mp3?v=1.1.24', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
-    { src:'audio/dialogo1.7.mp3?v=1.1.24', build:abCues17,     onStart:abInit17,          next:false }  /* barco de Lego: entra de baixo; 12.3s sai 1 peça; 15s "Construtor básico" */
+    { src:'audio/dialogo0.mp3?v=1.1.25',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.1.25', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.1.25',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.1.25',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.1.25', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.1.25', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.1.25', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.1.25', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.1.25', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo1.5.mp3?v=1.1.25', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
+    { src:'audio/dialogo1.6A.mp3?v=1.1.25', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
+    { src:'audio/dialogo1.6B.mp3?v=1.1.25', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
+    { src:'audio/dialogo1.7.mp3?v=1.1.25', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
+    { src:'audio/dialogo1.7A.mp3?v=1.1.25', build:abCues17A,   onStart:abInit17A,         next:false }  /* mesmo barco: segurar 1s p/ explodir (peças se espalham) */
   ]
 };
 
@@ -1145,7 +1159,7 @@ function startSegment(n){
   var abAppleStart = 8; /* índice fixo do 1.4; grupo da maçã = 1.4/1.5/1.6A/1.6B (8..11) */
   if(n < abAppleStart){ abAppleReset(); }
   if(n < abAppleStart - 1){ abAtomReset(); } /* não reseta o átomo (penúltimo antes do grupo) nem o grupo */
-  if(n !== 12){ legoHide(); } /* esconde a cena do barco (1.7) ao saltar p/ outro segmento */
+  if(n !== 12 && n !== 13){ legoHide(); } /* mantém a cena do barco nos segmentos 1.7/1.7A; esconde nos demais */
   if(seg.onStart){ seg.onStart(); }
 
   if(ab.audio.getAttribute('src') !== seg.src){ ab.audio.src = seg.src; abSetLoading(true); } /* novo áudio começa em 0 */
@@ -1264,7 +1278,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.1.24'); abSfx('audio/yes.mp3?v=1.1.24');
+    abSfx('audio/applause.mp3?v=1.1.25'); abSfx('audio/yes.mp3?v=1.1.25');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -1347,9 +1361,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.1.24',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.1.24', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.1.24',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.1.25',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.1.25', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.1.25',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -1482,7 +1496,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.24'); abSfx('audio/yes.mp3?v=1.1.24'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.1.25'); abSfx('audio/yes.mp3?v=1.1.25'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -1571,7 +1585,7 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
-var abAppleWhole='images/apple.svg?v=1.1.24', abApplePiece='images/apple-piece.svg?v=1.1.24';
+var abAppleWhole='images/apple.svg?v=1.1.25', abApplePiece='images/apple-piece.svg?v=1.1.25';
 var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
 
 function abAppleReset(){
@@ -1797,10 +1811,18 @@ function abCues16B(){
 var lego = {
   inited:false, active:false, raf:null, prev:0,
   renderer:null, scene:null, camera:null, boat:null, canvas:null,
+  ringEl:null, ringFill:null, ringText:null,
   bricks:[], pickIndex:0, emitted:null,
-  boatBaseY:0.3,
+  boatBaseY:0.3, boatScale:1.08,           /* 10% menor que o 1.2 da interação original */
   CAM_Y:2.2, CAM_Z:4.5, LOOK_Y:0.6,
+  HOLD_TIME:1.0, GROUND_Y:-1.6,            /* segurar 1s p/ explodir; chão (invisível) das peças */
   U:0.2, BH:0.2*0.45,
+  /* rotação por toque */
+  rotX:-0.2, rotY:0.4, autoR:true,
+  dragging:false, lx:0, ly:0, movedDist:0,
+  /* interação de explosão */
+  interactive:false, canExplode:false,
+  pressing:false, pStart:0, hProg:0, shake:0, exploded:false,
   C:{ RED:0xdc2626, BLUE:0x2563eb, DKBLUE:0x1e3a8a, YELLOW:0xfacc15,
       WHITE:0xf0eeea, BROWN:0x92400e, GREEN:0x16a34a, ORANGE:0xea580c, CYAN:0x06b6d4 }
 };
@@ -1830,7 +1852,8 @@ function legoAddBrick(x, y, z, w, h, d, c){
   var b=legoCreateBrick(w, h, d, c);
   b.position.set(x, y, z);
   lego.boat.add(b);
-  lego.bricks.push({ mesh:b, origPos:new THREE.Vector3(x, y, z), dropping:false, t:0 });
+  lego.bricks.push({ mesh:b, origPos:new THREE.Vector3(x, y, z), dropping:false, t:0,
+    vel:new THREE.Vector3(), rotVel:new THREE.Vector3(), landed:false, halfH:h/2 });
   return lego.bricks.length - 1;
 }
 function legoBuildBoat(){
@@ -1880,7 +1903,7 @@ function legoBuildBoat(){
     legoAddBrick(3*U-U*0.1, BH*2, z*U, U*0.15, U*0.15, U*0.05, C.CYAN);
   }
   lego.boat.position.y=lego.boatBaseY;
-  lego.boat.scale.set(1.2, 1.2, 1.2);
+  lego.boat.scale.set(lego.boatScale, lego.boatScale, lego.boatScale);
 }
 function legoInit(){
   if(lego.inited) return;
@@ -1898,7 +1921,44 @@ function legoInit(){
   var sun=new THREE.DirectionalLight(0xffffff, 0.95); sun.position.set(5,10,7); lego.scene.add(sun);
   var fill=new THREE.DirectionalLight(0xffddb8, 0.3); fill.position.set(-4,5,-6); lego.scene.add(fill);
   legoBuildBoat();
+  lego.ringEl=abEl('abLegoRing'); lego.ringFill=abEl('abLegoRingFill'); lego.ringText=abEl('abLegoRingText');
   window.addEventListener('resize', legoResize);
+  /* girar tocando + segurar p/ explodir */
+  lego.canvas.addEventListener('mousedown', legoPointerDown, {passive:false});
+  window.addEventListener('mousemove', legoPointerMove, {passive:false});
+  window.addEventListener('mouseup', legoPointerUp);
+  lego.canvas.addEventListener('touchstart', legoPointerDown, {passive:false});
+  window.addEventListener('touchmove', legoPointerMove, {passive:false});
+  window.addEventListener('touchend', legoPointerUp);
+  window.addEventListener('touchcancel', legoPointerUp);
+}
+function legoGetPoint(e){
+  if(e.touches && e.touches.length>0){ return {x:e.touches[0].clientX, y:e.touches[0].clientY}; }
+  return {x:e.clientX, y:e.clientY};
+}
+function legoPointerDown(e){
+  if(!lego.interactive || !lego.active){ return; }
+  e.preventDefault();
+  var p=legoGetPoint(e);
+  lego.dragging=true; lego.autoR=false;
+  lego.lx=p.x; lego.ly=p.y; lego.movedDist=0;
+  if(lego.canExplode && !lego.exploded){ lego.pressing=true; lego.pStart=performance.now(); }
+}
+function legoPointerMove(e){
+  if(!lego.dragging){ return; }
+  e.preventDefault();
+  var p=legoGetPoint(e);
+  var dx=p.x-lego.lx, dy=p.y-lego.ly;
+  lego.movedDist += Math.abs(dx)+Math.abs(dy);
+  if(lego.movedDist>6){ lego.pressing=false; lego.hProg=0; lego.shake=0; if(lego.ringEl){ lego.ringEl.classList.remove('on'); } }
+  lego.rotY += dx*0.007;
+  lego.rotX += dy*0.007;
+  lego.rotX = Math.max(-1.2, Math.min(0.6, lego.rotX));
+  lego.lx=p.x; lego.ly=p.y;
+}
+function legoPointerUp(){
+  lego.dragging=false; lego.pressing=false; lego.hProg=0; lego.shake=0;
+  if(lego.ringEl){ lego.ringEl.classList.remove('on'); }
 }
 function legoResize(){
   if(!lego.renderer || !lego.camera || !lego.canvas) return;
@@ -1911,21 +1971,23 @@ function legoResize(){
   lego.camera.updateProjectionMatrix();
   if(lego.emitted && abEl('abLegoLabel').classList.contains('show')){ legoPositionLabel(); }
 }
-/* Volta a peça destacada p/ o barco e zera a cena (re-entradas/replay). */
+/* Remonta o barco inteiro (peça destacada e/ou explosão) e zera a cena. */
 function legoResetScene(){
   if(!lego.boat) return;
-  if(lego.emitted){
-    var b=lego.emitted;
-    lego.scene.remove(b.mesh);
-    lego.boat.add(b.mesh);
+  lego.bricks.forEach(function(b){
+    if(b.mesh.parent !== lego.boat){ lego.scene.remove(b.mesh); lego.boat.add(b.mesh); }
     b.mesh.position.copy(b.origPos);
     b.mesh.rotation.set(0,0,0);
+    b.mesh.quaternion.identity();
     b.mesh.scale.set(1,1,1);
-    b.dropping=false;
-    lego.emitted=null;
-  }
-  lego.boat.rotation.set(-0.2, 0.4, 0);
+    b.dropping=false; b.landed=false; b.vel.set(0,0,0); b.rotVel.set(0,0,0);
+  });
+  lego.emitted=null;
+  lego.exploded=false; lego.pressing=false; lego.hProg=0; lego.shake=0;
+  lego.rotX=-0.2; lego.rotY=0.4; lego.autoR=true;
+  lego.boat.rotation.set(lego.rotX, lego.rotY, 0);
   lego.boat.position.y=lego.boatBaseY;
+  if(lego.ringEl){ lego.ringEl.classList.remove('on'); }
   abEl('abLegoLabel').classList.remove('show');
 }
 function legoStartLoop(){
@@ -1941,24 +2003,76 @@ function legoTick(){
   var dt=Math.min((now-lego.prev)/1000, 0.05); lego.prev=now;
   if(!lego.inited){ legoInit(); legoResize(); legoResetScene(); }
   if(!lego.boat){ return; }
-  // barco gira devagar e flutua de leve
-  lego.boat.rotation.y += dt*0.3;
-  lego.boat.position.y = lego.boatBaseY + Math.sin(now*0.0012)*0.04;
-  // peça que desce p/ destaque (arco curto + cresce + gira)
+  // barco intacto: gira (auto até o 1º toque, depois pelo arrasto) e flutua de leve
+  if(!lego.exploded){
+    if(lego.autoR){ lego.rotY += dt*0.3; }
+    lego.boat.rotation.x = lego.rotX;
+    lego.boat.rotation.y = lego.rotY;
+    lego.boat.position.y = lego.boatBaseY + Math.sin(now*0.0012)*0.04;
+  }
+  // progresso do "segurar 1s para explodir"
+  if(lego.pressing && lego.canExplode && !lego.exploded){
+    var th=(now-lego.pStart)/1000;
+    lego.hProg=Math.min(th/lego.HOLD_TIME, 1);
+    lego.shake=lego.hProg*0.04;
+    if(lego.ringEl){ lego.ringEl.classList.add('on'); }
+    if(lego.ringFill){ lego.ringFill.setAttribute('stroke-dashoffset', 213.6*(1-lego.hProg)); }
+    if(lego.ringText){ var rem=Math.max(0, Math.ceil((lego.HOLD_TIME-th)*10)/10); lego.ringText.textContent = rem>0 ? rem.toFixed(1)+'s' : ''; }
+    if(th>=lego.HOLD_TIME){ legoExplode(); }
+  }
+  // peça que desce p/ destaque (1.7): arco curto + cresce + gira
   if(lego.emitted && lego.emitted.dropping){
     var b=lego.emitted;
     b.t=Math.min(1, b.t + dt/1.4);
     var e=legoEaseInOut(b.t);
     b.mesh.position.lerpVectors(b.from, b.to, e);
-    b.mesh.position.y += Math.sin(e*Math.PI)*0.22;
+    b.mesh.position.y += Math.sin(e*Math.PI)*0.14;
     var sc=1 + e*1.3;
     b.mesh.scale.set(sc, sc, sc);
     b.mesh.rotation.y += dt*1.1;
     if(b.t>=1){ b.dropping=false; }
   }
-  lego.camera.position.set(0, lego.CAM_Y, lego.CAM_Z);
+  // explosão (1.7A): peças voam, caem e assentam no chão invisível
+  if(lego.exploded){
+    lego.bricks.forEach(function(bk){
+      if(bk.landed || bk.mesh.parent !== lego.scene){ return; }
+      bk.vel.y -= 12*dt;
+      bk.mesh.position.x += bk.vel.x*dt;
+      bk.mesh.position.y += bk.vel.y*dt;
+      bk.mesh.position.z += bk.vel.z*dt;
+      bk.mesh.rotation.x += bk.rotVel.x*dt;
+      bk.mesh.rotation.y += bk.rotVel.y*dt;
+      bk.mesh.rotation.z += bk.rotVel.z*dt;
+      var floor=lego.GROUND_Y + bk.halfH + 0.005;
+      if(bk.mesh.position.y <= floor){
+        bk.mesh.position.y=floor;
+        bk.vel.y*=-0.2; bk.vel.x*=0.5; bk.vel.z*=0.5; bk.rotVel.multiplyScalar(0.35);
+        if(Math.abs(bk.vel.y)<0.15){ bk.vel.set(0,0,0); bk.rotVel.set(0,0,0); bk.landed=true; }
+      }
+    });
+  }
+  lego.camera.position.set(lego.shake*(Math.random()-0.5), lego.CAM_Y + lego.shake*(Math.random()-0.5), lego.CAM_Z);
   lego.camera.lookAt(0, lego.LOOK_Y, 0);
   lego.renderer.render(lego.scene, lego.camera);
+}
+/* Segurar 1s -> o barco explode: todas as peças se espalham pela tela. */
+function legoExplode(){
+  if(lego.exploded){ return; }
+  lego.exploded=true; lego.pressing=false; lego.shake=0;
+  if(lego.ringEl){ lego.ringEl.classList.remove('on'); }
+  abVibe([60,40,70]);
+  lego.boat.updateMatrixWorld(true);
+  lego.bricks.forEach(function(bk){
+    if(bk.mesh.parent !== lego.boat){ return; }
+    var wp=new THREE.Vector3(); bk.mesh.getWorldPosition(wp);
+    var wq=new THREE.Quaternion(); bk.mesh.getWorldQuaternion(wq);
+    lego.boat.remove(bk.mesh); lego.scene.add(bk.mesh);
+    bk.mesh.position.copy(wp); bk.mesh.quaternion.copy(wq);
+    var a=Math.random()*Math.PI*2, pow=1.5+Math.random()*3.5;
+    bk.vel.set(Math.cos(a)*pow, 2+Math.random()*5, Math.sin(a)*pow);
+    bk.rotVel.set((Math.random()-0.5)*8, (Math.random()-0.5)*8, (Math.random()-0.5)*8);
+    bk.landed=false;
+  });
 }
 /* 12.3s: destaca UMA peça — desacopla do barco e a leva p/ baixo, à frente. */
 function legoEmitBrick(){
@@ -1971,7 +2085,7 @@ function legoEmitBrick(){
   b.mesh.position.copy(wp);
   b.mesh.rotation.set(0,0,0);
   b.from=wp.clone();
-  b.to=new THREE.Vector3(-0.45, -0.85, 2.0); /* baixo, à frente (perto da câmera) */
+  b.to=new THREE.Vector3(-0.5, -0.1, 1.7); /* desce só um pouco, à frente (fica bem visível na tela) */
   b.t=0; b.dropping=true;
   lego.emitted=b;
   abVibe([20,30,40]);
@@ -1994,11 +2108,12 @@ function legoLabel(){
   abEl('abLegoLabel').classList.add('show');
   abVibe(AB_VTXT);
 }
-/* Esconde a cena do barco e pausa o render (ao sair do segmento 1.7). */
+/* Esconde a cena do barco e pausa o render (ao sair de 1.7/1.7A). */
 function legoHide(){
-  lego.active=false;
+  lego.active=false; lego.dragging=false; lego.pressing=false; lego.interactive=false; lego.canExplode=false;
   var ov=abEl('abLego'); if(ov){ ov.classList.remove('in','show'); ov.style.display='none'; }
   var lb=abEl('abLegoLabel'); if(lb){ lb.classList.remove('show'); }
+  if(lego.ringEl){ lego.ringEl.classList.remove('on'); }
 }
 /* Manda o conteúdo da maçã/átomo subir e sumir; ao fim, limpa de vez. */
 function legoRiseOutPrev(){
@@ -2011,7 +2126,8 @@ function legoRiseOutPrev(){
     abEl('abParticleArrow').classList.remove('show');
   }, 1050);
 }
-/* onStart do dialogo1.7: sobe o conteúdo anterior e o barco entra de baixo. */
+/* onStart do dialogo1.7: o conteúdo anterior sobe e, após 2s, o barco entra de baixo.
+   Pode girar tocando na tela; ainda NÃO explode (isso é o 1.7A). */
 function abInit17(){
   abSpotlight(false); abNavDemoEnd();
   legoRiseOutPrev();
@@ -2025,7 +2141,8 @@ function abInit17(){
     legoResize();
     legoResetScene();
     legoStartLoop();
-    requestAnimationFrame(function(){ ov.classList.add('in'); }); /* entra de baixo até o centro (~1.6s) */
+    lego.interactive=true; lego.canExplode=false; /* girar sim, explodir não */
+    setTimeout(function(){ ov.classList.add('in'); }, 2000); /* delay de 2s antes de subir (~1.6s de subida) */
   });
   abShowFab(true);
 }
@@ -2035,6 +2152,25 @@ function abCues17(){
     { time:15.0, done:false, fn:function(){ legoLabel(); } }
   ];
 }
+/* onStart do dialogo1.7A: mesmo barco (remontado e inteiro), já centralizado.
+   Ativa a interação de explosão: segurar 1s no barco -> peças se espalham. */
+function abInit17A(){
+  abSpotlight(false); abNavDemoEnd();
+  var ov=abEl('abLego');
+  abEl('abLegoLabel').classList.remove('show');
+  ov.style.display='block';
+  ov.classList.add('show');
+  requestAnimationFrame(function(){
+    legoInit();
+    legoResize();
+    legoResetScene();              /* barco inteiro de novo (desfaz a peça destacada do 1.7) */
+    legoStartLoop();
+    lego.interactive=true; lego.canExplode=true; /* segurar 1s -> explode */
+    ov.classList.add('in');        /* já no centro (vindo do 1.7 nem se mexe) */
+  });
+  abShowFab(true);
+}
+function abCues17A(){ return []; }
 /* Clique no Refazer (no dialogo1.6A): some a seta, a maçã se refaz e SÓ AO
    COMPLETAR a remontagem toca yes/applause + confete; depois segue p/ 1.6B. */
 function abRedoCelebrate(){
@@ -2043,7 +2179,7 @@ function abRedoCelebrate(){
   abShowFab(false);
   abAppleRedo(function(){                            /* ao completar a maçã... */
     abAppleCut=false;
-    abSfx('audio/yes.mp3?v=1.1.24'); abSfx('audio/applause.mp3?v=1.1.24'); /* ...comemora */
+    abSfx('audio/yes.mp3?v=1.1.25'); abSfx('audio/applause.mp3?v=1.1.25'); /* ...comemora */
     abConfetti();
     setTimeout(function(){ startSegment(11); }, 1600); /* depois segue p/ dialogo1.6B */
   });
@@ -2058,7 +2194,7 @@ function abAppleDoCut(){
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.1.24'); abSfx('audio/applause.mp3?v=1.1.24');
+    abSfx('audio/yes.mp3?v=1.1.25'); abSfx('audio/applause.mp3?v=1.1.25');
     abEl('abAppleRedo').classList.remove('show');
     setTimeout(function(){ startSegment(9); }, 1500); /* -> dialogo1.5 */
     return;
