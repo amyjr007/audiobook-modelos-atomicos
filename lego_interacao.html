@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Interação — Barco de Lego (átomos)</title>
+
+<!-- Three.js: usa o arquivo local do app. Para usar em outro lugar, troque por:
+     <script src="https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.min.js"></script> -->
+<script src="three.min.js"></script>
+
+<style>
+:root {
+  --bg-cream:    #FBF6EE;
+  --ink-soft:    #5A4A3E;
+  --line-strong: rgba(31, 24, 16, 0.22);
+  --hot-deep:    #B8431D;
+  --shadow-md:   0 4px 14px rgba(31, 24, 16, 0.08), 0 12px 32px rgba(31, 24, 16, 0.06);
+  --radius-lg:   28px;
+  --ease:        cubic-bezier(0.22, 1, 0.36, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  background: var(--bg-cream);
+  font-family: system-ui, sans-serif;
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 16px;
+}
+.wrap { width: 100%; max-width: 640px; }
+
+/* ============================================================
+   CSS DA INTERAÇÃO (.lego-*)
+   ============================================================ */
+.lego-viewer {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 360px);
+  height: calc(100svh - 360px);
+  min-height: 280px;
+  max-height: 460px;
+  background: var(--bg-cream);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md), inset 0 0 0 1px var(--line-strong);
+  cursor: grab;
+  touch-action: none;
+}
+.lego-viewer:active { cursor: grabbing; }
+.lego-viewer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+.lego-viewer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(31,24,16,0.12) 100%);
+  border-radius: inherit;
+}
+.lego-instructions {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 24px;
+  padding: 14px 16px 18px;
+  background: linear-gradient(transparent, rgba(251,246,238,0.92));
+  pointer-events: none;
+  z-index: 10;
+}
+.lego-instr {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--ink-soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.lego-instr svg { flex-shrink: 0; opacity: 0.55; color: var(--ink-soft); }
+
+.lego-text {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 26px 28px 22px;
+  pointer-events: none;
+  z-index: 20;
+  background: linear-gradient(rgba(251,246,238,0.90), transparent);
+  opacity: 0;
+  transition: opacity 1.0s ease;
+  font-family: 'Fraunces', serif;
+  font-weight: 400; font-style: italic;
+  font-variation-settings: 'opsz' 24;
+  font-size: clamp(15px, 1.7vw, 18px);
+  line-height: 1.55;
+  color: var(--hot-deep);
+  text-align: center;
+}
+.lego-text > span {
+  display: block;
+  max-width: 600px;
+  margin: 0 auto;
+}
+.lego-text.--shown { opacity: 1; }
+
+.lego-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 80px; height: 80px;
+  margin: -40px 0 0 -40px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 15;
+}
+.lego-ring.--on { opacity: 1; }
+
+.lego-reset {
+  position: absolute;
+  bottom: 70px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(31, 24, 16, 0.82);
+  border: 1px solid rgba(31, 24, 16, 0.20);
+  color: var(--bg-cream);
+  padding: 12px 28px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 999px;
+  display: none;
+  z-index: 100;
+  transition: all 0.2s var(--ease);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.lego-reset:hover {
+  background: var(--hot-deep);
+  border-color: var(--hot-deep);
+  color: white;
+}
+.lego-reset:active { transform: translateX(-50%) scale(0.96); }
+.lego-reset.--shown { display: inline-block; }
+
+@media (max-width: 720px) {
+  .lego-viewer { height: calc(100vh - 320px); height: calc(100svh - 320px); min-height: 240px; max-height: 380px; }
+  .lego-instructions { gap: 14px; padding: 10px 12px 14px; }
+  .lego-instr { font-size: 10px; letter-spacing: 0.10em; }
+  .lego-text { padding: 18px 18px 14px; font-size: 14px; }
+  .lego-reset { bottom: 56px; padding: 10px 22px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <!-- ============================================================
+       HTML DA INTERAÇÃO
+       ============================================================ -->
+  <section>
+    <div class="lego-viewer" id="lego-viewer">
+      <canvas id="lego-canvas"></canvas>
+
+      <!-- Textos -->
+      <div class="lego-text" id="lego-txt-explode">
+        <span>Observe que o barco é destruído, mas as peças de construção básica permanecem intactas.</span>
+      </div>
+      <div class="lego-text" id="lego-txt-rebuild">
+        <span>Perceba que o barco é um aglomerado das partículas básicas de construção. Assim são os átomos que constituem qualquer matéria no planeta.</span>
+      </div>
+
+      <!-- Anel de hold -->
+      <svg class="lego-ring" id="lego-ring" viewBox="0 0 80 80" aria-hidden="true">
+        <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(31,24,16,0.15)" stroke-width="3"/>
+        <circle id="lego-ring-fill" cx="40" cy="40" r="34" fill="none" stroke="#E85D2C" stroke-width="3.5"
+                stroke-dasharray="213.6" stroke-dashoffset="213.6"
+                transform="rotate(-90 40 40)" stroke-linecap="round"/>
+        <text id="lego-ring-text" x="40" y="44" text-anchor="middle" fill="rgba(31,24,16,0.65)"
+              font-size="12" font-family="JetBrains Mono, monospace"></text>
+      </svg>
+
+      <!-- Botão de reconstrução -->
+      <button class="lego-reset" id="lego-reset">Reconstruir</button>
+
+      <!-- Instruções -->
+      <div class="lego-instructions">
+        <div class="lego-instr">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          Arraste para girar
+        </div>
+        <div class="lego-instr">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="8"/>
+            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+          </svg>
+          Segure 1s para explodir
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* ============================================================
+   JAVASCRIPT DA INTERAÇÃO — módulo LegoBoat
+   ============================================================ */
+var LegoBoat = (function() {
+  var HOLD_TIME = 1.0;
+  var CAM_Y = 2.2, CAM_Z = 4.5, LOOK_Y = 0.6;
+  var GROUND_Y = -1.5;
+  var REWIND_DUR = 1.2, REWIND_STAGGER = 0.6;
+  var U = 0.2, BH = U * 0.45;
+
+  var initialized = false;
+  var renderer, scene, camera, boat;
+  var canvas, container, ringEl, ringFillEl, ringTextEl, resetEl;
+  var txtExplodeEl, txtRebuildEl;
+  var bricks = [];
+
+  var rotX = -0.25, rotY = 0.5;
+  var dragging = false, lx = 0, ly = 0;
+  var pressing = false, pStart = 0, hProg = 0, shake = 0;
+  var movedDist = 0;
+  var exploded = false, autoR = true, rewinding = false;
+  var prev = 0;
+
+  var C = {
+    RED: 0xdc2626, BLUE: 0x2563eb, DKBLUE: 0x1e3a8a,
+    YELLOW: 0xfacc15, WHITE: 0xf0eeea, BROWN: 0x92400e,
+    GREEN: 0x16a34a, ORANGE: 0xea580c, CYAN: 0x06b6d4
+  };
+
+  function createBrick(w, h, d, color) {
+    var mat = new THREE.MeshPhongMaterial({color: color, flatShading: true, shininess: 30, specular: 0x222222});
+    var grp = new THREE.Group();
+    grp.add(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat));
+    var sR = 0.04, sH = 0.03;
+    var cX = Math.max(1, Math.round(w / 0.2));
+    var cZ = Math.max(1, Math.round(d / 0.2));
+    var sGeo = new THREE.CylinderGeometry(sR, sR, sH, 6);
+    for (var sx = 0; sx < cX; sx++) {
+      for (var sz = 0; sz < cZ; sz++) {
+        var s = new THREE.Mesh(sGeo, mat);
+        s.position.set(-w/2 + 0.1 + sx * 0.2, h/2 + sH/2, -d/2 + 0.1 + sz * 0.2);
+        grp.add(s);
+      }
+    }
+    grp.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(w * 1.01, h * 1.01, d * 1.01)),
+      new THREE.LineBasicMaterial({color: 0x000000, transparent: true, opacity: 0.18})
+    ));
+    return grp;
+  }
+
+  function addBrick(x, y, z, w, h, d, c) {
+    var b = createBrick(w, h, d, c);
+    b.position.set(x, y, z);
+    boat.add(b);
+    bricks.push({
+      mesh: b,
+      origPos: new THREE.Vector3(x, y, z),
+      vel: new THREE.Vector3(),
+      rotVel: new THREE.Vector3(),
+      landed: false, halfH: h / 2,
+      scatterPos: new THREE.Vector3(),
+      scatterQuat: new THREE.Quaternion(),
+      rewindT: 0, rewindDelay: 0
+    });
+  }
+
+  function buildBoat() {
+    boat = new THREE.Group();
+    scene.add(boat);
+    var z, x, w;
+
+    // Casco (fundo)
+    for (z = -6; z <= 6; z++) {
+      w = 5;
+      if (Math.abs(z) >= 6) w = 1;
+      else if (Math.abs(z) >= 5) w = 2;
+      else if (Math.abs(z) >= 4) w = 3;
+      else if (Math.abs(z) >= 3) w = 4;
+      for (x = -(w - 1); x <= (w - 1); x++) addBrick(x * U, 0, z * U, U, BH, U, C.DKBLUE);
+    }
+    // Paredes — camada 1
+    for (z = -5; z <= 5; z++) {
+      w = 4;
+      if (Math.abs(z) >= 5) w = 2;
+      else if (Math.abs(z) >= 4) w = 3;
+      addBrick(-(w - 1) * U, BH, z * U, U, BH, U, C.RED);
+      addBrick((w - 1) * U, BH, z * U, U, BH, U, C.RED);
+    }
+    addBrick(0, BH, -6 * U, U, BH, U, C.RED);
+    addBrick(0, BH, 6 * U, U, BH, U, C.RED);
+    // Paredes — camada 2
+    for (z = -4; z <= 4; z++) {
+      w = 4;
+      if (Math.abs(z) >= 4) w = 3;
+      addBrick(-(w - 1) * U, BH * 2, z * U, U, BH, U, C.BLUE);
+      addBrick((w - 1) * U, BH * 2, z * U, U, BH, U, C.BLUE);
+    }
+    // Convés
+    for (z = -5; z <= 5; z++) {
+      w = 4;
+      if (Math.abs(z) >= 5) w = 2;
+      else if (Math.abs(z) >= 4) w = 3;
+      for (x = -(w - 2); x <= (w - 2); x++) addBrick(x * U, BH, z * U, U, BH, U, C.BROWN);
+    }
+    // Cabine
+    for (z = -2; z <= 2; z++) addBrick(0, BH * 3, z * U, U, BH, U, C.WHITE);
+    addBrick(0, BH * 4, 0, U, BH, U, C.YELLOW);
+    addBrick(0, BH * 4, -U, U, BH, U, C.YELLOW);
+    addBrick(0, BH * 4, U, U, BH, U, C.YELLOW);
+    // Mastro
+    var mW = U * 0.35;
+    addBrick(0, BH * 5.2, 0, mW, BH * 2, mW, C.BROWN);
+    addBrick(0, BH * 7.2, 0, mW, BH * 2, mW, C.BROWN);
+    // Bandeira
+    addBrick(U * 0.35, BH * 8.8, 0, U * 0.5, BH * 0.7, U * 0.12, C.GREEN);
+    addBrick(U * 0.35, BH * 8.1, 0, U * 0.5, BH * 0.7, U * 0.12, C.ORANGE);
+    // Vigias
+    for (z = -2; z <= 2; z += 2) {
+      addBrick(-3 * U + U * 0.1, BH * 2, z * U, U * 0.15, U * 0.15, U * 0.05, C.CYAN);
+      addBrick(3 * U - U * 0.1, BH * 2, z * U, U * 0.15, U * 0.15, U * 0.05, C.CYAN);
+    }
+
+    boat.position.y = 0.3;
+    boat.scale.set(1.2, 1.2, 1.2);
+  }
+
+  function resize() {
+    if (!container || !renderer || !camera) return;
+    var w = container.clientWidth;
+    var h = container.clientHeight;
+    if (w <= 0 || h <= 0) return;
+    renderer.setSize(w, h, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    camera.aspect = w / h;
+    camera.fov = w < h ? 55 : 40;
+    camera.updateProjectionMatrix();
+  }
+
+  function getPoint(e) {
+    if (e.touches && e.touches.length > 0) {
+      return {x: e.touches[0].clientX, y: e.touches[0].clientY};
+    }
+    return {x: e.clientX, y: e.clientY};
+  }
+
+  function onPointerDown(e) {
+    if (e.target && e.target.id === 'lego-reset') return;
+    e.preventDefault(); e.stopPropagation();
+    var p = getPoint(e);
+    dragging = true; autoR = false;
+    lx = p.x; ly = p.y; movedDist = 0;
+    if (!exploded && !rewinding) {
+      pressing = true;
+      pStart = performance.now();
+    }
+  }
+
+  function onPointerMove(e) {
+    if (!dragging) return;
+    e.preventDefault(); e.stopPropagation();
+    var p = getPoint(e);
+    var dx = p.x - lx, dy = p.y - ly;
+    movedDist += Math.abs(dx) + Math.abs(dy);
+    if (movedDist > 6) {
+      pressing = false; hProg = 0; shake = 0;
+      ringEl.classList.remove('--on');
+    }
+    rotY += dx * 0.007;
+    rotX += dy * 0.007;
+    rotX = Math.max(-1.2, Math.min(0.6, rotX));
+    lx = p.x; ly = p.y;
+  }
+
+  function onPointerUp(e) {
+    if (e && e.target && e.target.id === 'lego-reset') return;
+    // Só previne o clique sintético quando estava de fato arrastando ou pressionando
+    if (e && (dragging || pressing)) e.preventDefault();
+    dragging = false; pressing = false;
+    hProg = 0; shake = 0;
+    if (ringEl) ringEl.classList.remove('--on');
+  }
+
+  function doExplode() {
+    exploded = true; pressing = false;
+    ringEl.classList.remove('--on');
+    resetEl.classList.add('--shown');
+
+    txtRebuildEl.classList.remove('--shown');
+    setTimeout(function() { txtExplodeEl.classList.add('--shown'); }, 300);
+
+    boat.updateMatrixWorld(true);
+    bricks.forEach(function(b) {
+      var wp = new THREE.Vector3();
+      b.mesh.getWorldPosition(wp);
+      var wq = new THREE.Quaternion();
+      b.mesh.getWorldQuaternion(wq);
+      boat.remove(b.mesh);
+      scene.add(b.mesh);
+      b.mesh.position.copy(wp);
+      b.mesh.quaternion.copy(wq);
+
+      var a = Math.random() * Math.PI * 2;
+      var pow = 1.5 + Math.random() * 3.5;
+      b.vel.set(Math.cos(a) * pow, 2 + Math.random() * 5, Math.sin(a) * pow);
+      b.rotVel.set((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8);
+      b.landed = false;
+    });
+  }
+
+  function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+
+  function startRewind() {
+    rewinding = true;
+    resetEl.classList.remove('--shown');
+
+    txtExplodeEl.classList.remove('--shown');
+    setTimeout(function() { txtRebuildEl.classList.add('--shown'); }, 600);
+
+    boat.rotation.set(rotX, rotY, 0);
+    boat.position.y = 0.3;
+    boat.updateMatrixWorld(true);
+
+    bricks.forEach(function(b) {
+      b.scatterPos.copy(b.mesh.position);
+      b.scatterQuat.copy(b.mesh.quaternion);
+      b.rewindT = 0;
+      var nY = b.origPos.y / 1.0;
+      var dist = Math.sqrt(b.origPos.x * b.origPos.x + b.origPos.z * b.origPos.z);
+      b.rewindDelay = (nY * 0.7 + dist * 0.1) * REWIND_STAGGER;
+    });
+  }
+
+  function updateRewind(dt) {
+    var allDone = true;
+    boat.updateMatrixWorld(true);
+
+    bricks.forEach(function(b) {
+      b.rewindDelay -= dt;
+      if (b.rewindDelay > 0) { allDone = false; return; }
+      b.rewindT += dt / REWIND_DUR;
+      if (b.rewindT >= 1) b.rewindT = 1;
+      else allDone = false;
+
+      var t = easeInOutCubic(Math.min(b.rewindT, 1));
+      var target = b.origPos.clone();
+      boat.localToWorld(target);
+      var boatQuat = new THREE.Quaternion();
+      boat.getWorldQuaternion(boatQuat);
+
+      b.mesh.position.lerpVectors(b.scatterPos, target, t);
+      b.mesh.quaternion.slerpQuaternions(b.scatterQuat, boatQuat, t);
+    });
+
+    if (allDone) finishRewind();
+  }
+
+  function finishRewind() {
+    rewinding = false; exploded = false;
+    bricks.forEach(function(b) {
+      scene.remove(b.mesh);
+      boat.add(b.mesh);
+      b.mesh.position.copy(b.origPos);
+      b.mesh.rotation.set(0, 0, 0);
+      b.mesh.quaternion.identity();
+      b.landed = false;
+      b.vel.set(0, 0, 0);
+      b.rotVel.set(0, 0, 0);
+    });
+  }
+
+  function handleReset() {
+    if (rewinding) return;
+    startRewind();
+  }
+
+  function tick() {
+    requestAnimationFrame(tick);
+
+    // Pula o render quando a aba não está visível, para poupar GPU.
+    // (No app original, aqui se checava a classe .active da página topic-1-p2.)
+    if (document.hidden) { prev = performance.now(); return; }
+
+    var now = performance.now();
+    var dt = Math.min((now - prev) / 1000, 0.05);
+    prev = now;
+
+    if (autoR && !exploded && !rewinding) rotY += dt * 0.35;
+    if (!exploded && !rewinding) boat.position.y = 0.3 + Math.sin(now * 0.0012) * 0.03;
+
+    if (pressing && !exploded && !rewinding) {
+      var t = (now - pStart) / 1000;
+      hProg = Math.min(t / HOLD_TIME, 1);
+      shake = hProg * 0.04;
+      ringEl.classList.add('--on');
+      var dashTotal = 213.6;
+      ringFillEl.setAttribute('stroke-dashoffset', dashTotal * (1 - hProg));
+      var rem = Math.max(0, Math.ceil((HOLD_TIME - t) * 10) / 10);
+      ringTextEl.textContent = rem > 0 ? rem.toFixed(1) + 's' : '';
+      var rC = Math.round(60 + 195 * hProg);
+      var gC = Math.round(40 - hProg * 30);
+      ringFillEl.setAttribute('stroke', 'rgb(' + rC + ',' + gC + ',20)');
+      if (t >= HOLD_TIME) doExplode();
+    }
+
+    camera.position.x = shake * (Math.random() - 0.5);
+    camera.position.y = CAM_Y + shake * (Math.random() - 0.5);
+    camera.position.z = CAM_Z;
+    camera.lookAt(0, LOOK_Y, 0);
+
+    if (!exploded && !rewinding) {
+      boat.rotation.x = rotX;
+      boat.rotation.y = rotY;
+    }
+
+    if (exploded && !rewinding) {
+      bricks.forEach(function(b) {
+        if (b.landed) return;
+        b.vel.y -= 12 * dt;
+        b.mesh.position.x += b.vel.x * dt;
+        b.mesh.position.y += b.vel.y * dt;
+        b.mesh.position.z += b.vel.z * dt;
+        b.mesh.rotation.x += b.rotVel.x * dt;
+        b.mesh.rotation.y += b.rotVel.y * dt;
+        b.mesh.rotation.z += b.rotVel.z * dt;
+        var floor = GROUND_Y + b.halfH + 0.005;
+        if (b.mesh.position.y <= floor) {
+          b.mesh.position.y = floor;
+          b.vel.y *= -0.2;
+          b.vel.x *= 0.5;
+          b.vel.z *= 0.5;
+          b.rotVel.multiplyScalar(0.35);
+          if (Math.abs(b.vel.y) < 0.15) {
+            b.vel.set(0, 0, 0);
+            b.rotVel.set(0, 0, 0);
+            b.landed = true;
+          }
+        }
+      });
+    }
+
+    if (rewinding) updateRewind(dt);
+
+    renderer.render(scene, camera);
+  }
+
+  function init() {
+    if (initialized) return;
+    if (typeof THREE === 'undefined') return;
+
+    canvas = document.getElementById('lego-canvas');
+    container = document.getElementById('lego-viewer');
+    ringEl = document.getElementById('lego-ring');
+    ringFillEl = document.getElementById('lego-ring-fill');
+    ringTextEl = document.getElementById('lego-ring-text');
+    resetEl = document.getElementById('lego-reset');
+    txtExplodeEl = document.getElementById('lego-txt-explode');
+    txtRebuildEl = document.getElementById('lego-txt-rebuild');
+
+    if (!canvas || !container) return;
+    initialized = true;
+
+    renderer = new THREE.WebGLRenderer({canvas: canvas, antialias: true});
+    renderer.setClearColor(0xFBF6EE);
+
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(50, 1, 0.1, 120);
+    camera.position.set(0, CAM_Y, CAM_Z);
+    camera.lookAt(0, LOOK_Y, 0);
+
+    // Iluminação (ajustada para fundo creme)
+    scene.add(new THREE.AmbientLight(0xfff6ee, 0.75));
+    var sun = new THREE.DirectionalLight(0xffffff, 0.92);
+    sun.position.set(5, 10, 7);
+    scene.add(sun);
+    var fill = new THREE.DirectionalLight(0xffddb8, 0.28);
+    fill.position.set(-4, 5, -6);
+    scene.add(fill);
+
+    // Chão e grade
+    var gndMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(80, 80),
+      new THREE.MeshPhongMaterial({color: 0xF0EAE0, shininess: 4})
+    );
+    gndMesh.rotation.x = -Math.PI / 2;
+    gndMesh.position.y = GROUND_Y;
+    scene.add(gndMesh);
+    var grid = new THREE.GridHelper(40, 160, 0xD8CEBC, 0xD8CEBC);
+    grid.position.y = GROUND_Y + 0.003;
+    scene.add(grid);
+
+    buildBoat();
+    resize();
+
+    canvas.addEventListener('mousedown', onPointerDown, {passive: false});
+    container.addEventListener('mousemove', onPointerMove, {passive: false});
+    container.addEventListener('mouseup', onPointerUp);
+    window.addEventListener('mouseup', onPointerUp);   // captura soltar fora
+    canvas.addEventListener('touchstart', onPointerDown, {passive: false});
+    container.addEventListener('touchmove', onPointerMove, {passive: false});
+    container.addEventListener('touchend', onPointerUp, {passive: false});
+    container.addEventListener('touchcancel', onPointerUp);
+    window.addEventListener('resize', resize);
+
+    resetEl.addEventListener('click', handleReset);
+    resetEl.addEventListener('touchend', function(e) {
+      e.stopPropagation();
+      handleReset();
+    });
+
+    prev = performance.now();
+    tick();
+  }
+
+  function resetInput() {
+    dragging = false; pressing = false; hProg = 0; shake = 0;
+    if (ringEl) ringEl.classList.remove('--on');
+  }
+
+  return { init: init, resize: resize, resetInput: resetInput };
+})();
+
+// Inicializa a interação (no app original isto era chamado ao navegar para a página 2).
+window.addEventListener('load', function() {
+  LegoBoat.init();
+  LegoBoat.resize();
+});
+</script>
+
+</body>
+</html>
