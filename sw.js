@@ -1,5 +1,5 @@
 /* Service Worker — Audiobook Modelos Atômicos (PWA offline + auto-update) */
-const CACHE = 'audiobook-atomos-b20260618173851'; /* BUILD — carimbado automaticamente pelo git hook */
+const CACHE = 'audiobook-atomos-b20260618182930'; /* BUILD — carimbado automaticamente pelo git hook */
 
 /* App shell pré-cacheado para funcionar offline. */
 const SHELL = [
@@ -35,6 +35,7 @@ const SHELL = [
   './audio/dialogo2.3.1.mp3',
   './audio/dialogo2.4.mp3',
   './audio/dialogo2.4.1.mp3',
+  './audio/dialogo2.5.mp3',
   './audio/applause.mp3',
   './audio/yes.mp3',
   './videos/john_dalton_1.mp4',
