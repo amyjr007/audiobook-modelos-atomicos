@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Laboratório de Dalton</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #1a1511;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+
+  .dl-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Sora', sans-serif;
+    touch-action: none;
+    background: #1a1511;
+    color: #1a1511;
+  }
+
+  .dl-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(218,165,32,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 80%, rgba(139,69,19,0.1) 0%, transparent 60%),
+      linear-gradient(180deg, #2a1f16 0%, #1a1511 45%, #3d2817 45%, #6b4226 100%);
+  }
+  .dl-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-radial-gradient(circle at 0 0, transparent 0, rgba(255,255,255,0.015) 1px, transparent 2px),
+      repeating-radial-gradient(circle at 100% 100%, transparent 0, rgba(0,0,0,0.02) 1px, transparent 2px);
+    background-size: 3px 3px, 5px 5px;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  .dl-counter {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 55%;
+    background:
+      linear-gradient(180deg, #8b5a2b 0%, #7a4a22 4%, #6b4226 20%, #5a3620 60%, #3d2817 100%);
+    background-image:
+      repeating-linear-gradient(87deg,
+        transparent 0px, rgba(0,0,0,0.08) 2px, transparent 4px,
+        rgba(255,255,255,0.02) 8px, transparent 12px,
+        rgba(0,0,0,0.1) 24px, transparent 40px),
+      repeating-linear-gradient(92deg, transparent 0, rgba(0,0,0,0.04) 80px, transparent 160px);
+    box-shadow:
+      inset 0 6px 0 rgba(0,0,0,0.3),
+      inset 0 8px 15px rgba(0,0,0,0.4),
+      0 -2px 20px rgba(0,0,0,0.6);
+  }
+  .dl-counter::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(180deg, #a8733f, #6b4226);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+
+  .dl-header {
+    position: absolute; top: 0; left: 0; right: 0;
+    text-align: center;
+    padding: 10px 16px 4px;
+    z-index: 5;
+  }
+  .dl-header h1 {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: clamp(16px, 4vw, 24px);
+    color: #f4ead5;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8), 0 0 20px rgba(218,165,32,0.3);
+  }
+  .dl-ornament {
+    color: #b8860b;
+    margin: 0 6px;
+    opacity: 0.8;
+  }
+  .dl-subtitle {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(9px, 2.2vw, 11px);
+    color: #c9a66b;
+    margin-top: 2px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .dl-progress {
+    position: absolute;
+    top: 148px; left: 10px;
+    background: linear-gradient(145deg, #daa520, #b8860b 50%, #8b6914);
+    color: #1a1511;
+    padding: 5px 12px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 1px;
+    z-index: 20;
+    box-shadow: 0 2px 0 #5a4208, 0 4px 8px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+    border: 1px solid #5a4208;
+    transform: rotate(-2deg);
+  }
+
+  .dl-machine {
+    position: absolute;
+    top: 55px; left: 50%;
+    transform: translateX(-50%) scale(0.8);
+    width: clamp(200px, 48vw, 260px);
+    z-index: 8;
+  }
+  .dl-machine-body {
+    background: linear-gradient(145deg, #c9a66b 0%, #8b6914 45%, #6b4e0b 100%);
+    border-radius: 10px 10px 6px 6px;
+    padding: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6),
+      inset 0 2px 2px rgba(255,240,200,0.5),
+      inset 0 -4px 8px rgba(0,0,0,0.3),
+      inset 4px 0 8px rgba(255,240,200,0.1),
+      inset -4px 0 8px rgba(0,0,0,0.2);
+    border: 1px solid #3d2817;
+    position: relative;
+  }
+  .dl-rivet {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: radial-gradient(circle at 35% 35%, #f4ead5, #6b4e0b 70%);
+    border-radius: 50%;
+    box-shadow: inset 0 -1px 1px rgba(0,0,0,0.5);
+  }
+  .dl-rivet.tl { top: 4px; left: 4px; }
+  .dl-rivet.tr { top: 4px; right: 4px; }
+  .dl-rivet.bl { bottom: 4px; left: 4px; }
+  .dl-rivet.br { bottom: 4px; right: 4px; }
+
+  .dl-machine-plate {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    color: #1a1511;
+    font-size: 9px;
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+    opacity: 0.75;
+  }
+  .dl-machine-display {
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(255,240,200,0.12), transparent 60%),
+      linear-gradient(180deg, #0a0a0a, #1a2030 70%, #0a0a0a);
+    border-radius: 4px;
+    height: clamp(95px, 14vh, 125px);
+    position: relative;
+    overflow: hidden;
+    border: 3px solid #3d2817;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.9), inset 0 0 20px rgba(0,0,0,0.7);
+    margin-bottom: 10px;
+  }
+  .dl-machine-display::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  #dl-machineCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  .dl-machine-count {
+    position: absolute;
+    top: 4px; right: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: rgba(218,165,32,0.75);
+    letter-spacing: 1px;
+    z-index: 3;
+    text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  }
+
+  .dl-btn-dispense {
+    width: 100%;
+    padding: 11px 10px;
+    background: linear-gradient(180deg, #c0392b 0%, #922b21 60%, #641e16 100%);
+    color: #f4ead5;
+    border: 2px solid #2d0f0a;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 0 #2d0f0a, 0 6px 10px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+    transition: transform 0.08s, box-shadow 0.08s;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  }
+  .dl-btn-dispense:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #2d0f0a, 0 2px 4px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .dl-btn-dispense:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(0.3);
+  }
+
+  .dl-tube {
+    position: absolute;
+    bottom: -18px; left: 50%;
+    transform: translateX(-50%);
+    width: 16px; height: 20px;
+    background: linear-gradient(180deg, #3d2817 0%, #1a1511 100%);
+    border: 2px solid #6b4e0b;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+  }
+  .dl-tube::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 20%;
+    width: 2px; height: 40%;
+    background: rgba(255,240,200,0.25);
+    border-radius: 1px;
+  }
+
+  .dl-instructions {
+    position: absolute;
+    top: 65px; left: 10px;
+    background: linear-gradient(145deg, #f4ead5, #e8d9b5);
+    padding: 7px 10px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    max-width: 120px;
+    color: #3d2817;
+    z-index: 4;
+    line-height: 1.4;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(139,69,19,0.2);
+    transform: rotate(-2deg);
+    border-left: 3px solid #b8860b;
+  }
+  @media (max-width: 420px) {
+    .dl-instructions { font-size: 9px; max-width: 95px; padding: 5px 7px; }
+  }
+
+  .dl-atom {
+    position: absolute;
+    border-radius: 50%;
+    cursor: grab;
+    touch-action: none;
+    z-index: 50;
+    transition: transform 0.15s;
+  }
+  .dl-atom.dl-dragging {
+    cursor: grabbing;
+    z-index: 200;
+    transform: scale(1.08);
+    filter: drop-shadow(0 12px 16px rgba(0,0,0,0.5));
+  }
+  .dl-atom.dl-falling { animation: dl-drop-in 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  @keyframes dl-drop-in {
+    0% { transform: translateY(-80px) scale(0.5); opacity: 0; }
+    40% { opacity: 1; }
+    70% { transform: translateY(10px) scale(1.05); }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  .dl-atom.dl-ready { animation: dl-ready-pulse 1.8s ease-in-out infinite; }
+  @keyframes dl-ready-pulse {
+    0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+    50% { filter: drop-shadow(0 0 12px rgba(218,165,32,0.7)); }
+  }
+
+  .dl-jars {
+    position: absolute;
+    bottom: 48px; left: 0; right: 0;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    padding: 0 6px;
+    z-index: 5;
+  }
+  .dl-jar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 130px;
+  }
+  .dl-jar {
+    width: clamp(72px, 21vw, 120px);
+    height: clamp(120px, 32vh, 190px);
+    position: relative;
+  }
+  .dl-jar-lid-seal {
+    position: absolute;
+    top: 3px; left: 50%;
+    transform: translateX(-50%);
+    width: 58%; height: 5px;
+    background: linear-gradient(180deg, #8b2500, #641a00);
+    border-radius: 2px 2px 0 0;
+    z-index: 4;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  .dl-jar-rim {
+    position: absolute;
+    top: 7px; left: 50%;
+    transform: translateX(-50%);
+    width: 68%; height: 7px;
+    background: linear-gradient(180deg,
+      rgba(240,240,240,0.85) 0%,
+      rgba(200,215,210,0.7) 50%,
+      rgba(160,180,175,0.6) 100%);
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    z-index: 3;
+  }
+  .dl-jar-neck {
+    position: absolute;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    width: 58%; height: 16%;
+    background: linear-gradient(90deg,
+      rgba(180,210,200,0.35) 0%,
+      rgba(230,240,235,0.55) 25%,
+      rgba(210,225,220,0.4) 55%,
+      rgba(170,200,190,0.3) 100%);
+    border: 1.5px solid rgba(200,220,215,0.6);
+    border-bottom: none;
+    z-index: 2;
+  }
+  .dl-jar-body {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 80%;
+    background: linear-gradient(90deg,
+      rgba(180,210,200,0.28) 0%,
+      rgba(230,240,235,0.45) 25%,
+      rgba(210,225,220,0.32) 55%,
+      rgba(160,195,185,0.35) 100%);
+    border: 1.5px solid rgba(200,220,215,0.55);
+    border-radius: 4px 4px 16px 16px;
+    overflow: hidden;
+    backdrop-filter: blur(2px);
+    box-shadow:
+      inset 0 0 18px rgba(255,255,255,0.15),
+      inset -8px 0 12px rgba(0,0,0,0.08),
+      0 8px 14px rgba(0,0,0,0.4);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .dl-jar-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  .dl-jar-body::before {
+    content: '';
+    position: absolute;
+    top: 8%; left: 8%;
+    width: 14%; height: 68%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.05));
+    border-radius: 50%;
+    filter: blur(2px);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .dl-jar-body::after {
+    content: '';
+    position: absolute;
+    top: 15%; right: 10%;
+    width: 4%; height: 55%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.3), transparent);
+    border-radius: 50%;
+    filter: blur(1px);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .dl-jar.dl-drag-over .dl-jar-body {
+    border-color: rgba(218,165,32,0.9);
+    box-shadow:
+      inset 0 0 25px rgba(218,165,32,0.35),
+      0 0 22px rgba(218,165,32,0.6),
+      inset -8px 0 12px rgba(0,0,0,0.08);
+  }
+  .dl-jar-label {
+    margin-top: 10px;
+    text-align: center;
+    background: linear-gradient(180deg, #f4ead5 0%, #e8d9b5 100%);
+    padding: 5px 6px 4px;
+    border-radius: 1px;
+    width: 100%;
+    max-width: 118px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(139,69,19,0.3);
+    position: relative;
+    transform: rotate(-1.5deg);
+  }
+  .dl-jar-wrap:nth-child(even) .dl-jar-label { transform: rotate(1.2deg); }
+  .dl-jar-wrap:nth-child(3) .dl-jar-label { transform: rotate(-0.8deg); }
+  .dl-jar-label::before, .dl-jar-label::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 3px;
+    background: linear-gradient(180deg, rgba(139,69,19,0.5), rgba(139,69,19,0.3));
+    top: -2px;
+  }
+  .dl-jar-label::before { left: 8px; transform: rotate(-8deg); }
+  .dl-jar-label::after { right: 8px; transform: rotate(7deg); }
+  .dl-jar-label .dl-name {
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: clamp(11px, 2.7vw, 14px);
+    color: #3d2817;
+    letter-spacing: 0.5px;
+    line-height: 1;
+  }
+  .dl-jar-label .dl-divider {
+    width: 60%; height: 1px;
+    background: linear-gradient(90deg, transparent, #8b6914, transparent);
+    margin: 2px auto;
+  }
+  .dl-jar-label .dl-mass {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(9px, 2vw, 11px);
+    color: #6b4e0b;
+    letter-spacing: 0.5px;
+  }
+
+  @keyframes dl-correct-glow {
+    0%, 100% {
+      box-shadow: inset 0 0 18px rgba(255,255,255,0.15),
+        inset -8px 0 12px rgba(0,0,0,0.08), 0 8px 14px rgba(0,0,0,0.4);
+      border-color: rgba(200,220,215,0.55);
+    }
+    50% {
+      box-shadow: inset 0 0 35px rgba(85,107,47,0.75), 0 0 30px rgba(154,205,50,0.9);
+      border-color: #9acd32;
+    }
+  }
+  @keyframes dl-wrong-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-7px) rotate(-2deg); }
+    40% { transform: translateX(7px) rotate(2deg); }
+    60% { transform: translateX(-5px) rotate(-1deg); }
+    80% { transform: translateX(5px) rotate(1deg); }
+  }
+  @keyframes dl-wrong-glow {
+    0%, 100% {
+      box-shadow: inset 0 0 18px rgba(255,255,255,0.15),
+        inset -8px 0 12px rgba(0,0,0,0.08), 0 8px 14px rgba(0,0,0,0.4);
+      border-color: rgba(200,220,215,0.55);
+    }
+    50% {
+      box-shadow: inset 0 0 35px rgba(139,37,0,0.75), 0 0 28px rgba(200,50,0,0.85);
+      border-color: #c03020;
+    }
+  }
+  .dl-jar.dl-correct .dl-jar-body { animation: dl-correct-glow 0.9s ease; }
+  .dl-jar.dl-wrong { animation: dl-wrong-shake 0.55s ease; }
+  .dl-jar.dl-wrong .dl-jar-body { animation: dl-wrong-glow 0.9s ease; }
+
+  .dl-feedback {
+    position: absolute;
+    top: 42%; left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    padding: 13px 28px;
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: clamp(18px, 4.8vw, 28px);
+    z-index: 300;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    letter-spacing: 1px;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.5);
+    white-space: nowrap;
+  }
+  .dl-feedback.dl-show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .dl-feedback.dl-correct-fb {
+    background: linear-gradient(145deg, #9acd32 0%, #556b2f 100%);
+    color: #f4ead5;
+    border: 2px solid #3d4a20;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+    border-radius: 4px;
+  }
+  .dl-feedback.dl-wrong-fb {
+    background: linear-gradient(145deg, #c03020 0%, #6b1a00 100%);
+    color: #f4ead5;
+    border: 2px solid #3d0d00;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+    border-radius: 4px;
+  }
+
+  .dl-success {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,5,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 500;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .dl-success.dl-show { display: flex; animation: dl-fade-in 0.4s ease; }
+  @keyframes dl-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+  .dl-certificate {
+    background: radial-gradient(ellipse at center, #f9f0d8 0%, #e8d9b5 100%);
+    padding: 30px 26px 24px;
+    max-width: 420px;
+    width: 100%;
+    position: relative;
+    border: 3px double #8b6914;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7),
+      inset 0 0 0 8px #f9f0d8,
+      inset 0 0 0 9px #8b6914;
+    animation: dl-cert-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes dl-cert-in {
+    0% { transform: scale(0.3) rotate(-8deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .dl-cert-icon {
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: 6px;
+    animation: dl-celebrate 1.4s ease infinite;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+  }
+  @keyframes dl-celebrate {
+    0%, 100% { transform: rotate(-6deg) scale(1); }
+    50% { transform: rotate(6deg) scale(1.08); }
+  }
+  .dl-cert-eyebrow {
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: #8b6914;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .dl-cert-title {
+    text-align: center;
+    font-family: 'Sora', sans-serif;
+    font-weight: 700;
+    font-size: clamp(20px, 5.5vw, 30px);
+    color: #3d2817;
+    margin-bottom: 10px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+  }
+  .dl-cert-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 8px 0;
+    color: #8b6914;
+    font-size: 13px;
+  }
+  .dl-cert-divider::before, .dl-cert-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #8b6914, transparent);
+    max-width: 80px;
+  }
+  .dl-cert-message {
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(13px, 3.5vw, 16px);
+    color: #3d2817;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    padding: 0 4px;
+  }
+  .dl-cert-message .key {
+    font-style: italic;
+    font-weight: 700;
+    color: #8b2500;
+    border-bottom: 2px solid #b8860b;
+    padding-bottom: 1px;
+  }
+  .dl-cert-message .name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    color: #6b4e0b;
+    letter-spacing: 1px;
+  }
+  .dl-btn-restart {
+    display: block;
+    margin: 0 auto;
+    padding: 11px 26px;
+    background: linear-gradient(180deg, #b8860b 0%, #8b6914 60%, #6b4e0b 100%);
+    color: #1a1511;
+    border: 2px solid #3d2817;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(12px, 3vw, 14px);
+    letter-spacing: 3px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 0 #3d2817, 0 6px 10px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,240,200,0.5);
+    transition: transform 0.08s, box-shadow 0.08s;
+  }
+  .dl-btn-restart:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #3d2817, 0 2px 4px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,240,200,0.5);
+  }
+
+  .dl-confetti {
+    position: absolute;
+    z-index: 400;
+    pointer-events: none;
+    animation: dl-confetti-fall 3s cubic-bezier(0.3, 0.1, 0.5, 1) forwards;
+  }
+  @keyframes dl-confetti-fall {
+    0% { transform: translateY(-30px) rotate(0); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="dl-wrap" id="dl-wrap">
+  <div class="dl-bg"></div>
+  <div class="dl-counter"></div>
+  <div class="dl-header">
+    <h1><span class="dl-ornament">&#10086;</span>Laboratório de Dalton<span class="dl-ornament">&#10086;</span></h1>
+    <div class="dl-subtitle">Organize os átomos no mini-game a seguir:</div>
+  </div>
+  <div class="dl-progress" id="dl-stats">00 / 16</div>
+  <div class="dl-instructions">Aperte o botão<br>e arraste o átomo<br>ao vidro correto.</div>
+  <div class="dl-machine">
+    <div class="dl-machine-body">
+      <span class="dl-rivet tl"></span><span class="dl-rivet tr"></span>
+      <span class="dl-rivet bl"></span><span class="dl-rivet br"></span>
+      <div class="dl-machine-plate">&mdash; DISPENSADOR &mdash;</div>
+      <div class="dl-machine-display">
+        <canvas id="dl-machineCanvas"></canvas>
+        <div class="dl-machine-count" id="dl-machineCount">16</div>
+      </div>
+      <button class="dl-btn-dispense" id="dl-btnDispense">Tirar Átomo</button>
+    </div>
+    <div class="dl-tube"></div>
+  </div>
+  <div class="dl-jars" id="dl-jars"></div>
+  <div class="dl-feedback" id="dl-feedback"></div>
+  <div class="dl-success" id="dl-success">
+    <div class="dl-certificate">
+      <div class="dl-cert-icon">&#9879;&#65039;</div>
+      <div class="dl-cert-eyebrow">&mdash; Parabéns &mdash;</div>
+      <div class="dl-cert-title">Experimento concluído</div>
+      <div class="dl-cert-divider">&#10086; &#10086; &#10086;</div>
+      <div class="dl-cert-message">Você organizou os átomos de acordo com a <span class="key">massa</span>, critério usado por <span class="name">John Dalton</span> em seu modelo atômico.</div>
+      <button class="dl-btn-restart" id="dl-btnRestart">&#8635; Reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  var wrap = document.getElementById('dl-wrap');
+
+  var dlElements = [
+    { id: 'H',  name: 'Hidrogênio', mass: 1,  color: '#e8dfd0', darkColor: '#7a6a50', rMachine: 7,  rJar: 10, dragDiam: 30 },
+    { id: 'C',  name: 'Carbono',    mass: 12, color: '#5a4d43', darkColor: '#1a1511', rMachine: 9,  rJar: 13, dragDiam: 38 },
+    { id: 'N',  name: 'Nitrogênio', mass: 14, color: '#6a8aaa', darkColor: '#1e3a5f', rMachine: 11, rJar: 15, dragDiam: 44 },
+    { id: 'Fe', name: 'Ferro',      mass: 56, color: '#a0551f', darkColor: '#4a1e00', rMachine: 13, rJar: 19, dragDiam: 52 }
+  ];
+
+  function DLPhysicsWorld(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.balls = [];
+    this.gravity = 0.35;
+    this.damping = 0.995;
+    this.wallRestitution = 0.55;
+    this.floorFriction = 0.9;
+    this.w = 0;
+    this.h = 0;
+  }
+  DLPhysicsWorld.prototype.resize = function() {
+    var rect = this.canvas.getBoundingClientRect();
+    this.w = rect.width;
+    this.h = rect.height;
+    var dpr = window.devicePixelRatio || 1;
+    this.canvas.width = Math.round(rect.width * dpr);
+    this.canvas.height = Math.round(rect.height * dpr);
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  DLPhysicsWorld.prototype.addBall = function(x, y, r, el, vx, vy) {
+    this.balls.push({ x: x, y: y, vx: vx || 0, vy: vy || 0, r: r, color: el.color, darkColor: el.darkColor, elementId: el.id });
+  };
+  DLPhysicsWorld.prototype.step = function() {
+    var n = this.balls.length;
+    for (var i = 0; i < n; i++) {
+      var b = this.balls[i];
+      b.vy += this.gravity;
+      b.vx *= this.damping;
+      b.vy *= this.damping;
+      if (b.vx > 18) b.vx = 18;
+      if (b.vx < -18) b.vx = -18;
+      if (b.vy > 22) b.vy = 22;
+      if (b.vy < -22) b.vy = -22;
+      b.x += b.vx;
+      b.y += b.vy;
+      if (b.x - b.r < 0) { b.x = b.r; b.vx = -b.vx * this.wallRestitution; }
+      else if (b.x + b.r > this.w) { b.x = this.w - b.r; b.vx = -b.vx * this.wallRestitution; }
+      if (b.y - b.r < 0) { b.y = b.r; b.vy = -b.vy * this.wallRestitution; }
+      else if (b.y + b.r > this.h) {
+        b.y = this.h - b.r;
+        b.vy = -b.vy * this.wallRestitution;
+        b.vx *= this.floorFriction;
+      }
+    }
+    for (var iter = 0; iter < 2; iter++) {
+      for (var i = 0; i < n; i++) {
+        var a = this.balls[i];
+        for (var j = i + 1; j < n; j++) {
+          var bb = this.balls[j];
+          var dx = bb.x - a.x;
+          var dy = bb.y - a.y;
+          var distSq = dx * dx + dy * dy;
+          var minDist = a.r + bb.r;
+          if (distSq < minDist * minDist && distSq > 0.0001) {
+            var dist = Math.sqrt(distSq);
+            var nx = dx / dist;
+            var ny = dy / dist;
+            var overlap = minDist - dist;
+            var ma = a.r * a.r;
+            var mb = bb.r * bb.r;
+            var totalMass = ma + mb;
+            var aShare = mb / totalMass;
+            var bShare = ma / totalMass;
+            a.x -= nx * overlap * aShare;
+            a.y -= ny * overlap * aShare;
+            bb.x += nx * overlap * bShare;
+            bb.y += ny * overlap * bShare;
+            var dvx = bb.vx - a.vx;
+            var dvy = bb.vy - a.vy;
+            var velAlong = dvx * nx + dvy * ny;
+            if (velAlong > 0) continue;
+            var e = 0.35;
+            var impulse = -(1 + e) * velAlong / (1 / ma + 1 / mb);
+            a.vx -= (impulse / ma) * nx;
+            a.vy -= (impulse / ma) * ny;
+            bb.vx += (impulse / mb) * nx;
+            bb.vy += (impulse / mb) * ny;
+          }
+        }
+      }
+    }
+  };
+  DLPhysicsWorld.prototype.render = function() {
+    var ctx = this.ctx;
+    ctx.clearRect(0, 0, this.w, this.h);
+    for (var i = 0; i < this.balls.length; i++) {
+      var b = this.balls[i];
+      var floorDist = this.h - (b.y + b.r);
+      if (floorDist < 30) {
+        var shadowAlpha = Math.max(0, 0.25 * (1 - floorDist / 30));
+        ctx.fillStyle = 'rgba(0,0,0,' + shadowAlpha + ')';
+        ctx.beginPath();
+        ctx.ellipse(b.x, this.h - 1, b.r * 0.9, b.r * 0.25, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    for (var i = 0; i < this.balls.length; i++) {
+      var b = this.balls[i];
+      this._drawBall(b.x, b.y, b.r, b.color, b.darkColor);
+    }
+  };
+  DLPhysicsWorld.prototype._drawBall = function(x, y, r, color, darkColor) {
+    var ctx = this.ctx;
+    var grad = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.05, x, y, r);
+    grad.addColorStop(0, color);
+    grad.addColorStop(0.6, darkColor);
+    grad.addColorStop(1, '#000');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+    var hg = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, 0, x - r * 0.4, y - r * 0.4, r * 0.55);
+    hg.addColorStop(0, 'rgba(255,255,255,0.55)');
+    hg.addColorStop(0.4, 'rgba(255,255,255,0.15)');
+    hg.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = hg;
+    ctx.beginPath();
+    ctx.arc(x - r * 0.4, y - r * 0.4, r * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, r - 0.5, 0, Math.PI * 2);
+    ctx.stroke();
+  };
+
+  var machineWorld = null;
+  var jarWorlds = {};
+  var placed = 0;
+  var currentAtom = null;
+  var animId = null;
+
+  function updateStats() {
+    var n = String(placed).padStart(2, '0');
+    var el = document.getElementById('dl-stats');
+    if (el) el.textContent = n + ' / 16';
+  }
+  function updateMachineCount() {
+    var remaining = machineWorld ? machineWorld.balls.length : 0;
+    var el = document.getElementById('dl-machineCount');
+    if (el) el.textContent = String(remaining);
+  }
+
+  function buildJars() {
+    var container = document.getElementById('dl-jars');
+    if (!container) return;
+    container.innerHTML = '';
+    dlElements.forEach(function(el) {
+      var w = document.createElement('div');
+      w.className = 'dl-jar-wrap';
+      w.innerHTML =
+        '<div class="dl-jar" data-element="' + el.id + '">' +
+          '<div class="dl-jar-lid-seal"></div>' +
+          '<div class="dl-jar-rim"></div>' +
+          '<div class="dl-jar-neck"></div>' +
+          '<div class="dl-jar-body">' +
+            '<canvas class="dl-jar-canvas" id="dl-canvas-' + el.id + '"></canvas>' +
+          '</div>' +
+        '</div>' +
+        '<div class="dl-jar-label">' +
+          '<div class="dl-name">' + el.name + '</div>' +
+          '<div class="dl-divider"></div>' +
+          '<div class="dl-mass">massa ' + el.mass + 'u</div>' +
+        '</div>';
+      container.appendChild(w);
+    });
+  }
+
+  function setupPhysics() {
+    var mc = document.getElementById('dl-machineCanvas');
+    if (!mc) return;
+    machineWorld = new DLPhysicsWorld(mc);
+    machineWorld.resize();
+    dlElements.forEach(function(el) {
+      for (var i = 0; i < 4; i++) {
+        var x = 10 + Math.random() * (machineWorld.w - 20);
+        var y = 10 + Math.random() * (machineWorld.h * 0.55);
+        var vx = (Math.random() - 0.5) * 3;
+        var vy = Math.random() * 2;
+        machineWorld.addBall(x, y, el.rMachine, el, vx, vy);
+      }
+    });
+    updateMachineCount();
+    jarWorlds = {};
+    dlElements.forEach(function(el) {
+      var canvas = document.getElementById('dl-canvas-' + el.id);
+      if (!canvas) return;
+      var world = new DLPhysicsWorld(canvas);
+      world.resize();
+      var x = world.w / 2 + (Math.random() - 0.5) * 10;
+      var y = world.h / 3;
+      world.addBall(x, y, el.rJar, el, (Math.random() - 0.5) * 2, 0);
+      jarWorlds[el.id] = world;
+    });
+  }
+
+  function dispenseAtom() {
+    if (currentAtom || !machineWorld || machineWorld.balls.length === 0) return;
+    var idx = Math.floor(Math.random() * machineWorld.balls.length);
+    var ball = machineWorld.balls[idx];
+    var elId = ball.elementId;
+    machineWorld.balls.splice(idx, 1);
+    updateMachineCount();
+    var el = dlElements.find(function(e) { return e.id === elId; });
+    var btn = document.getElementById('dl-btnDispense');
+    if (btn) btn.disabled = true;
+    var atom = document.createElement('div');
+    atom.className = 'dl-atom dl-falling';
+    atom.style.width = el.dragDiam + 'px';
+    atom.style.height = el.dragDiam + 'px';
+    atom.style.background = 'radial-gradient(circle at 32% 28%, ' + el.color + ', ' + el.darkColor + ' 72%, #000 110%)';
+    atom.style.boxShadow = 'inset -4px -5px 8px rgba(0,0,0,0.45), inset 3px 3px 6px rgba(255,255,255,0.25), 0 6px 12px rgba(0,0,0,0.5)';
+    atom.dataset.element = el.id;
+    var machine = wrap.querySelector('.dl-machine');
+    var mRect = machine.getBoundingClientRect();
+    var wrapRect = wrap.getBoundingClientRect();
+    var x = mRect.left - wrapRect.left + mRect.width / 2 - el.dragDiam / 2;
+    var y = mRect.bottom - wrapRect.top + 20;
+    atom.style.left = x + 'px';
+    atom.style.top = y + 'px';
+    wrap.appendChild(atom);
+    currentAtom = atom;
+    setTimeout(function() {
+      atom.classList.remove('dl-falling');
+      atom.classList.add('dl-ready');
+      attachDrag(atom);
+    }, 850);
+  }
+
+  function attachDrag(atom) {
+    var offX = 0, offY = 0, dragging = false;
+    function start(e) {
+      e.preventDefault();
+      dragging = true;
+      atom.classList.remove('dl-ready');
+      atom.classList.add('dl-dragging');
+      var rect = atom.getBoundingClientRect();
+      offX = e.clientX - rect.left;
+      offY = e.clientY - rect.top;
+      try { atom.setPointerCapture(e.pointerId); } catch(_) {}
+    }
+    function move(e) {
+      if (!dragging) return;
+      e.preventDefault();
+      var wrapRect = wrap.getBoundingClientRect();
+      atom.style.left = (e.clientX - wrapRect.left - offX) + 'px';
+      atom.style.top = (e.clientY - wrapRect.top - offY) + 'px';
+      highlightJar(e.clientX, e.clientY);
+    }
+    function end(e) {
+      if (!dragging) return;
+      dragging = false;
+      atom.classList.remove('dl-dragging');
+      clearJarHighlights();
+      checkDrop(atom, e.clientX, e.clientY);
+    }
+    atom.addEventListener('pointerdown', start);
+    atom.addEventListener('pointermove', move);
+    atom.addEventListener('pointerup', end);
+    atom.addEventListener('pointercancel', end);
+  }
+
+  function highlightJar(x, y) {
+    wrap.querySelectorAll('.dl-jar').forEach(function(jar) {
+      var r = jar.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+        jar.classList.add('dl-drag-over');
+      } else {
+        jar.classList.remove('dl-drag-over');
+      }
+    });
+  }
+  function clearJarHighlights() {
+    wrap.querySelectorAll('.dl-jar').forEach(function(j) { j.classList.remove('dl-drag-over'); });
+  }
+
+  function checkDrop(atom, x, y) {
+    var target = null;
+    wrap.querySelectorAll('.dl-jar').forEach(function(jar) {
+      var r = jar.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) target = jar;
+    });
+    if (target) {
+      if (target.dataset.element === atom.dataset.element) {
+        handleCorrect(atom, target);
+      } else {
+        handleWrong(atom, target);
+      }
+    } else {
+      atom.classList.add('dl-ready');
+    }
+  }
+
+  function handleCorrect(atom, jar) {
+    var elId = atom.dataset.element;
+    var el = dlElements.find(function(e) { return e.id === elId; });
+    var canvas = jar.querySelector('.dl-jar-canvas');
+    var canvasRect = canvas.getBoundingClientRect();
+    var wrapRect = wrap.getBoundingClientRect();
+    atom.style.transition = 'all 0.35s cubic-bezier(0.4, 0, 0.2, 1)';
+    atom.style.left = (canvasRect.left - wrapRect.left + canvasRect.width / 2 - el.dragDiam / 2) + 'px';
+    atom.style.top = (canvasRect.top - wrapRect.top - 5) + 'px';
+    atom.style.transform = 'scale(0.55)';
+    atom.style.opacity = '0.2';
+    jar.classList.add('dl-correct');
+    showFeedback('✦ Acertou!', 'correct');
+    setTimeout(function() {
+      atom.remove();
+      var world = jarWorlds[elId];
+      var spawnX = world.w / 2 + (Math.random() - 0.5) * 20;
+      var spawnY = el.rJar + 2;
+      var vx = (Math.random() - 0.5) * 3;
+      var vy = 2 + Math.random() * 2;
+      world.addBall(spawnX, spawnY, el.rJar, el, vx, vy);
+      jar.classList.remove('dl-correct');
+      currentAtom = null;
+      placed++;
+      updateStats();
+      var btn = document.getElementById('dl-btnDispense');
+      if (btn) btn.disabled = machineWorld.balls.length === 0;
+      if (placed === 16) {
+        setTimeout(showSuccess, 500);
+      }
+    }, 350);
+  }
+
+  function handleWrong(atom, jar) {
+    jar.classList.add('dl-wrong');
+    showFeedback('✗ Tente outro vidro', 'wrong');
+    var machine = wrap.querySelector('.dl-machine');
+    var mRect = machine.getBoundingClientRect();
+    var wrapRect = wrap.getBoundingClientRect();
+    var el = dlElements.find(function(e) { return e.id === atom.dataset.element; });
+    atom.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    atom.style.left = (mRect.left - wrapRect.left + mRect.width / 2 - el.dragDiam / 2) + 'px';
+    atom.style.top = (mRect.bottom - wrapRect.top + 20) + 'px';
+    setTimeout(function() {
+      atom.style.transition = '';
+      jar.classList.remove('dl-wrong');
+      atom.classList.add('dl-ready');
+    }, 550);
+  }
+
+  var feedbackTimer = null;
+  function showFeedback(text, type) {
+    var fb = document.getElementById('dl-feedback');
+    if (!fb) return;
+    fb.textContent = text;
+    fb.className = 'dl-feedback ' + (type === 'correct' ? 'dl-correct-fb' : 'dl-wrong-fb') + ' dl-show';
+    clearTimeout(feedbackTimer);
+    feedbackTimer = setTimeout(function() { fb.classList.remove('dl-show'); }, 1200);
+  }
+
+  function showSuccess() {
+    var modal = document.getElementById('dl-success');
+    if (modal) modal.classList.add('dl-show');
+    var colors = ['#b8860b', '#8b2500', '#556b2f', '#1e3a5f', '#8b4513', '#daa520', '#f4ead5'];
+    for (var i = 0; i < 60; i++) {
+      (function(idx) {
+        setTimeout(function() {
+          var c = document.createElement('div');
+          c.className = 'dl-confetti';
+          var isCircle = Math.random() > 0.4;
+          var size = 6 + Math.random() * 8;
+          c.style.width = size + 'px';
+          c.style.height = size + (isCircle ? 0 : Math.random() * 4) + 'px';
+          c.style.background = colors[Math.floor(Math.random() * colors.length)];
+          c.style.borderRadius = isCircle ? '50%' : '1px';
+          c.style.left = Math.random() * 100 + '%';
+          c.style.top = '-20px';
+          c.style.animationDuration = (2.2 + Math.random() * 2) + 's';
+          c.style.opacity = 0.7 + Math.random() * 0.3;
+          wrap.appendChild(c);
+          setTimeout(function() { c.remove(); }, 4500);
+        }, idx * 35);
+      })(i);
+    }
+  }
+
+  function restart() {
+    var modal = document.getElementById('dl-success');
+    if (modal) modal.classList.remove('dl-show');
+    if (currentAtom) { currentAtom.remove(); currentAtom = null; }
+    var btn = document.getElementById('dl-btnDispense');
+    if (btn) btn.disabled = false;
+    placed = 0;
+    updateStats();
+    buildJars();
+    setupPhysics();
+  }
+
+  function animate() {
+    if (machineWorld) { machineWorld.step(); machineWorld.render(); }
+    for (var id in jarWorlds) {
+      var w = jarWorlds[id];
+      w.step();
+      w.render();
+    }
+    animId = requestAnimationFrame(animate);
+  }
+
+  function handleResize() {
+    if (machineWorld) {
+      var ow = machineWorld.w, oh = machineWorld.h;
+      machineWorld.resize();
+      if (ow > 0 && oh > 0) {
+        var sx = machineWorld.w / ow, sy = machineWorld.h / oh;
+        for (var k = 0; k < machineWorld.balls.length; k++) { machineWorld.balls[k].x *= sx; machineWorld.balls[k].y *= sy; }
+      }
+    }
+    for (var id in jarWorlds) {
+      var w = jarWorlds[id];
+      var ow2 = w.w, oh2 = w.h;
+      w.resize();
+      if (ow2 > 0 && oh2 > 0) {
+        var sx2 = w.w / ow2, sy2 = w.h / oh2;
+        for (var k = 0; k < w.balls.length; k++) { w.balls[k].x *= sx2; w.balls[k].y *= sy2; }
+      }
+    }
+  }
+
+  document.getElementById('dl-btnDispense').addEventListener('click', dispenseAtom);
+  document.getElementById('dl-btnRestart').addEventListener('click', restart);
+  window.addEventListener('resize', handleResize);
+
+  placed = 0;
+  updateStats();
+  buildJars();
+  setupPhysics();
+  animate();
+})();
+</script>
+</body>
+</html>
