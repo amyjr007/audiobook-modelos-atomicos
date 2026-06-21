@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Three.js (local) — usado só na cena do barco de Lego (dialogo1.7). 'defer' p/ não bloquear o 1º paint. -->
-<script defer src="three.min.js?v=1.2.10"></script>
+<script defer src="three.min.js?v=1.2.11"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -400,9 +400,20 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch2-cup-scene{position:absolute;inset:0;z-index:6;pointer-events:none}
 .ch2-cup-dark{position:absolute;inset:0;z-index:2;background:rgba(4,6,9,.92);opacity:0;visibility:hidden;transition:opacity .7s ease,visibility .7s ease}
 .ch2-cup-dark.on{opacity:1;visibility:visible}
-.ch2-cup{position:absolute;left:50%;top:38%;z-index:3;transform:translate(-50%,-50%) scale(.4);opacity:0;transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .6s ease}
+.ch2-cup{position:absolute;left:50%;top:38%;z-index:4;pointer-events:none;transform:translate(-50%,-50%) scale(.4);opacity:0;transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .6s ease}
 .ch2-cup.in{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.ch2-cup.big{transform:translate(-50%,-50%) scale(1.7)}
+.ch2-cup.big{transform:translate(-50%,-50%) scale(1.18)}
+.ch2-cup.zoomed{opacity:0;transition:opacity .4s ease}
+/* frame retangular atrás do copo (estilo metal_cold) + lupa/zoom */
+.ch2-cup-frame{position:absolute;left:50%;top:38%;z-index:3;width:min(72vw,300px);height:min(54vh,344px);border-radius:18px;overflow:hidden;background:linear-gradient(180deg,rgba(150,205,240,.22),rgba(60,140,205,.40));box-shadow:0 18px 60px rgba(0,0,0,.55),0 0 0 1px rgba(255,199,119,.16);opacity:0;transform:translate(-50%,-50%) scale(.4);transition:transform .7s cubic-bezier(.34,1.56,.64,1),opacity .6s ease;touch-action:none;pointer-events:none}
+.ch2-cup-frame.in{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.ch2-cup-frame.big{transform:translate(-50%,-50%) scale(1.18)}
+.ch2-cup-frame.arm{pointer-events:auto}
+.ch2-cup-lupa{position:absolute;left:50%;top:50%;width:150px;height:150px;border-radius:50%;overflow:hidden;pointer-events:none;opacity:0;transform:translate(-50%,-50%);box-shadow:0 12px 30px rgba(0,0,0,.6),0 0 0 4px rgba(236,241,244,.92),0 0 0 8px rgba(70,80,88,.6),inset 0 0 26px rgba(0,0,0,.5);transition:opacity .16s ease}
+.ch2-cup-lupa.on{opacity:1}
+.ch2-cup-grid{position:absolute;left:0;top:0;width:400px;height:400px;background:#0c2233}
+.ch2-cup-lupa-hint{position:absolute;left:0;right:0;top:74%;z-index:4;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(12px,3.4vw,15px);font-weight:600;letter-spacing:.3px;color:var(--text2);opacity:0;transition:opacity .5s ease}
+.ch2-cup-lupa-hint.show{animation:ch2HintPulse 2.2s ease-in-out infinite}
 .ch2-cup-glass{position:relative;width:100px;height:128px;clip-path:polygon(9% 0,91% 0,80% 100%,20% 100%);background:linear-gradient(90deg,rgba(205,228,238,.20),rgba(244,251,255,.34) 32%,rgba(195,224,238,.18));box-shadow:inset 0 0 18px rgba(255,255,255,.28),0 12px 26px rgba(0,0,0,.45)}
 .ch2-cup-water{position:absolute;left:0;right:0;bottom:0;height:74%;background:linear-gradient(180deg,rgba(120,200,240,.62),rgba(40,130,210,.82))}
 .ch2-cup-water::before{content:'';position:absolute;left:0;right:0;top:0;height:7px;background:rgba(220,245,255,.55)}
@@ -1134,7 +1145,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-mat-top" id="abMatTop">Matéria</div>
       <div class="ab-states" id="abStates" style="display:none">
         <div class="ab-states-card" id="abStatesCard">
-          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.2.10" alt="Estado físico da matéria" draggable="false">
+          <img class="ab-state-img" id="abStateImg" src="images/estado-solido.svg?v=1.2.11" alt="Estado físico da matéria" draggable="false">
           <svg class="ab-crack" id="abCrack" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             <g class="c1" stroke="#ffffff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".9">
               <path d="M150 150 L120 104 L128 74"/>
@@ -1162,7 +1173,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-atom-q1" id="abAtomQ1">Do que a matéria é formada por dentro?</div>
           <div class="ab-atom-q2" id="abAtomQ2">Ela é formada por átomos</div>
           <div class="ab-atom-q3" id="abAtomQ3">O que é um átomo?</div>
-          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.2.10" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
+          <img class="ab-atom-img" id="abAtomImg" src="images/img7.jpg?v=1.2.11" alt="Demócrito e Leucippo: a pedra e os átomos indivisíveis" draggable="false">
         </div>
       </div>
       <div class="ab-atom-final" id="abAtomFinal">
@@ -1174,7 +1185,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ab-apple" id="abApple" style="display:none">
         <div class="ab-apple-title" id="abAppleTitle">A maçã</div>
         <div class="ab-apple-stage" id="abAppleStage">
-          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.2.10" alt="Maçã" draggable="false">
+          <img class="ab-apple-img" id="abAppleImg" src="images/apple.svg?v=1.2.11" alt="Maçã" draggable="false">
           <div class="ab-apple-atom" id="abAppleAtom">átomo</div>
           <svg class="ab-particle-arrow" id="abParticleArrow" viewBox="0 0 80 92" width="62" height="72" aria-hidden="true">
             <path d="M16 8 C56 16 64 44 46 78" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
@@ -1215,15 +1226,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Quiz de cards (dialogo1) -->
       <div class="ab-quiz" id="abQuiz" style="display:none">
-        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.2.10" alt="Rocha" draggable="false"><span>Rocha</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.2.10" alt="Água" draggable="false"><span>Água</span></button>
-        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.2.10" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(0)"><img src="images/rock_transparent.jpeg?v=1.2.11" alt="Rocha" draggable="false"><span>Rocha</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(1)"><img src="images/water_cup.jpg?v=1.2.11" alt="Água" draggable="false"><span>Água</span></button>
+        <button type="button" class="ab-card" onclick="abQuizAnswer(2)"><img src="images/light_energy.png?v=1.2.11" alt="Feixe de luz" draggable="false"><span>Feixe de luz</span></button>
       </div>
 
       <!-- Confete da comemoração -->
       <canvas class="ab-confetti" id="abConfetti"></canvas>
 
-      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.2.10" preload="auto"></audio>
+      <audio id="abAudio" src="audio/dialogo0.mp3?v=1.2.11" preload="auto"></audio>
     </div>
   </div>
 
@@ -1313,6 +1324,10 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ch2-cup-name" id="ch2CupName"></div>
         <div class="ch2-cup-sub" id="ch2CupSub"></div>
         <div class="ch2-cup-dark" id="ch2CupDark"></div>
+        <!-- frame retangular atrás do copo (mesmo do metal_cold); abriga a lupa/zoom -->
+        <div class="ch2-cup-frame" id="ch2CupFrame">
+          <div class="ch2-cup-lupa" id="ch2CupLupa"><div class="ch2-cup-grid" id="ch2CupGrid"></div><div class="ch2-lupa-glare"></div></div>
+        </div>
         <div class="ch2-cup" id="ch2Cup">
           <div class="ch2-cup-glass">
             <div class="ch2-cup-water"></div>
@@ -1320,6 +1335,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           </div>
           <div class="ch2-cup-rim"></div>
         </div>
+        <div class="ch2-cup-lupa-hint" id="ch2CupLupaHint">🤏 dê zoom com dois dedos</div>
       </div>
 
       <!-- dialogo2.4.1: "Átomos organizados" + metal_cold (sobe de baixo) -->
@@ -1444,7 +1460,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <div class="ch2-dark" id="ch2Dark"></div>
       <canvas class="ch2-confetti" id="ch2ConfettiCv"></canvas>
 
-      <audio id="ch2Audio" src="audio/dialogo2.mp3?v=1.2.10" preload="auto"></audio>
+      <audio id="ch2Audio" src="audio/dialogo2.mp3?v=1.2.11" preload="auto"></audio>
     </div>
   </div>
 
@@ -1658,7 +1674,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.2.10</div>
+<div class="app-version" id="appVersion">v1.2.11</div>
 
 </div>
 <script>
@@ -1874,22 +1890,22 @@ var ab = {
   journeyText:'A jornada através do tempo pra entender o átomo',
   cues:[],
   segments:[
-    { src:'audio/dialogo0.mp3?v=1.2.10',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.2.10', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
-    { src:'audio/dialogo1A.mp3?v=1.2.10',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.2.10',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
-    { src:'audio/dialogo1.0.mp3?v=1.2.10', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
-    { src:'audio/dialogo1.1.mp3?v=1.2.10', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
-    { src:'audio/dialogo1.2.mp3?v=1.2.10', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.2.10', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.2.10', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
-    { src:'audio/dialogo1.5.mp3?v=1.2.10', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
-    { src:'audio/dialogo1.6A.mp3?v=1.2.10', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
-    { src:'audio/dialogo1.6B.mp3?v=1.2.10', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
-    { src:'audio/dialogo1.7.mp3?v=1.2.10', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
-    { src:'audio/dialogo1.7A.mp3?v=1.2.10', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
-    { src:'audio/dialogo1.7B.mp3?v=1.2.10', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
-    { src:'audio/dialogo1.7C.mp3?v=1.2.10', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
+    { src:'audio/dialogo0.mp3?v=1.2.11',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.2.11', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo1A.mp3?v=1.2.11',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
+    { src:'audio/dialogo1.mp3?v=1.2.11',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.0.mp3?v=1.2.11', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.2.11', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
+    { src:'audio/dialogo1.2.mp3?v=1.2.11', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
+    { src:'audio/dialogo1.3.mp3?v=1.2.11', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.2.11', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo1.5.mp3?v=1.2.11', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
+    { src:'audio/dialogo1.6A.mp3?v=1.2.11', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
+    { src:'audio/dialogo1.6B.mp3?v=1.2.11', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
+    { src:'audio/dialogo1.7.mp3?v=1.2.11', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
+    { src:'audio/dialogo1.7A.mp3?v=1.2.11', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
+    { src:'audio/dialogo1.7B.mp3?v=1.2.11', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
+    { src:'audio/dialogo1.7C.mp3?v=1.2.11', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
   ]
 };
 
@@ -2089,7 +2105,7 @@ function abQuizAnswer(i){
     if(ab.audio){ ab.audio.pause(); } ab.playing=false; abSetFab(false);
     cards[2].classList.add('correct');
     abConfetti();
-    abSfx('audio/applause.mp3?v=1.2.10'); abSfx('audio/yes.mp3?v=1.2.10');
+    abSfx('audio/applause.mp3?v=1.2.11'); abSfx('audio/yes.mp3?v=1.2.11');
     setTimeout(function(){ startSegment(ab.seg + 1); }, 2800); /* terminou -> dialogo1.0 */
   } else {
     var c=cards[i]; c.classList.remove('wrong'); void c.offsetWidth; c.classList.add('wrong');
@@ -2172,9 +2188,9 @@ function abMatTopReset(){ abEl('abMatTop').classList.remove('show'); }
 
 /* --- Carrossel de estados físicos com virada 3D (sólido/líquido/gás) --- */
 var abStateList = [
-  { img:'images/estado-solido.svg?v=1.2.10',  label:'Sólido'  },
-  { img:'images/estado-liquido.svg?v=1.2.10', label:'Líquido' },
-  { img:'images/estado-gas.svg?v=1.2.10',     label:'Gasoso'  }
+  { img:'images/estado-solido.svg?v=1.2.11',  label:'Sólido'  },
+  { img:'images/estado-liquido.svg?v=1.2.11', label:'Líquido' },
+  { img:'images/estado-gas.svg?v=1.2.11',     label:'Gasoso'  }
 ];
 var abStateIdx = 0, abStatesShown = false, abStatesUser = false, abStatesFlipping = false, abSolidBig = false, abStatesLocked = false;
 
@@ -2307,7 +2323,7 @@ function abTapHit(){
   else {
     var m=abTapMode; abTapMode=null;
     abEl('abStatesHand').className='ab-hand ab-states-hand';
-    if(m.sfx){ abSfx('audio/applause.mp3?v=1.2.10'); abSfx('audio/yes.mp3?v=1.2.10'); }
+    if(m.sfx){ abSfx('audio/applause.mp3?v=1.2.11'); abSfx('audio/yes.mp3?v=1.2.11'); }
     abBreakNow(m.kind, m.onBreak);
   }
 }
@@ -2396,7 +2412,7 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
-var abAppleWhole='images/apple.svg?v=1.2.10', abApplePiece='images/apple-piece.svg?v=1.2.10';
+var abAppleWhole='images/apple.svg?v=1.2.11', abApplePiece='images/apple-piece.svg?v=1.2.11';
 var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
 
 function abAppleReset(){
@@ -3116,7 +3132,7 @@ function abRedoCelebrate(){
   abShowFab(false);
   abAppleRedo(function(){                            /* ao completar a maçã... */
     abAppleCut=false;
-    abSfx('audio/yes.mp3?v=1.2.10'); abSfx('audio/applause.mp3?v=1.2.10'); /* ...comemora */
+    abSfx('audio/yes.mp3?v=1.2.11'); abSfx('audio/applause.mp3?v=1.2.11'); /* ...comemora */
     abConfetti();
     setTimeout(function(){ startSegment(11); }, 1600); /* depois segue p/ dialogo1.6B */
   });
@@ -3131,7 +3147,7 @@ function abAppleDoCut(){
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.2.10'); abSfx('audio/applause.mp3?v=1.2.10');
+    abSfx('audio/yes.mp3?v=1.2.11'); abSfx('audio/applause.mp3?v=1.2.11');
     abEl('abAppleRedo').classList.remove('show');
     setTimeout(function(){ startSegment(9); }, 1500); /* -> dialogo1.5 */
     return;
@@ -3618,26 +3634,26 @@ var ch2 = {
   audio:null, inited:false, started:false, ended:false, playing:false,
   awaitingNext:false, raf:null, seg:0, cues:[],
   segments:[
-    { src:'audio/dialogo2.mp3?v=1.2.10',   build:ch2CuesSeg0, onStart:ch2InitSeg0, next:true  }, /* linha do tempo: 450 A.C. -> 1800 -> John Dalton */
-    { src:'audio/dialogo2.1.mp3?v=1.2.10', build:ch2CuesSeg1, onStart:ch2InitSeg1, next:true  }, /* ken burns + áreas de estudo; depois as 3 bolas do daltonismo */
-    { src:'audio/dialogo2.2.mp3?v=1.2.10', build:ch2CuesSeg2, onStart:ch2InitSeg2, next:true  }, /* John Dalton 2: "Átomos são reais!" -> "1º Modelo atômico da história" */
-    { src:'audio/dialogo2.3.mp3?v=1.2.10',   build:ch2CuesSeg3, onStart:ch2InitSeg3, next:true }, /* vídeo john_dalton_1 + frases; toca o áudio INTEIRO; ao fim ▶ -> 2.4 (NÃO toca mais 2.3.1) */
-    { src:'audio/dialogo2.4.mp3?v=1.2.10',   build:ch2CuesSeg4, onStart:ch2InitSeg4, next:true  }, /* 1º postulado (marcador "3. postulado 1") */
-    { src:'audio/dialogo2.4.1.mp3?v=1.2.10', build:ch2CuesNone,  onStart:ch2InitSeg5, onEnd:ch2LupaEnable, next:true  }, /* "Átomos organizados" + metal_cold; ao FIM libera a lupa (pinça); ▶ -> 2.5 */
-    { src:'audio/dialogo2.5.mp3?v=1.2.10',   build:ch2CuesSeg6, onStart:ch2InitSeg6, next:true, nextIdx:8 }, /* Postulado 2 (nova versão); ▶ pula o 2.5.0 e vai pro 2.5.1 */
-    { src:'audio/dialogo2.5.0.mp3?v=1.2.10', build:ch2CuesSeg7, onStart:ch2InitSeg7, next:true  }, /* mantém as esferas: elementos químicos, nomes, símbolos e símbolos de Dalton */
-    { src:'audio/dialogo2.5.1.mp3?v=1.2.10', build:ch2CuesSeg8, onStart:ch2InitSeg8, next:true, nextIdx:12 }, /* Átomos são esféricos -> dalton_elements/1808 -> esferas; ▶ -> 2.5.1A */
-    { src:'audio/dialogo2.5.2.mp3?v=1.2.10', build:ch2CuesNone, onStart:ch2InitSeg9, next:true, nextIdx:11 }, /* (quiz) ERROU: massas de cada bola; ▶ -> 2.5.4 */
-    { src:'audio/dialogo2.5.3.mp3?v=1.2.10', build:ch2CuesNone, onStart:ch2InitSeg10, next:true }, /* (quiz) ACERTOU; ▶ -> 2.5.4 */
-    { src:'audio/dialogo2.5.4.mp3?v=1.2.10', build:ch2CuesSeg11, onStart:ch2InitSeg11, next:true, nextIdx:17 }, /* (quiz) sobe a cena + massas; ▶ -> 2.6 (Postulado 3) */
-    { src:'audio/dialogo2.5.1A.mp3?v=1.2.10', build:ch2CuesSeg12, onStart:ch2InitSeg12, next:true }, /* seg12: De onde vem a diferença -> massas; ▶ -> 2.5.1B */
-    { src:'audio/dialogo2.5.1B.mp3?v=1.2.10', build:ch2CuesSeg13, onStart:ch2InitSeg13, next:true }, /* seg13: "Átomos com a mesma massa pertencem ao mesmo elemento"; ▶ -> 2.5.1C */
-    { src:'audio/dialogo2.5.1C.mp3?v=1.2.10', build:ch2CuesSeg14, onStart:ch2InitSeg14, next:true }, /* seg14: massa do C -> cai no vidro; depois N e O; ▶ -> 2.5.1D */
-    { src:'audio/dialogo2.5.1D.mp3?v=1.2.10', build:ch2CuesSeg15, onStart:ch2InitSeg15, onEnd:ch2GameAudioEnded, next:false }, /* seg15: mini-game; fim do jogo -> card (Refazer / ▶ Continuar) */
-    { src:'audio/dialogo2.5.1E.mp3?v=1.2.10', build:ch2CuesSeg16, onStart:ch2InitSeg16, next:false }, /* seg16: "O cálculo de massa relativa de Dalton" (6s) + quiz da massa */
-    { src:'audio/dialogo2.6.mp3?v=1.2.10', build:ch2CuesSeg17, onStart:ch2InitSeg17, next:true }, /* seg17: Postulado 3; ▶ -> 2.6.1 */
-    { src:'audio/dialogo2.6.1.mp3?v=1.2.10', build:ch2CuesSeg18, onStart:ch2InitSeg18, next:true }, /* seg18: molécula de água; ▶ -> 2.6.2 */
-    { src:'audio/dialogo2.6.2.mp3?v=1.2.10', build:ch2CuesSeg19, onStart:ch2InitSeg19, next:false } /* seg19: moléculas -> copo de água -> substâncias químicas; fim -> ▶ */
+    { src:'audio/dialogo2.mp3?v=1.2.11',   build:ch2CuesSeg0, onStart:ch2InitSeg0, next:true  }, /* linha do tempo: 450 A.C. -> 1800 -> John Dalton */
+    { src:'audio/dialogo2.1.mp3?v=1.2.11', build:ch2CuesSeg1, onStart:ch2InitSeg1, next:true  }, /* ken burns + áreas de estudo; depois as 3 bolas do daltonismo */
+    { src:'audio/dialogo2.2.mp3?v=1.2.11', build:ch2CuesSeg2, onStart:ch2InitSeg2, next:true  }, /* John Dalton 2: "Átomos são reais!" -> "1º Modelo atômico da história" */
+    { src:'audio/dialogo2.3.mp3?v=1.2.11',   build:ch2CuesSeg3, onStart:ch2InitSeg3, next:true }, /* vídeo john_dalton_1 + frases; toca o áudio INTEIRO; ao fim ▶ -> 2.4 (NÃO toca mais 2.3.1) */
+    { src:'audio/dialogo2.4.mp3?v=1.2.11',   build:ch2CuesSeg4, onStart:ch2InitSeg4, next:true  }, /* 1º postulado (marcador "3. postulado 1") */
+    { src:'audio/dialogo2.4.1.mp3?v=1.2.11', build:ch2CuesNone,  onStart:ch2InitSeg5, onEnd:ch2LupaEnable, next:true  }, /* "Átomos organizados" + metal_cold; ao FIM libera a lupa (pinça); ▶ -> 2.5 */
+    { src:'audio/dialogo2.5.mp3?v=1.2.11',   build:ch2CuesSeg6, onStart:ch2InitSeg6, next:true, nextIdx:8 }, /* Postulado 2 (nova versão); ▶ pula o 2.5.0 e vai pro 2.5.1 */
+    { src:'audio/dialogo2.5.0.mp3?v=1.2.11', build:ch2CuesSeg7, onStart:ch2InitSeg7, next:true  }, /* mantém as esferas: elementos químicos, nomes, símbolos e símbolos de Dalton */
+    { src:'audio/dialogo2.5.1.mp3?v=1.2.11', build:ch2CuesSeg8, onStart:ch2InitSeg8, next:true, nextIdx:12 }, /* Átomos são esféricos -> dalton_elements/1808 -> esferas; ▶ -> 2.5.1A */
+    { src:'audio/dialogo2.5.2.mp3?v=1.2.11', build:ch2CuesNone, onStart:ch2InitSeg9, next:true, nextIdx:11 }, /* (quiz) ERROU: massas de cada bola; ▶ -> 2.5.4 */
+    { src:'audio/dialogo2.5.3.mp3?v=1.2.11', build:ch2CuesNone, onStart:ch2InitSeg10, next:true }, /* (quiz) ACERTOU; ▶ -> 2.5.4 */
+    { src:'audio/dialogo2.5.4.mp3?v=1.2.11', build:ch2CuesSeg11, onStart:ch2InitSeg11, next:true, nextIdx:17 }, /* (quiz) sobe a cena + massas; ▶ -> 2.6 (Postulado 3) */
+    { src:'audio/dialogo2.5.1A.mp3?v=1.2.11', build:ch2CuesSeg12, onStart:ch2InitSeg12, next:true }, /* seg12: De onde vem a diferença -> massas; ▶ -> 2.5.1B */
+    { src:'audio/dialogo2.5.1B.mp3?v=1.2.11', build:ch2CuesSeg13, onStart:ch2InitSeg13, next:true }, /* seg13: "Átomos com a mesma massa pertencem ao mesmo elemento"; ▶ -> 2.5.1C */
+    { src:'audio/dialogo2.5.1C.mp3?v=1.2.11', build:ch2CuesSeg14, onStart:ch2InitSeg14, next:true }, /* seg14: massa do C -> cai no vidro; depois N e O; ▶ -> 2.5.1D */
+    { src:'audio/dialogo2.5.1D.mp3?v=1.2.11', build:ch2CuesSeg15, onStart:ch2InitSeg15, onEnd:ch2GameAudioEnded, next:false }, /* seg15: mini-game; fim do jogo -> card (Refazer / ▶ Continuar) */
+    { src:'audio/dialogo2.5.1E.mp3?v=1.2.11', build:ch2CuesSeg16, onStart:ch2InitSeg16, next:false }, /* seg16: "O cálculo de massa relativa de Dalton" (6s) + quiz da massa */
+    { src:'audio/dialogo2.6.mp3?v=1.2.11', build:ch2CuesSeg17, onStart:ch2InitSeg17, next:true }, /* seg17: Postulado 3; ▶ -> 2.6.1 */
+    { src:'audio/dialogo2.6.1.mp3?v=1.2.11', build:ch2CuesSeg18, onStart:ch2InitSeg18, next:true }, /* seg18: molécula de água; ▶ -> 2.6.2 */
+    { src:'audio/dialogo2.6.2.mp3?v=1.2.11', build:ch2CuesSeg19, onStart:ch2InitSeg19, next:false } /* seg19: moléculas -> copo de água -> substâncias químicas; fim -> ▶ */
   ]
 };
 function ch2El(id){ return document.getElementById(id); }
@@ -3703,10 +3719,10 @@ function ch2CuesNone(){ return []; }
 function ch2InitSeg0(){ ch2SceneReset(); }
 function ch2CuesSeg0(){
   return [
-    { t:3.0,  done:false, fn:function(){ ch2ShowYear('450 A.C.'); ch2ShowImg('images/img1.jpg?v=1.2.10'); } }, /* entra img1 + ano */
+    { t:3.0,  done:false, fn:function(){ ch2ShowYear('450 A.C.'); ch2ShowImg('images/img1.jpg?v=1.2.11'); } }, /* entra img1 + ano */
     { t:11.0, done:false, fn:function(){ ch2HideImg(); ch2HideYear(); } },                                     /* some a imagem (e o ano daquela era) */
     { t:17.7, done:false, fn:function(){ ch2ShowYear('1800'); } },                                             /* entra o ano 1800 em cima */
-    { t:22.8, done:false, fn:function(){ ch2ShowImg('images/john_dalton.jpeg?v=1.2.10', 'John Dalton'); } }     /* entra John Dalton + nome */
+    { t:22.8, done:false, fn:function(){ ch2ShowImg('images/john_dalton.jpeg?v=1.2.11', 'John Dalton'); } }     /* entra John Dalton + nome */
   ];
 }
 
@@ -3751,7 +3767,7 @@ function ch2InitSeg2(){
 }
 function ch2CuesSeg2(){
   return [
-    { t:0.8,  done:false, fn:function(){ ch2ShowImgVideo('videos/john_dalton2.mp4?v=1.2.10'); ch2El('ch2ImgWrap').classList.add('kenburns-face'); } }, /* entra vídeo Dalton 2 + ken burns no rosto */
+    { t:0.8,  done:false, fn:function(){ ch2ShowImgVideo('videos/john_dalton2.mp4?v=1.2.11'); ch2El('ch2ImgWrap').classList.add('kenburns-face'); } }, /* entra vídeo Dalton 2 + ken burns no rosto */
     { t:5.3,  done:false, fn:function(){ ch2ShowCaption('Átomos são reais!'); } },              /* frase no topo da imagem */
     { t:10.0, done:false, fn:function(){ ch2HideCaption(); } },                                  /* some o texto */
     { t:18.5, done:false, fn:function(){ ch2ShowCaption('1º Modelo atômico da história'); } }   /* legenda final no topo */
@@ -3793,7 +3809,7 @@ function ch2InitSeg3(){
 function ch2CuesSeg3(){
   return [
     { t:2.0,  done:false, fn:function(){ ch2FadeOutScene(); } },                                            /* tudo sai em fade */
-    { t:3.0,  done:false, fn:function(){ ch2ShowVideo('videos/john_dalton_1.mp4?v=1.2.10'); } },           /* toca o vídeo (congela no fim) */
+    { t:3.0,  done:false, fn:function(){ ch2ShowVideo('videos/john_dalton_1.mp4?v=1.2.11'); } },           /* toca o vídeo (congela no fim) */
     { t:10.5, done:false, fn:function(){ ch2ShowVCaption('Teoria com embasamento científico'); } },
     { t:17.0, done:false, fn:function(){ ch2HideVCaption(); } },
     { t:19.0, done:false, fn:function(){ ch2ShowVCaption('Não discutiremos os experimentos dele'); } },
@@ -3864,7 +3880,7 @@ function ch2InitSeg5(){
   var post=ch2El('ch2Post'); if(post){ post.classList.add('ch2-riseout'); }
   setTimeout(function(){ if(post){ post.classList.remove('in','ch2-riseout'); post.style.display='none'; } }, 1250);
   /* sobe de baixo: título "Átomos organizados" + imagem metal_cold */
-  ch2El('ch2OrgImg').src='images/metal_cold.png?v=1.2.10';
+  ch2El('ch2OrgImg').src='images/metal_cold.png?v=1.2.11';
   var org=ch2El('ch2Org'); org.classList.remove('in'); org.style.display='flex'; void org.offsetWidth; org.classList.add('in');
 }
 /* ----- Lupa (pinça) sobre a imagem do metal: revela a rede 2D de átomos ----- */
@@ -3966,9 +3982,9 @@ function ch2InitSeg6(){
 }
 function ch2CuesSeg6(){
   return [
-    { t:12.4, done:false, fn:function(){ ch2P2ImgShow('images/john_dalton3.png?v=1.2.10', true); } },     /* john_dalton3 + ken burns no topo */
+    { t:12.4, done:false, fn:function(){ ch2P2ImgShow('images/john_dalton3.png?v=1.2.11', true); } },     /* john_dalton3 + ken burns no topo */
     { t:15.0, done:false, fn:function(){ ch2P2ImgHide(); } },                                              /* sai (animação padrão) */
-    { t:18.0, done:false, fn:function(){ ch2P2VidShow('videos/lab_dalton.mp4?v=1.2.10'); } },              /* vídeo lab_dalton */
+    { t:18.0, done:false, fn:function(){ ch2P2VidShow('videos/lab_dalton.mp4?v=1.2.11'); } },              /* vídeo lab_dalton */
     { t:26.0, done:false, fn:function(){ ch2P2VidHide(); } },
     { t:28.2, done:false, fn:function(){ ch2El('ch2P2T1').classList.add('bigor'); ch2P2TxtShow('ch2P2T1','Base teórica dessa observação'); } },
     { t:30.2, done:false, fn:function(){ ch2P2TxtShow('ch2P2T2','“Os materiais são diferentes porque existem átomos diferentes.”'); } },
@@ -3976,7 +3992,7 @@ function ch2CuesSeg6(){
     { t:37.0, done:false, fn:function(){ ch2El('ch2P2T1').classList.remove('bigor'); ch2P2TxtShow('ch2P2T1','Dalton classificou 20 tipos de átomos'); } },
     { t:41.0, done:false, fn:function(){ ch2P2TxtShow('ch2P2Or','Hoje conhecemos 118!'); } },              /* laranja, embaixo */
     { t:43.0, done:false, fn:function(){ ch2P2TxtHide('ch2P2T1'); ch2P2TxtHide('ch2P2Or'); } },
-    { t:49.8, done:false, fn:function(){ ch2P2TabShow('images/tabela_periodica.jpg?v=1.2.10'); } },         /* tabela periódica */
+    { t:49.8, done:false, fn:function(){ ch2P2TabShow('images/tabela_periodica.jpg?v=1.2.11'); } },         /* tabela periódica */
     { t:51.3, done:false, fn:function(){ ch2P2TxtShow('ch2P2TabTitle','Tabela Periódica dos Elementos'); } },/* acima da imagem */
     { t:60.0, done:false, fn:function(){ ch2El('ch2P2TabSub').classList.add('white'); ch2P2TxtShow('ch2P2TabSub','Tipos de átomos'); } }, /* branco, abaixo da tabela */
     { t:66.0, done:false, fn:function(){ ch2P2TxtHide('ch2P2TabSub'); } },                                  /* "Tipos de átomos" sai */
@@ -3990,7 +4006,7 @@ function ch2Top2Hide(){ var e=ch2El('ch2Top2'); e.classList.remove('in'); e.clas
 function ch2ShowNames(){ CH2_ELS.forEach(function(id){ var e=ch2El(id); if(!e) return; var n=e.querySelector('.ch2-el-name'); if(n){ n.classList.remove('in'); void n.offsetWidth; n.classList.add('in'); } }); abVibe(AB_VTXT); }
 function ch2ShowSyms(){ CH2_ELS.forEach(function(id){ var e=ch2El(id); if(!e) return; var s=e.querySelector('.ch2-el-sym'); if(s){ s.classList.remove('in'); void s.offsetWidth; s.classList.add('in'); } }); abVibe(AB_VTXT); }
 function ch2DaltonSymShow(){
-  var img=ch2El('ch2DaltonSymImg'); if(!img.getAttribute('src')){ img.src='images/dalton_symbols.jpeg?v=1.2.10'; }
+  var img=ch2El('ch2DaltonSymImg'); if(!img.getAttribute('src')){ img.src='images/dalton_symbols.jpeg?v=1.2.11'; }
   var d=ch2El('ch2DaltonSym'); d.style.display='flex'; d.classList.remove('out'); void d.offsetWidth; d.classList.add('in'); abVibe(AB_VTXT);
   ch2El('ch2Post2Body').classList.add('blur-bg'); /* embaça o que está atrás */
 }
@@ -4017,7 +4033,7 @@ function ch2InitSeg7(){
   var t2=ch2El('ch2Top2'); t2.classList.remove('in','out'); t2.textContent='';
   CH2_ELS.forEach(function(id){ var e=ch2El(id); if(!e) return; var n=e.querySelector('.ch2-el-name'); if(n){ n.classList.remove('in'); } var s=e.querySelector('.ch2-el-sym'); if(s){ s.classList.remove('in'); } });
   var d=ch2El('ch2DaltonSym'); d.classList.remove('in','out'); d.style.display='none';
-  var dimg=ch2El('ch2DaltonSymImg'); if(dimg && !dimg.getAttribute('src')){ dimg.src='images/dalton_symbols.jpeg?v=1.2.10'; } /* pré-carrega p/ entrar já centralizada */
+  var dimg=ch2El('ch2DaltonSymImg'); if(dimg && !dimg.getAttribute('src')){ dimg.src='images/dalton_symbols.jpeg?v=1.2.11'; } /* pré-carrega p/ entrar já centralizada */
   ch2El('ch2Post2Body').classList.remove('blur-bg');
 }
 function ch2CuesSeg7(){
@@ -4106,7 +4122,7 @@ function ch2CuesSeg8(){
     { t:3.0,  done:false, fn:function(){ ch2Post2MidHide(); } },
     { t:3.7,  done:false, fn:function(){ ch2P2TxtShow('ch2P2T1','Como podemos representar os diferentes tipos de átomos?'); } },
     { t:8.8,  done:false, fn:function(){ ch2P2TxtHide('ch2P2T1'); } },
-    { t:10.8, done:false, fn:function(){ ch2P2ImgShow('images/dalton_elements.jpg?v=1.2.10', false); ch2El('ch2P2Img').classList.add('whole'); } }, /* dalton_elements: inteira + 10% maior */
+    { t:10.8, done:false, fn:function(){ ch2P2ImgShow('images/dalton_elements.jpg?v=1.2.11', false); ch2El('ch2P2Img').classList.add('whole'); } }, /* dalton_elements: inteira + 10% maior */
     { t:13.0, done:false, fn:function(){ ch2El('ch2P2Img').classList.add('kb-soft'); } },          /* ken burns sutil a partir de 13s */
     { t:16.0, done:false, fn:function(){ ch2P2TxtShow('ch2P2Year','1808'); } },                    /* laranja */
     { t:27.0, done:false, fn:function(){ ch2P2ClearExceptTop(); } },                              /* some tudo (menos título+texto) */
@@ -4128,11 +4144,11 @@ function ch2QuizAnswer(i){
   ch2ShowBallMasses(); /* 10 g dentro de cada bola; balança segue em 50 g */
   if(i===correct){
     opts[i].classList.add('correct');
-    abSfx('audio/applause.mp3?v=1.2.10'); abSfx('audio/yes.mp3?v=1.2.10'); ch2DoConfetti(); abVibe([40,40,80]);
+    abSfx('audio/applause.mp3?v=1.2.11'); abSfx('audio/yes.mp3?v=1.2.11'); ch2DoConfetti(); abVibe([40,40,80]);
     setTimeout(function(){ ch2StartSegment(10); }, 1600); /* dialogo2.5.3 */
   } else {
     opts[i].classList.add('wrong'); opts[correct].classList.add('correct');
-    abSfx('audio/lowscore.mp3?v=1.2.10'); abVibe([90,40,90]);
+    abSfx('audio/lowscore.mp3?v=1.2.11'); abVibe([90,40,90]);
     setTimeout(function(){ ch2StartSegment(9); }, 1500);  /* dialogo2.5.2 */
   }
 }
@@ -4469,7 +4485,7 @@ function ch2GameSpawnAtom(desc, gray){
   ch2Game.atom=a; ch2Game.atomDesc=desc;
   var h=ch2GameAtomHome(a); a.style.left=h.x+'px'; a.style.top=h.y+'px';
   ch2GameAttachDrag(a);
-  abSfx('audio/ball_out.mp3?v=1.2.10'); abVibe(AB_VTXT);   /* saiu uma bola do dispensador */
+  abSfx('audio/ball_out.mp3?v=1.2.11'); abVibe(AB_VTXT);   /* saiu uma bola do dispensador */
 }
 /* treme a cena do Capítulo 2 (erro no jogo) */
 function ch2ScreenShake(){ var s=ch2El('ch2Stage'); if(!s) return; s.classList.remove('ch2-shake'); void s.offsetWidth; s.classList.add('ch2-shake'); setTimeout(function(){ s.classList.remove('ch2-shake'); }, 460); }
@@ -4501,7 +4517,7 @@ function ch2GameCorrect(jar){
   ch2JarSpawn(desc.body, (Math.random()-.5)*2, 2.5, ch2Game.gray);   /* entra no vidro com física */
   ch2Game.placed++; ch2Game.hits++;
   jar.classList.add('ch2j-ok'); setTimeout(function(){ jar.classList.remove('ch2j-ok'); }, 700);
-  abSfx('audio/ball_in.mp3?v=1.2.10'); abSfx('audio/right.mp3?v=1.2.10');   /* bola no vidro + acerto */
+  abSfx('audio/ball_in.mp3?v=1.2.11'); abSfx('audio/right.mp3?v=1.2.11');   /* bola no vidro + acerto */
   ch2GameFeedback('✓ Acertou!', true); abVibe([15,25,35]);
   if(ch2Game.placed>=16){ setTimeout(ch2GameFinish, 650); }
   else { setTimeout(ch2GameDispense, 600); }
@@ -4509,7 +4525,7 @@ function ch2GameCorrect(jar){
 function ch2GameWrong(jar){
   ch2Game.errors++;
   jar.classList.add('ch2j-bad'); setTimeout(function(){ jar.classList.remove('ch2j-bad'); }, 700);
-  abSfx('audio/error.mp3?v=1.2.10'); ch2ScreenShake();   /* erro: som + treme a tela */
+  abSfx('audio/error.mp3?v=1.2.11'); ch2ScreenShake();   /* erro: som + treme a tela */
   ch2GameFeedback('✗ Tente outro vidro', false); abVibe([90,40,90]);
   ch2GameReturnAtom();
 }
@@ -4521,7 +4537,7 @@ function ch2GameFinish(){
   var sEl=ch2El('ch2GameScore'); if(sEl){ sEl.textContent=score; }
   var stEl=ch2El('ch2GameStats'); if(stEl){ stEl.textContent='Acertos: '+ch2Game.hits+'  ·  Erros: '+ch2Game.errors+'  ·  Tempo: '+sec+'s'; }
   var card=ch2El('ch2GameCard'); if(card){ card.classList.add('in'); }
-  abSfx('audio/yes.mp3?v=1.2.10'); abSfx('audio/applause.mp3?v=1.2.10'); ch2DoConfetti(); abVibe([40,40,80]);
+  abSfx('audio/yes.mp3?v=1.2.11'); abSfx('audio/applause.mp3?v=1.2.11'); ch2DoConfetti(); abVibe([40,40,80]);
   /* fim do jogo: para o áudio; os botões do card (Refazer / ▶ Continuar) assumem o controle */
   if(ch2.audio){ try{ ch2.audio.pause(); }catch(_){} }
   ch2.playing=false; ch2.ended=true; ch2.awaitingNext=false;
@@ -4657,13 +4673,20 @@ function ch2CuesSeg18(){
 
 /* ===== Segmento 19: dialogo2.6.2 — moléculas convergem num copo de água ===== */
 function ch2CupReset(){
-  var sc=ch2El('ch2CupScene'); if(sc){ sc.style.display='none'; var ms=sc.querySelectorAll('.ch2-wmol'); for(var i=0;i<ms.length;i++){ ms[i].parentNode.removeChild(ms[i]); } }
-  var cup=ch2El('ch2Cup'); if(cup){ cup.classList.remove('in','big'); }
+  var sc=ch2El('ch2CupScene'); if(sc){ sc.style.display='none'; var ms=sc.querySelectorAll('.ch2-cup-scene > .ch2-wmol'); for(var i=0;i<ms.length;i++){ ms[i].parentNode.removeChild(ms[i]); } }
+  var cup=ch2El('ch2Cup'); if(cup){ cup.classList.remove('in','big','zoomed'); }
   var d=ch2El('ch2CupDark'); if(d){ d.classList.remove('on'); }
   var nm=ch2El('ch2CupName'); if(nm){ nm.classList.remove('in'); nm.textContent=''; }
   var sb=ch2El('ch2CupSub'); if(sb){ sb.classList.remove('in'); sb.textContent=''; }
+  var fr=ch2El('ch2CupFrame'); if(fr){ fr.classList.remove('in','big'); }
+  if(typeof ch2CupLupaReset==='function'){ ch2CupLupaReset(); }
 }
-function ch2CupShow(){ var sc=ch2El('ch2CupScene'); if(sc){ sc.style.display='block'; } var cup=ch2El('ch2Cup'); if(cup){ cup.classList.remove('big'); void cup.offsetWidth; cup.classList.add('in'); } abVibe(AB_VTXT); }
+function ch2CupShow(){
+  var sc=ch2El('ch2CupScene'); if(sc){ sc.style.display='block'; }
+  var fr=ch2El('ch2CupFrame'); if(fr){ fr.classList.remove('big'); void fr.offsetWidth; fr.classList.add('in'); }
+  var cup=ch2El('ch2Cup'); if(cup){ cup.classList.remove('big','zoomed'); void cup.offsetWidth; cup.classList.add('in'); }
+  abVibe(AB_VTXT);
+}
 /* a molécula grande encolhe e some (entra no copo) */
 function ch2MolToCup(){
   var mol=ch2El('ch2Mol'); if(mol){ mol.style.transition='transform 1.3s cubic-bezier(.4,0,.3,1)'; mol.style.transform='scale(.16)'; }
@@ -4697,8 +4720,57 @@ function ch2CupFill(){
 }
 function ch2CupNameShow(txt){ var e=ch2El('ch2CupName'); if(!e) return; e.textContent=txt; void e.offsetWidth; e.classList.add('in'); abVibe(AB_VTXT); }
 function ch2CupSubShow(txt){ var e=ch2El('ch2CupSub'); if(!e) return; e.textContent=txt; void e.offsetWidth; e.classList.add('in'); abVibe(AB_VTXT); }
-/* aumenta o copo, traz pra 1º plano e escurece o resto */
-function ch2CupSpotlight(){ var cup=ch2El('ch2Cup'); if(cup){ cup.classList.add('big'); } var d=ch2El('ch2CupDark'); if(d){ d.classList.add('on'); } abVibe([30,40,60]); }
+/* aumenta o copo + frame, traz pra 1º plano, escurece o resto e libera o zoom (lupa) */
+function ch2CupSpotlight(){
+  var cup=ch2El('ch2Cup'); if(cup){ cup.classList.add('big'); }
+  var fr=ch2El('ch2CupFrame'); if(fr){ fr.classList.add('big'); }
+  var d=ch2El('ch2CupDark'); if(d){ d.classList.add('on'); }
+  ch2CupLupaEnable();
+  abVibe([30,40,60]);
+}
+/* ----- lupa/zoom do copo: revela as moléculas de água espalhadas na substância (fica fixa ao soltar) ----- */
+var ch2CupLupa={ enabled:false, active:false, locked:false, ptrs:{} };
+function ch2CupGridBuild(){
+  var g=ch2El('ch2CupGrid'); if(!g || g.childElementCount) return;   /* monta só uma vez */
+  var W=400,H=400,step=46;
+  for(var y=14;y<H-10;y+=step){
+    var odd=Math.round((y-14)/step)%2;
+    for(var x=14;x<W-10;x+=step){
+      var ox=odd?step/2:0; if(x+ox>W-18) continue;
+      var m=document.createElement('div'); m.className='ch2-wmol';
+      m.innerHTML='<span class="o"></span><span class="h a"></span><span class="h b"></span>';
+      m.style.transform='translate('+(x+ox)+'px,'+y+'px) scale(.92)';
+      g.appendChild(m);
+    }
+  }
+}
+function ch2CupLupaEnable(){ ch2CupLupa.enabled=true; ch2CupGridBuild(); var fr=ch2El('ch2CupFrame'); if(fr){ fr.classList.add('arm'); } var h=ch2El('ch2CupLupaHint'); if(h){ h.classList.add('show'); } }
+function ch2CupLupaReset(){ ch2CupLupa.enabled=false; ch2CupLupa.active=false; ch2CupLupa.locked=false; ch2CupLupa.ptrs={}; var l=ch2El('ch2CupLupa'); if(l){ l.classList.remove('on'); } var c=ch2El('ch2Cup'); if(c){ c.classList.remove('zoomed'); } var fr=ch2El('ch2CupFrame'); if(fr){ fr.classList.remove('arm'); } var h=ch2El('ch2CupLupaHint'); if(h){ h.classList.remove('show'); } }
+function ch2CupLupaCount(){ return Object.keys(ch2CupLupa.ptrs).length; }
+function ch2CupLupaStart(){
+  ch2CupLupa.active=true; ch2CupLupa.locked=false;
+  var l=ch2El('ch2CupLupa'); if(l){ l.classList.add('on'); }
+  var c=ch2El('ch2Cup'); if(c){ c.classList.add('zoomed'); }   /* o copo dá lugar à vista molecular */
+  var h=ch2El('ch2CupLupaHint'); if(h){ h.classList.remove('show'); }
+  ch2CupLupaApply(); abVibe(22);
+}
+function ch2CupLupaApply(){
+  var ids=Object.keys(ch2CupLupa.ptrs); if(ids.length<2) return;
+  var a=ch2CupLupa.ptrs[ids[0]], b=ch2CupLupa.ptrs[ids[1]];
+  var fr=ch2El('ch2CupFrame'); if(!fr) return; var r=fr.getBoundingClientRect();
+  var mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+  var dist=Math.hypot(a.x-b.x,a.y-b.y);
+  var diam=Math.max(90, Math.min(Math.min(r.width,r.height), dist));
+  var half=diam/2;
+  var lx=(mx-r.left)/ (r.width/fr.offsetWidth);   /* corrige a escala do frame (.big) */
+  var ly=(my-r.top) / (r.height/fr.offsetHeight);
+  lx=Math.max(half,Math.min(fr.offsetWidth-half,lx)); ly=Math.max(half,Math.min(fr.offsetHeight-half,ly));
+  var lupa=ch2El('ch2CupLupa'); lupa.style.width=diam+'px'; lupa.style.height=diam+'px'; lupa.style.left=lx+'px'; lupa.style.top=ly+'px';
+  var grid=ch2El('ch2CupGrid'); if(grid){ grid.style.transform='translate('+(-(lx-half))+'px,'+(-(ly-half))+'px)'; }
+}
+function ch2CupLupaDown(e){ if(!ch2CupLupa.enabled) return; ch2CupLupa.ptrs[e.pointerId]={x:e.clientX,y:e.clientY}; if(ch2CupLupaCount()>=2 && !ch2CupLupa.active){ e.preventDefault(); ch2CupLupaStart(); } }
+function ch2CupLupaPointerMove(e){ if(!ch2CupLupa.ptrs[e.pointerId]) return; ch2CupLupa.ptrs[e.pointerId]={x:e.clientX,y:e.clientY}; if(ch2CupLupa.active){ e.preventDefault(); ch2CupLupaApply(); } }
+function ch2CupLupaPointerUp(e){ if(!ch2CupLupa.ptrs[e.pointerId]) return; delete ch2CupLupa.ptrs[e.pointerId]; if(ch2CupLupa.active && ch2CupLupaCount()<2){ ch2CupLupa.active=false; ch2CupLupa.locked=true; } } /* ao soltar: MANTÉM a lupa e o zoom */
 function ch2InitSeg19(){
   ch2ShowFab(true); ch2DarkOff();
   /* MANTÉM a molécula do 2.6.1 (e o cabeçalho Postulado 3) na tela */
@@ -4813,6 +4885,12 @@ function ch2Init(){
     window.addEventListener('pointermove', ch2LupaPointerMove, {passive:false});
     window.addEventListener('pointerup', ch2LupaPointerUp);
     window.addEventListener('pointercancel', ch2LupaPointerUp);
+    /* lupa/zoom do copo (dialogo2.6.2) */
+    var cf=ch2El('ch2CupFrame');
+    if(cf){ cf.addEventListener('pointerdown', ch2CupLupaDown); }
+    window.addEventListener('pointermove', ch2CupLupaPointerMove, {passive:false});
+    window.addEventListener('pointerup', ch2CupLupaPointerUp);
+    window.addEventListener('pointercancel', ch2CupLupaPointerUp);
   }
 }
 
