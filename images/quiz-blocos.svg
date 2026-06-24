@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <ellipse cx="120" cy="210" rx="72" ry="12" fill="#000000" opacity="0.22"/>
+
+  <!-- Bloco amarelo (topo, deslocado p/ a direita) -->
+  <g>
+    <ellipse cx="112" cy="64" rx="10" ry="6" fill="#caa006"/>
+    <ellipse cx="140" cy="64" rx="10" ry="6" fill="#caa006"/>
+    <ellipse cx="168" cy="64" rx="10" ry="6" fill="#caa006"/>
+    <rect x="96" y="64" width="88" height="36" rx="6" fill="#facc15"/>
+    <rect x="96" y="64" width="88" height="11" rx="6" fill="#ffe27a"/>
+  </g>
+
+  <!-- Bloco azul (meio, deslocado p/ a esquerda) -->
+  <g>
+    <ellipse cx="72" cy="110" rx="10" ry="6" fill="#1741b6"/>
+    <ellipse cx="100" cy="110" rx="10" ry="6" fill="#1741b6"/>
+    <ellipse cx="128" cy="110" rx="10" ry="6" fill="#1741b6"/>
+    <rect x="56" y="110" width="88" height="36" rx="6" fill="#2563eb"/>
+    <rect x="56" y="110" width="88" height="11" rx="6" fill="#6298f2"/>
+  </g>
+
+  <!-- Bloco vermelho (base) -->
+  <g>
+    <ellipse cx="88" cy="156" rx="10" ry="6" fill="#8f1717"/>
+    <ellipse cx="116" cy="156" rx="10" ry="6" fill="#8f1717"/>
+    <ellipse cx="144" cy="156" rx="10" ry="6" fill="#8f1717"/>
+    <rect x="72" y="156" width="88" height="36" rx="6" fill="#dc2626"/>
+    <rect x="72" y="156" width="88" height="11" rx="6" fill="#f2776b"/>
+  </g>
+</svg>
