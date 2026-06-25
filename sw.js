@@ -1,5 +1,5 @@
 /* Service Worker — Audiobook Modelos Atômicos (PWA offline + auto-update) */
-const CACHE = 'audiobook-atomos-b20260625055633'; /* BUILD — carimbado automaticamente pelo git hook */
+const CACHE = 'audiobook-atomos-b20260625082539'; /* BUILD — carimbado automaticamente pelo git hook */
 
 /* App shell pré-cacheado para funcionar offline. */
 const SHELL = [
@@ -113,9 +113,17 @@ self.addEventListener('activate', function (e) {
     caches.keys()
       .then(function (keys) { return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); })); })
       .then(function () { return self.clients.claim(); })
-      .then(function () { return warmAudio(); }) /* garante todo o áudio no cache p/ saltos instantâneos/offline */
+      .then(function () { return warmAudio().then(notifyOfflineReady); }) /* garante todo o áudio no cache p/ saltos instantâneos/offline; depois avisa a página */
   );
 });
+
+/* Avisa todas as páginas abertas que o cache (áudio + shell) está completo:
+   é o gatilho do aviso "pronto para usar offline". */
+function notifyOfflineReady() {
+  return self.clients.matchAll({ includeUncontrolled: true }).then(function (cs) {
+    cs.forEach(function (c) { try { c.postMessage({ type: 'offline-ready' }); } catch (_) {} });
+  });
+}
 
 /* Aquece o cache de áudio de forma RESILIENTE: ao contrário do pré-cache do
    install (que falha em silêncio), aqui cada mp3 é tentado várias vezes com
@@ -146,7 +154,7 @@ function warmAudio() {
 /* Permite que a página peça o aquecimento (cobre SWs já instalados, que não
    disparam 'activate' de novo). */
 self.addEventListener('message', function (e) {
-  if (e.data && e.data.type === 'warm-audio') { e.waitUntil(warmAudio()); }
+  if (e.data && e.data.type === 'warm-audio') { e.waitUntil(warmAudio().then(notifyOfflineReady)); }
 });
 
 function abIsHTML(req) {
