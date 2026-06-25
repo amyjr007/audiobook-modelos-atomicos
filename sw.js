@@ -1,5 +1,5 @@
 /* Service Worker — Audiobook Modelos Atômicos (PWA offline + auto-update) */
-const CACHE = 'audiobook-atomos-b20260625084127'; /* BUILD — carimbado automaticamente pelo git hook */
+const CACHE = 'audiobook-atomos-b20260625084625'; /* BUILD — carimbado automaticamente pelo git hook */
 
 /* App shell pré-cacheado para funcionar offline. */
 const SHELL = [
@@ -117,11 +117,24 @@ self.addEventListener('activate', function (e) {
   );
 });
 
-/* Avisa todas as páginas abertas que o cache (áudio + shell) está completo:
-   é o gatilho do aviso "pronto para usar offline". */
+/* Confere se TODO o áudio está mesmo no cache (warmAudio pode resolver com
+   falhas). Só assim o aviso "pronto para usar offline" é confiável. */
+function abAllAudioCached() {
+  var AUDIO = SHELL.filter(function (u) { return /\.mp3$/.test(u); });
+  return caches.open(CACHE).then(function (c) {
+    return Promise.all(AUDIO.map(function (u) {
+      return c.match(u, { ignoreSearch: true }).then(function (h) { return !!h; });
+    })).then(function (r) { return r.every(Boolean); });
+  });
+}
+/* Avisa todas as páginas abertas que dá pra usar offline — SÓ quando o áudio
+   inteiro estiver cacheado (senão o aviso mentiria). */
 function notifyOfflineReady() {
-  return self.clients.matchAll({ includeUncontrolled: true }).then(function (cs) {
-    cs.forEach(function (c) { try { c.postMessage({ type: 'offline-ready' }); } catch (_) {} });
+  return abAllAudioCached().then(function (ok) {
+    if (!ok) return;
+    return self.clients.matchAll({ includeUncontrolled: true }).then(function (cs) {
+      cs.forEach(function (c) { try { c.postMessage({ type: 'offline-ready' }); } catch (_) {} });
+    });
   });
 }
 
@@ -183,7 +196,15 @@ self.addEventListener('fetch', function (e) {
     return;
   }
 
-  /* Demais assets (áudio, imagens, ícones, fontes): stale-while-revalidate —
+  /* Mídia com Range (áudio/vídeo): monta um 206 Partial Content a partir do
+     arquivo INTEIRO no cache. Sem isso, iOS/Safari (e às vezes Chrome) recusam
+     a resposta 200 e a mídia simplesmente não toca OFFLINE. */
+  if (req.headers.get('range')) {
+    e.respondWith(abRangeResponse(req));
+    return;
+  }
+
+  /* Demais assets (áudio sem range, imagens, ícones, fontes): stale-while-revalidate —
      responde do cache na hora e atualiza em segundo plano. */
   e.respondWith(
     caches.match(req, { ignoreSearch: true }).then(function (cached) {
@@ -196,3 +217,37 @@ self.addEventListener('fetch', function (e) {
     })
   );
 });
+
+/* Responde um pedido com cabeçalho Range: usa o arquivo inteiro do cache e
+   devolve só a fatia pedida como 206. Se não estiver no cache, vai pra rede. */
+function abRangeResponse(req) {
+  return caches.match(req, { ignoreSearch: true }).then(function (cached) {
+    if (cached) {
+      return cached.arrayBuffer().then(function (buf) {
+        return abBuildPartial(buf, req.headers.get('range'), cached.headers.get('Content-Type'));
+      });
+    }
+    return fetch(req).catch(function () { return new Response('', { status: 504 }); });
+  });
+}
+
+function abBuildPartial(buffer, rangeHeader, contentType) {
+  var total = buffer.byteLength;
+  var m = /bytes=(\d*)-(\d*)/.exec(rangeHeader || '');
+  var start = m && m[1] ? parseInt(m[1], 10) : 0;
+  var end = m && m[2] ? parseInt(m[2], 10) : total - 1;
+  if (isNaN(start) || start < 0) start = 0;
+  if (isNaN(end) || end >= total) end = total - 1;
+  if (start > end) start = 0;
+  var chunk = buffer.slice(start, end + 1);
+  return new Response(chunk, {
+    status: 206,
+    statusText: 'Partial Content',
+    headers: {
+      'Content-Type': contentType || 'application/octet-stream',
+      'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+      'Content-Length': String(chunk.byteLength),
+      'Accept-Ranges': 'bytes'
+    }
+  });
+}
