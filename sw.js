@@ -1,5 +1,5 @@
 /* Service Worker — Audiobook Modelos Atômicos (PWA offline + auto-update) */
-const CACHE = 'audiobook-atomos-b20260626150514'; /* BUILD — carimbado automaticamente pelo git hook */
+const CACHE = 'audiobook-atomos-b20260626152255'; /* BUILD — carimbado automaticamente pelo git hook */
 
 /* App shell pré-cacheado para funcionar offline. */
 const SHELL = [
@@ -127,30 +127,9 @@ self.addEventListener('activate', function (e) {
     caches.keys()
       .then(function (keys) { return Promise.all(keys.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); })); })
       .then(function () { return self.clients.claim(); })
-      .then(function () { return warmAudio().then(notifyOfflineReady); }) /* garante todo o áudio no cache p/ saltos instantâneos/offline; depois avisa a página */
+      .then(function () { return warmAudio(); }) /* garante todo o áudio no cache p/ saltos instantâneos/offline */
   );
 });
-
-/* Confere se TODO o áudio está mesmo no cache (warmAudio pode resolver com
-   falhas). Só assim o aviso "pronto para usar offline" é confiável. */
-function abAllAudioCached() {
-  var AUDIO = SHELL.filter(function (u) { return /\.mp3$/.test(u); });
-  return caches.open(CACHE).then(function (c) {
-    return Promise.all(AUDIO.map(function (u) {
-      return c.match(u, { ignoreSearch: true }).then(function (h) { return !!h; });
-    })).then(function (r) { return r.every(Boolean); });
-  });
-}
-/* Avisa todas as páginas abertas que dá pra usar offline — SÓ quando o áudio
-   inteiro estiver cacheado (senão o aviso mentiria). */
-function notifyOfflineReady() {
-  return abAllAudioCached().then(function (ok) {
-    if (!ok) return;
-    return self.clients.matchAll({ includeUncontrolled: true }).then(function (cs) {
-      cs.forEach(function (c) { try { c.postMessage({ type: 'offline-ready' }); } catch (_) {} });
-    });
-  });
-}
 
 /* Aquece o cache de áudio de forma RESILIENTE: ao contrário do pré-cache do
    install (que falha em silêncio), aqui cada mp3 é tentado várias vezes com
@@ -181,7 +160,7 @@ function warmAudio() {
 /* Permite que a página peça o aquecimento (cobre SWs já instalados, que não
    disparam 'activate' de novo). */
 self.addEventListener('message', function (e) {
-  if (e.data && e.data.type === 'warm-audio') { e.waitUntil(warmAudio().then(notifyOfflineReady)); }
+  if (e.data && e.data.type === 'warm-audio') { e.waitUntil(warmAudio()); }
 });
 
 function abIsHTML(req) {
