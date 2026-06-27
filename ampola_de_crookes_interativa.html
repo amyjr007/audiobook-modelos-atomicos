@@ -1,0 +1,165 @@
+<h2 class="sr-only">Ampola de Crookes interativa em orientação vertical: botão liga/desliga que faz um raio catódico verde crescer do cátodo ao ânodo como um sabre de luz, com hélice e placas de deflexão removíveis e ligada a uma bateria.</h2>
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+#amp .seg{stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset .72s cubic-bezier(.2,.7,.2,1);stroke-linecap:round;fill:none}
+#amp.on .seg{stroke-dashoffset:0}
+#amp .cglow{opacity:0;transition:opacity .5s ease .12s}
+#amp.on .cglow{opacity:1}
+#amp .tubeglow{opacity:0;transition:opacity .6s ease .1s}
+#amp.on .tubeglow{opacity:.13}
+#amp .raylabel{opacity:0;transition:opacity .4s ease .35s}
+#amp.on .raylabel{opacity:1}
+#amp .flow{opacity:0}
+#amp.on .flow{opacity:.9}
+#prop{transform-box:fill-box;transform-origin:center;opacity:1;transform:translateY(0);transition:opacity .42s ease,transform .42s cubic-bezier(.34,1.4,.5,1)}
+#prop.gone{opacity:0;transform:translateY(48px)}
+.wheel{transform-box:fill-box;transform-origin:center}
+.bl{fill:#aeb6bf;stroke:#79818b;stroke-width:.8}
+#plateL,#plateR{transform-box:fill-box;transition:opacity .42s ease,transform .42s cubic-bezier(.34,1.35,.5,1)}
+#plateL.gone{opacity:0;transform:translateX(-32px)}
+#plateR.gone{opacity:0;transform:translateX(32px)}
+@media (prefers-reduced-motion: no-preference){
+#amp.on #prop:not(.gone) .wheel{animation:spin 1.05s linear infinite}
+#amp.on .flow{animation:march 1s linear infinite}
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes march{to{stroke-dashoffset:-130}}
+.cbtn{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px}
+</style>
+
+<svg id="amp" width="100%" viewBox="0 0 380 620" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>Ampola de Crookes interativa</title>
+<desc>Tubo de vidro vertical com cátodo embaixo e ânodo em cima, raio catódico verde, hélice e placas de deflexão, ligado a uma bateria.</desc>
+<defs>
+<clipPath id="glassClip"><path d="M190 92 C 210 92 218 112 218 150 C 219 188 256 196 270 330 C 256 466 219 474 218 512 C 218 548 210 568 190 568 C 170 568 162 548 162 512 C 161 474 124 466 110 330 C 124 196 161 188 162 150 C 162 112 170 92 190 92 Z"/></clipPath>
+</defs>
+
+<rect x="6" y="6" width="368" height="608" rx="22" fill="#0a0d13" stroke="#1d2530" stroke-width="1"/>
+
+<path d="M35 248 C 14 184 30 112 72 100 C 112 88 160 90 190 92" fill="none" stroke="#c2603a" stroke-width="2.6" stroke-linecap="round"/>
+<path class="flow" d="M35 248 C 14 184 30 112 72 100 C 112 88 160 90 190 92" fill="none" stroke="#ff9f6e" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 13"/>
+<path d="M35 332 C 18 432 44 522 96 540 C 134 554 168 558 190 560" fill="none" stroke="#5b8bbf" stroke-width="2.6" stroke-linecap="round"/>
+<path class="flow" d="M35 332 C 18 432 44 522 96 540 C 134 554 168 558 190 560" fill="none" stroke="#92c2f0" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 13"/>
+
+<rect x="18" y="250" width="34" height="80" rx="7" fill="#14181f" stroke="#39414e" stroke-width="1"/>
+<rect x="20" y="276" width="30" height="1.4" fill="#39414e"/>
+<rect x="20" y="304" width="30" height="1.4" fill="#39414e"/>
+<rect x="31" y="245" width="8" height="6" rx="1.5" fill="#9aa0a8"/>
+<text x="35" y="270" text-anchor="middle" font-size="12" fill="#d8a96e">+</text>
+<text x="35" y="322" text-anchor="middle" font-size="13" fill="#7fb0e0">–</text>
+<text x="35" y="349" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#c9ced4">Bateria</text>
+
+<path d="M190 92 C 210 92 218 112 218 150 C 219 188 256 196 270 330 C 256 466 219 474 218 512 C 218 548 210 568 190 568 C 170 568 162 548 162 512 C 161 474 124 466 110 330 C 124 196 161 188 162 150 C 162 112 170 92 190 92 Z" fill="#aecfe0" fill-opacity="0.05" stroke="#9fc0d6" stroke-opacity="0.4" stroke-width="1.4"/>
+<ellipse class="tubeglow" cx="190" cy="358" rx="74" ry="180" fill="#39ff14" clip-path="url(#glassClip)"/>
+
+<line x1="190" y1="130" x2="190" y2="94" stroke="#6b7079" stroke-width="3"/>
+<rect x="186" y="130" width="8" height="40" rx="2" fill="#9aa3ad" stroke="#5b626b" stroke-width="0.8"/>
+<rect x="170" y="146" width="40" height="8" rx="2" fill="#9aa3ad" stroke="#5b626b" stroke-width="0.8"/>
+<line x1="190" y1="508" x2="190" y2="560" stroke="#6b7079" stroke-width="3"/>
+<path d="M174 500 Q190 491 206 500" fill="none" stroke="#b9c0c8" stroke-width="1.5"/>
+<rect x="170" y="500" width="40" height="8" rx="2" fill="#9aa3ad" stroke="#5b626b" stroke-width="0.8"/>
+
+<g id="beamGroup">
+<path class="seg" d="M190 505 Q216 360 190 158" stroke="#39ff14" stroke-width="26" opacity="0.1" pathLength="1000"/>
+<path class="seg" d="M190 505 Q216 360 190 158" stroke="#46ff26" stroke-width="15" opacity="0.2" pathLength="1000"/>
+<path class="seg" d="M190 505 Q216 360 190 158" stroke="#79ff5c" stroke-width="7" opacity="0.75" pathLength="1000"/>
+<path class="seg" d="M190 505 Q216 360 190 158" stroke="#e8ffe2" stroke-width="2.6" opacity="0.95" pathLength="1000"/>
+</g>
+
+<g class="cglow">
+<circle cx="190" cy="503" r="20" fill="#39ff14" opacity="0.22"/>
+<circle cx="190" cy="503" r="11" fill="#9dff7a" opacity="0.4"/>
+<circle cx="190" cy="503" r="5" fill="#ecffe6" opacity="0.8"/>
+</g>
+
+<g id="plates">
+<g id="plateL">
+<line x1="123" y1="360" x2="92" y2="360" stroke="#6f7a86" stroke-width="3"/>
+<rect x="80" y="353" width="12" height="14" rx="2" fill="#59626d" stroke="#7c8694" stroke-width="0.8"/>
+<rect x="123" y="302" width="11" height="116" rx="2" fill="#2c3b4e" stroke="#46607a" stroke-width="0.8"/>
+<text x="128.5" y="332" text-anchor="middle" font-size="13" fill="#74b6ff">–</text>
+<text x="128.5" y="364" text-anchor="middle" font-size="13" fill="#74b6ff">–</text>
+<text x="128.5" y="396" text-anchor="middle" font-size="13" fill="#74b6ff">–</text>
+</g>
+<g id="plateR">
+<line x1="257" y1="360" x2="296" y2="360" stroke="#6f7a86" stroke-width="3"/>
+<rect x="296" y="353" width="12" height="14" rx="2" fill="#59626d" stroke="#7c8694" stroke-width="0.8"/>
+<rect x="246" y="302" width="11" height="116" rx="2" fill="#3f3030" stroke="#7a4646" stroke-width="0.8"/>
+<text x="251.5" y="332" text-anchor="middle" font-size="13" fill="#ff8a72">+</text>
+<text x="251.5" y="364" text-anchor="middle" font-size="13" fill="#ff8a72">+</text>
+<text x="251.5" y="396" text-anchor="middle" font-size="13" fill="#ff8a72">+</text>
+</g>
+</g>
+
+<g id="prop">
+<rect x="187" y="386" width="6" height="70" rx="1" fill="#5b626b"/>
+<rect x="174" y="456" width="32" height="8" rx="2" fill="#474d56"/>
+<g class="wheel">
+<rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(0 190 360)"/>
+<rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(60 190 360)"/>
+<rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(120 190 360)"/>
+<rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(180 190 360)"/>
+<rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(240 190 360)"/>
+<rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(300 190 360)"/>
+<circle cx="190" cy="360" r="7" fill="#d2d7dd" stroke="#8a919a" stroke-width="0.8"/>
+</g>
+</g>
+
+<path d="M150 222 C 132 262 128 300 134 342" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/>
+
+<text x="214" y="153" text-anchor="start" font-size="12.5" fill="#cdd3da">ânodo (+)</text>
+<text x="214" y="509" text-anchor="start" font-size="12.5" fill="#cdd3da">cátodo (–)</text>
+<g class="raylabel">
+<line x1="221" y1="250" x2="194" y2="252" stroke="#5fae53" stroke-width="1" stroke-dasharray="3 3"/>
+<text x="223" y="247" text-anchor="start" font-size="12" fill="#8dff77">Raios catódicos</text>
+</g>
+</svg>
+
+<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
+<button id="powerBtn" class="cbtn"><i class="ti ti-power" aria-hidden="true"></i><span>Ligar</span></button>
+<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
+<button id="propBtn" class="cbtn"><i class="ti ti-propeller" aria-hidden="true"></i><span>Hélice</span></button>
+<button id="plateBtn" class="cbtn"><i class="ti ti-layout-distribute-horizontal" aria-hidden="true"></i><span>Placas</span></button>
+</div>
+</div>
+
+<script>
+(function(){
+var amp=document.getElementById('amp');
+var prop=document.getElementById('prop');
+var plateL=document.getElementById('plateL');
+var plateR=document.getElementById('plateR');
+var segs=document.querySelectorAll('#beamGroup .seg');
+var powerBtn=document.getElementById('powerBtn');
+var propBtn=document.getElementById('propBtn');
+var plateBtn=document.getElementById('plateBtn');
+var on=false, hasProp=true, hasPlates=true;
+var straightD="M190 505 Q190 360 190 158";
+var bentD="M190 505 Q216 360 190 158";
+function setBeam(){var d=hasPlates?bentD:straightD;segs.forEach(function(p){p.setAttribute('d',d);});}
+function render(){
+ amp.classList.toggle('on',on);
+ powerBtn.querySelector('span').textContent=on?'Desligar':'Ligar';
+ powerBtn.querySelector('i').className=on?'ti ti-bolt':'ti ti-power';
+ powerBtn.style.background=on?'var(--bg-success)':'';
+ powerBtn.style.color=on?'var(--text-success)':'';
+ powerBtn.style.borderColor=on?'var(--border-success)':'';
+ powerBtn.setAttribute('aria-pressed',on);
+ prop.classList.toggle('gone',!hasProp);
+ propBtn.style.background=hasProp?'var(--bg-accent)':'';
+ propBtn.style.color=hasProp?'var(--text-accent)':'var(--text-secondary)';
+ propBtn.style.borderColor=hasProp?'var(--border-accent)':'';
+ propBtn.setAttribute('aria-pressed',hasProp);
+ plateL.classList.toggle('gone',!hasPlates);
+ plateR.classList.toggle('gone',!hasPlates);
+ plateBtn.style.background=hasPlates?'var(--bg-accent)':'';
+ plateBtn.style.color=hasPlates?'var(--text-accent)':'var(--text-secondary)';
+ plateBtn.style.borderColor=hasPlates?'var(--border-accent)':'';
+ plateBtn.setAttribute('aria-pressed',hasPlates);
+}
+powerBtn.onclick=function(){on=!on;render();};
+propBtn.onclick=function(){hasProp=!hasProp;render();};
+plateBtn.onclick=function(){hasPlates=!hasPlates;setBeam();render();};
+setBeam();render();
+})();
+</script>
