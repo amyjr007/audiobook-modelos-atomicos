@@ -1,11 +1,12 @@
 /* Service Worker — Audiobook Modelos Atômicos (PWA offline + auto-update) */
-const CACHE = 'audiobook-atomos-b20260627133917'; /* BUILD — carimbado automaticamente pelo git hook */
+const CACHE = 'audiobook-atomos-b20260627135227'; /* BUILD — carimbado automaticamente pelo git hook */
 
 /* App shell pré-cacheado para funcionar offline. */
 const SHELL = [
   './',
   './index.html',
   './audiobook_modelos_atomicos.html',
+  './ampola_de_crookes_interativa.html',
   './manifest.webmanifest',
   './three.min.js',
   './icons/icon-192.png',

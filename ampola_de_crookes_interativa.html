@@ -1,5 +1,10 @@
 <h2 class="sr-only">Ampola de Crookes interativa em orientação vertical: botão liga/desliga que faz um raio catódico verde crescer do cátodo ao ânodo como um sabre de luz, com hélice e placas de deflexão removíveis e ligada a uma bateria.</h2>
 <style>
+:root{--bg-success:rgba(70,211,154,.18);--text-success:#46d39a;--border-success:rgba(70,211,154,.55);--bg-accent:rgba(255,122,24,.18);--text-accent:#ffab4d;--border-accent:rgba(255,122,24,.5);--text-secondary:rgba(255,255,255,.55)}
+html,body{margin:0;background:transparent;overflow:hidden}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0 6px}
+.cbtn{padding:9px 12px;border-radius:11px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-weight:700;cursor:pointer;touch-action:manipulation}
+.cbtn i{display:none}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 #amp .seg{stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset .72s cubic-bezier(.2,.7,.2,1);stroke-linecap:round;fill:none}
 #amp.on .seg{stroke-dashoffset:0}
