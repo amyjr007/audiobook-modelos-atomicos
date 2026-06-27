@@ -34,7 +34,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 #prop{transform-box:fill-box;transform-origin:center;opacity:1;transform:translateY(0);transition:opacity .42s ease,transform .42s cubic-bezier(.34,1.4,.5,1)}
 #prop.gone{opacity:0;transform:translateY(48px)}
 .wheel{transform-box:fill-box;transform-origin:center}
-.bl{fill:#aeb6bf;stroke:#79818b;stroke-width:.8}
+.bl{fill:url(#metalV);stroke:#565e67;stroke-width:.7}
 #plateL,#plateR{transform-box:fill-box;transition:opacity .42s ease,transform .42s cubic-bezier(.34,1.35,.5,1)}
 #plateL.gone{opacity:0;transform:translateX(-32px)}
 #plateR.gone{opacity:0;transform:translateX(32px)}
@@ -51,34 +51,57 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 <desc>Tubo de vidro vertical com cátodo embaixo e ânodo em cima, raio catódico verde, hélice e placas de deflexão, ligado a uma bateria.</desc>
 <defs>
 <clipPath id="glassClip"><path d="M190 92 C 210 92 218 112 218 150 C 219 188 256 196 270 330 C 256 466 219 474 218 512 C 218 548 210 568 190 568 C 170 568 162 548 162 512 C 161 474 124 466 110 330 C 124 196 161 188 162 150 C 162 112 170 92 190 92 Z"/></clipPath>
+<radialGradient id="panelBg" cx="0.5" cy="0.4" r="0.9"><stop offset="0" stop-color="#161d26"/><stop offset="0.55" stop-color="#0c1016"/><stop offset="1" stop-color="#05070b"/></radialGradient>
+<linearGradient id="glassBody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#46606f" stop-opacity="0.5"/><stop offset="0.16" stop-color="#9ec3d6" stop-opacity="0.17"/><stop offset="0.5" stop-color="#e6f5ff" stop-opacity="0.08"/><stop offset="0.84" stop-color="#7da3b6" stop-opacity="0.2"/><stop offset="1" stop-color="#33454f" stop-opacity="0.58"/></linearGradient>
+<linearGradient id="metalV" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4d555e"/><stop offset="0.34" stop-color="#cfd6dd"/><stop offset="0.52" stop-color="#f1f5f8"/><stop offset="0.7" stop-color="#a7b0b9"/><stop offset="1" stop-color="#444b54"/></linearGradient>
+<linearGradient id="metalH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c2cad2"/><stop offset="0.42" stop-color="#f1f5f8"/><stop offset="0.6" stop-color="#99a2ac"/><stop offset="1" stop-color="#525a63"/></linearGradient>
+<linearGradient id="battGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0c1015"/><stop offset="0.4" stop-color="#2b333d"/><stop offset="0.58" stop-color="#222a33"/><stop offset="1" stop-color="#0a0e12"/></linearGradient>
+<linearGradient id="wireRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0916a"/><stop offset="0.45" stop-color="#bb4f29"/><stop offset="1" stop-color="#7d2e12"/></linearGradient>
+<linearGradient id="wireBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9cc6f0"/><stop offset="0.45" stop-color="#4d7fad"/><stop offset="1" stop-color="#2b4f72"/></linearGradient>
+<filter id="softShadow" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="2.4" stdDeviation="2.2" flood-color="#000" flood-opacity="0.55"/></filter>
+<filter id="rayGlow" x="-120%" y="-30%" width="340%" height="160%"><feGaussianBlur stdDeviation="4"/></filter>
 </defs>
 
-<rect x="6" y="6" width="368" height="608" rx="22" fill="#0a0d13" stroke="#1d2530" stroke-width="1"/>
+<rect x="6" y="6" width="368" height="608" rx="22" fill="url(#panelBg)" stroke="#2a3543" stroke-width="1.2"/>
 
-<path d="M35 248 C 14 184 30 112 72 100 C 112 88 160 90 190 92" fill="none" stroke="#c2603a" stroke-width="2.6" stroke-linecap="round"/>
-<path class="flow" d="M35 248 C 14 184 30 112 72 100 C 112 88 160 90 190 92" fill="none" stroke="#ff9f6e" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 13"/>
-<path d="M35 332 C 18 432 44 522 96 540 C 134 554 168 558 190 560" fill="none" stroke="#5b8bbf" stroke-width="2.6" stroke-linecap="round"/>
-<path class="flow" d="M35 332 C 18 432 44 522 96 540 C 134 554 168 558 190 560" fill="none" stroke="#92c2f0" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="1 13"/>
+<path d="M35 248 C 14 184 30 112 72 100 C 112 88 160 90 190 92" fill="none" stroke="#000" stroke-opacity="0.45" stroke-width="5.4" stroke-linecap="round"/>
+<path d="M35 248 C 14 184 30 112 72 100 C 112 88 160 90 190 92" fill="none" stroke="url(#wireRed)" stroke-width="3.6" stroke-linecap="round"/>
+<path d="M35 247 C 16 185 31 114 72 102 C 110 91 158 92 189 94" fill="none" stroke="#ffd9c4" stroke-opacity="0.55" stroke-width="0.9" stroke-linecap="round"/>
+<path class="flow" d="M35 248 C 14 184 30 112 72 100 C 112 88 160 90 190 92" fill="none" stroke="#ffd0ad" stroke-width="2.1" stroke-linecap="round" stroke-dasharray="1 13"/>
+<path d="M35 332 C 18 432 44 522 96 540 C 134 554 168 558 190 560" fill="none" stroke="#000" stroke-opacity="0.45" stroke-width="5.4" stroke-linecap="round"/>
+<path d="M35 332 C 18 432 44 522 96 540 C 134 554 168 558 190 560" fill="none" stroke="url(#wireBlue)" stroke-width="3.6" stroke-linecap="round"/>
+<path d="M35 333 C 19 432 45 521 96 538 C 132 552 166 556 189 558" fill="none" stroke="#dcebff" stroke-opacity="0.5" stroke-width="0.9" stroke-linecap="round"/>
+<path class="flow" d="M35 332 C 18 432 44 522 96 540 C 134 554 168 558 190 560" fill="none" stroke="#cfe6ff" stroke-width="2.1" stroke-linecap="round" stroke-dasharray="1 13"/>
 
-<rect x="18" y="250" width="34" height="80" rx="7" fill="#14181f" stroke="#39414e" stroke-width="1"/>
-<rect x="20" y="276" width="30" height="1.4" fill="#39414e"/>
-<rect x="20" y="304" width="30" height="1.4" fill="#39414e"/>
-<rect x="31" y="245" width="8" height="6" rx="1.5" fill="#9aa0a8"/>
+<rect x="18" y="250" width="34" height="80" rx="7" fill="url(#battGrad)" stroke="#454e59" stroke-width="1" filter="url(#softShadow)"/>
+<rect x="20.5" y="252" width="6" height="76" rx="4" fill="#ffffff" opacity="0.07"/>
+<rect x="20" y="276" width="30" height="1.4" fill="#454e59"/>
+<rect x="20" y="304" width="30" height="1.4" fill="#454e59"/>
+<rect x="31" y="244" width="8" height="7" rx="1.5" fill="url(#metalH)"/>
 <text x="35" y="270" text-anchor="middle" font-size="12" fill="#d8a96e">+</text>
 <text x="35" y="322" text-anchor="middle" font-size="13" fill="#7fb0e0">–</text>
 <text x="35" y="349" text-anchor="middle" font-size="12" font-family="sans-serif" fill="#c9ced4">Bateria</text>
 
-<path d="M190 92 C 210 92 218 112 218 150 C 219 188 256 196 270 330 C 256 466 219 474 218 512 C 218 548 210 568 190 568 C 170 568 162 548 162 512 C 161 474 124 466 110 330 C 124 196 161 188 162 150 C 162 112 170 92 190 92 Z" fill="#aecfe0" fill-opacity="0.05" stroke="#9fc0d6" stroke-opacity="0.4" stroke-width="1.4"/>
+<path d="M190 92 C 210 92 218 112 218 150 C 219 188 256 196 270 330 C 256 466 219 474 218 512 C 218 548 210 568 190 568 C 170 568 162 548 162 512 C 161 474 124 466 110 330 C 124 196 161 188 162 150 C 162 112 170 92 190 92 Z" fill="url(#glassBody)" stroke="#0a0d13" stroke-opacity="0.6" stroke-width="3.4"/>
+<path d="M190 92 C 210 92 218 112 218 150 C 219 188 256 196 270 330 C 256 466 219 474 218 512 C 218 548 210 568 190 568 C 170 568 162 548 162 512 C 161 474 124 466 110 330 C 124 196 161 188 162 150 C 162 112 170 92 190 92 Z" fill="none" stroke="#d6eefb" stroke-opacity="0.55" stroke-width="1.3"/>
 <ellipse class="tubeglow" cx="190" cy="358" rx="74" ry="180" fill="#39ff14" clip-path="url(#glassClip)"/>
+<g clip-path="url(#glassClip)">
+<path d="M152 132 C 140 222 140 470 152 538" fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="7" stroke-linecap="round" filter="url(#rayGlow)"/>
+<path d="M150 130 C 139 222 139 472 150 540" fill="none" stroke="#ffffff" stroke-opacity="0.7" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M232 156 C 242 250 242 450 232 506" fill="none" stroke="#ffffff" stroke-opacity="0.18" stroke-width="3.4" stroke-linecap="round"/>
+</g>
 
-<line x1="190" y1="130" x2="190" y2="94" stroke="#6b7079" stroke-width="3"/>
-<rect x="186" y="130" width="8" height="40" rx="2" fill="#9aa3ad" stroke="#5b626b" stroke-width="0.8"/>
-<rect x="170" y="146" width="40" height="8" rx="2" fill="#9aa3ad" stroke="#5b626b" stroke-width="0.8"/>
-<line x1="190" y1="508" x2="190" y2="560" stroke="#6b7079" stroke-width="3"/>
-<path d="M174 500 Q190 491 206 500" fill="none" stroke="#b9c0c8" stroke-width="1.5"/>
-<rect x="170" y="500" width="40" height="8" rx="2" fill="#9aa3ad" stroke="#5b626b" stroke-width="0.8"/>
+<line x1="190" y1="130" x2="190" y2="94" stroke="#7c828b" stroke-width="3.4"/>
+<line x1="190" y1="130" x2="190" y2="94" stroke="#cfd6dd" stroke-opacity="0.6" stroke-width="1"/>
+<rect x="186" y="130" width="8" height="40" rx="2" fill="url(#metalV)" stroke="#3f464e" stroke-width="0.6"/>
+<rect x="170" y="146" width="40" height="8" rx="2.5" fill="url(#metalH)" stroke="#3f464e" stroke-width="0.6" filter="url(#softShadow)"/>
+<line x1="190" y1="508" x2="190" y2="560" stroke="#7c828b" stroke-width="3.4"/>
+<line x1="190" y1="508" x2="190" y2="560" stroke="#cfd6dd" stroke-opacity="0.6" stroke-width="1"/>
+<path d="M174 500 Q190 491 206 500" fill="none" stroke="#cfd6dd" stroke-width="1.5"/>
+<rect x="170" y="500" width="40" height="8" rx="2.5" fill="url(#metalH)" stroke="#3f464e" stroke-width="0.6" filter="url(#softShadow)"/>
 
 <g id="beamGroup">
+<path class="seg" d="M190 505 Q216 360 190 158" stroke="#39ff14" stroke-width="38" opacity="0.16" pathLength="1000" filter="url(#rayGlow)"/>
 <path class="seg" d="M190 505 Q216 360 190 158" stroke="#39ff14" stroke-width="26" opacity="0.1" pathLength="1000"/>
 <path class="seg" d="M190 505 Q216 360 190 158" stroke="#46ff26" stroke-width="15" opacity="0.2" pathLength="1000"/>
 <path class="seg" d="M190 505 Q216 360 190 158" stroke="#79ff5c" stroke-width="7" opacity="0.75" pathLength="1000"/>
@@ -93,17 +116,19 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 
 <g id="plates">
 <g id="plateL">
-<line x1="123" y1="360" x2="92" y2="360" stroke="#6f7a86" stroke-width="3"/>
-<rect x="80" y="353" width="12" height="14" rx="2" fill="#59626d" stroke="#7c8694" stroke-width="0.8"/>
-<rect x="123" y="302" width="11" height="116" rx="2" fill="#2c3b4e" stroke="#46607a" stroke-width="0.8"/>
+<line x1="123" y1="360" x2="92" y2="360" stroke="#7c828b" stroke-width="3"/>
+<rect x="80" y="353" width="12" height="14" rx="2" fill="url(#metalV)" stroke="#3f464e" stroke-width="0.6"/>
+<rect x="123" y="302" width="11" height="116" rx="2" fill="#2c3b4e" stroke="#5e80ac" stroke-width="0.8" filter="url(#softShadow)"/>
+<rect x="124.4" y="304" width="2.4" height="112" rx="1.2" fill="#a8cdf5" opacity="0.34"/>
 <text x="128.5" y="332" text-anchor="middle" font-size="13" fill="#74b6ff">–</text>
 <text x="128.5" y="364" text-anchor="middle" font-size="13" fill="#74b6ff">–</text>
 <text x="128.5" y="396" text-anchor="middle" font-size="13" fill="#74b6ff">–</text>
 </g>
 <g id="plateR">
-<line x1="257" y1="360" x2="296" y2="360" stroke="#6f7a86" stroke-width="3"/>
-<rect x="296" y="353" width="12" height="14" rx="2" fill="#59626d" stroke="#7c8694" stroke-width="0.8"/>
-<rect x="246" y="302" width="11" height="116" rx="2" fill="#3f3030" stroke="#7a4646" stroke-width="0.8"/>
+<line x1="257" y1="360" x2="296" y2="360" stroke="#7c828b" stroke-width="3"/>
+<rect x="296" y="353" width="12" height="14" rx="2" fill="url(#metalV)" stroke="#3f464e" stroke-width="0.6"/>
+<rect x="246" y="302" width="11" height="116" rx="2" fill="#3f3030" stroke="#9a5a5a" stroke-width="0.8" filter="url(#softShadow)"/>
+<rect x="247.2" y="304" width="2.4" height="112" rx="1.2" fill="#ffb59c" opacity="0.32"/>
 <text x="251.5" y="332" text-anchor="middle" font-size="13" fill="#ff8a72">+</text>
 <text x="251.5" y="364" text-anchor="middle" font-size="13" fill="#ff8a72">+</text>
 <text x="251.5" y="396" text-anchor="middle" font-size="13" fill="#ff8a72">+</text>
@@ -111,8 +136,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 </g>
 
 <g id="prop">
-<rect x="70" y="357" width="122" height="6" rx="3" fill="#5b626b"/>
-<rect x="62" y="349" width="10" height="22" rx="2.5" fill="#474d56"/>
+<rect x="70" y="357" width="122" height="6" rx="3" fill="url(#metalH)" filter="url(#softShadow)"/>
+<rect x="62" y="349" width="10" height="22" rx="2.5" fill="url(#metalV)" stroke="#3f464e" stroke-width="0.6"/>
 <g class="wheel">
 <rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(0 190 360)"/>
 <rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(60 190 360)"/>
@@ -120,7 +145,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 <rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(180 190 360)"/>
 <rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(240 190 360)"/>
 <rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(300 190 360)"/>
-<circle cx="190" cy="360" r="7" fill="#d2d7dd" stroke="#8a919a" stroke-width="0.8"/>
+<circle cx="190" cy="360" r="7" fill="url(#metalH)" stroke="#5a626b" stroke-width="0.8"/>
+<circle cx="190" cy="360" r="2.4" fill="#3f464e"/>
 </g>
 </g>
 
@@ -197,12 +223,12 @@ function fan(state){
  }catch(_){}
 }
 /* efeito sonoro curto (one-shot): clique dos botões, som das placas */
-function sound(name){ try{ if(!sfx[name]){ sfx[name]=new Audio('audio/'+name); } sfx[name].currentTime=0; var p=sfx[name].play(); if(p&&p.catch){ p.catch(function(){}); } }catch(_){} }
+function sound(name){ try{ var a=sfx[name]; if(!a){ a=sfx[name]=new Audio('audio/'+name); } try{ a.currentTime=0; }catch(_){} var p=a.play(); if(p&&p.catch){ p.catch(function(){}); } }catch(_){} }
 var wasSpinning=false;
 function updateFan(){   /* o som da hélice só toca enquanto ela GIRA (máquina ligada E hélice ativa) */
  var spin=(on && hasProp);
  if(spin){ fan(true); }
- else { fan(false); if(wasSpinning){ sound('micro_fan_off.m4a'); } }   /* ao parar: corta o micro_fan e toca o "off" uma vez */
+ else { fan(false); if(wasSpinning){ sound('micro_fan_off.mp3'); } }   /* ao parar: corta o micro_fan e toca o "off" uma vez */
  wasSpinning=spin;
 }
 powerBtn.onclick=function(){ sound('click_sound.m4a'); on=!on; rays(on); updateFan(); render(); };
