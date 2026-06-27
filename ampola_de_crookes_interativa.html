@@ -165,21 +165,28 @@ function render(){
  plateBtn.classList.toggle('on',hasPlates);
  plateBtn.setAttribute('aria-pressed',hasPlates);
 }
-var raysAudio=null;
+var raysAudio=null, fanAudio=null, sfx={};
 function rays(state){
  try{
   if(!raysAudio){ raysAudio=new Audio('audio/raios_catodicos.mp3'); raysAudio.loop=true; }
-  if(state){ var p=raysAudio.play(); if(p&&p.catch){ p.catch(function(){}); } }
-  else { try{ raysAudio.pause(); }catch(_){} }
+  if(state){ var p=raysAudio.play(); if(p&&p.catch){ p.catch(function(){}); } } else { try{ raysAudio.pause(); }catch(_){} }
  }catch(_){}
 }
-powerBtn.onclick=function(){on=!on;rays(on);render();};
-propBtn.onclick=function(){hasProp=!hasProp;render();};
-plateBtn.onclick=function(){hasPlates=!hasPlates;setBeam();render();};
-/* a página pai pede pra desligar/parar o som ao sair da cena */
-window.addEventListener('message',function(e){ if(e&&e.data&&e.data.amp==='stop'){ on=false; rays(false); render(); } });
-/* pausa o som ao perder o foco; retoma se voltar com a máquina ligada */
-document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){ try{ raysAudio.pause(); }catch(_){} } } else if(on){ rays(true); } });
+function fan(state){
+ try{
+  if(!fanAudio){ fanAudio=new Audio('audio/micro_fan.mp3'); fanAudio.loop=true; }
+  if(state){ var p=fanAudio.play(); if(p&&p.catch){ p.catch(function(){}); } } else { try{ fanAudio.pause(); }catch(_){} }
+ }catch(_){}
+}
+/* efeito sonoro curto (one-shot): clique dos botões, som das placas */
+function sound(name){ try{ if(!sfx[name]){ sfx[name]=new Audio('audio/'+name); } sfx[name].currentTime=0; var p=sfx[name].play(); if(p&&p.catch){ p.catch(function(){}); } }catch(_){} }
+powerBtn.onclick=function(){ sound('click_sound.m4a'); on=!on; rays(on); render(); };
+propBtn.onclick=function(){ sound('click_sound.m4a'); hasProp=!hasProp; fan(hasProp); render(); };
+plateBtn.onclick=function(){ sound('click_sound.m4a'); hasPlates=!hasPlates; if(hasPlates){ sound('plates.mp3'); } setBeam(); render(); };
+/* a página pai pede pra resetar/parar tudo ao sair da cena */
+window.addEventListener('message',function(e){ if(e&&e.data&&e.data.amp==='stop'){ on=false; hasProp=false; hasPlates=false; rays(false); fan(false); setBeam(); render(); } });
+/* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
+document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(hasProp){ fan(true); } } });
 setBeam();render();
 })();
 </script>
