@@ -216,10 +216,16 @@ function rays(state){
   if(state){ var p=raysAudio.play(); if(p&&p.catch){ p.catch(function(){}); } } else { try{ raysAudio.pause(); }catch(_){} }
  }catch(_){}
 }
+var FAN_LOOP_START=2.5, FAN_LOOP_END=10.0;   /* loop só na seção do meio do micro_fan.mp3 (12s) */
 function fan(state){
  try{
-  if(!fanAudio){ fanAudio=new Audio('audio/micro_fan.mp3'); fanAudio.loop=true; }
-  if(state){ var p=fanAudio.play(); if(p&&p.catch){ p.catch(function(){}); } } else { try{ fanAudio.pause(); }catch(_){} }
+  if(!fanAudio){
+   fanAudio=new Audio('audio/micro_fan.mp3'); fanAudio.loop=false;
+   fanAudio.addEventListener('timeupdate',function(){ if(fanAudio.currentTime>=FAN_LOOP_END){ try{ fanAudio.currentTime=FAN_LOOP_START; }catch(_){} } });
+   fanAudio.addEventListener('ended',function(){ try{ fanAudio.currentTime=FAN_LOOP_START; var pp=fanAudio.play(); if(pp&&pp.catch){ pp.catch(function(){}); } }catch(_){} });   /* segurança: não recomeça do 0 */
+  }
+  if(state){ var p=fanAudio.play(); if(p&&p.catch){ p.catch(function(){}); } }   /* toca da posição atual (0 = começo, com a "partida") */
+  else { try{ fanAudio.pause(); fanAudio.currentTime=0; }catch(_){} }            /* ao parar, volta pro começo p/ a próxima partida */
  }catch(_){}
 }
 /* efeito sonoro curto (one-shot): clique dos botões, som das placas */
