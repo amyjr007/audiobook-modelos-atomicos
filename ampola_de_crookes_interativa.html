@@ -165,9 +165,21 @@ function render(){
  plateBtn.classList.toggle('on',hasPlates);
  plateBtn.setAttribute('aria-pressed',hasPlates);
 }
-powerBtn.onclick=function(){on=!on;render();};
+var raysAudio=null;
+function rays(state){
+ try{
+  if(!raysAudio){ raysAudio=new Audio('audio/raios_catodicos.mp3'); raysAudio.loop=true; }
+  if(state){ var p=raysAudio.play(); if(p&&p.catch){ p.catch(function(){}); } }
+  else { try{ raysAudio.pause(); }catch(_){} }
+ }catch(_){}
+}
+powerBtn.onclick=function(){on=!on;rays(on);render();};
 propBtn.onclick=function(){hasProp=!hasProp;render();};
 plateBtn.onclick=function(){hasPlates=!hasPlates;setBeam();render();};
+/* a página pai pede pra desligar/parar o som ao sair da cena */
+window.addEventListener('message',function(e){ if(e&&e.data&&e.data.amp==='stop'){ on=false; rays(false); render(); } });
+/* pausa o som ao perder o foco; retoma se voltar com a máquina ligada */
+document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){ try{ raysAudio.pause(); }catch(_){} } } else if(on){ rays(true); } });
 setBeam();render();
 })();
 </script>
