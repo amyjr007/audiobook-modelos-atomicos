@@ -198,13 +198,14 @@ function fan(state){
 }
 /* efeito sonoro curto (one-shot): clique dos botões, som das placas */
 function sound(name){ try{ if(!sfx[name]){ sfx[name]=new Audio('audio/'+name); } sfx[name].currentTime=0; var p=sfx[name].play(); if(p&&p.catch){ p.catch(function(){}); } }catch(_){} }
-powerBtn.onclick=function(){ sound('click_sound.m4a'); on=!on; rays(on); render(); };
-propBtn.onclick=function(){ sound('click_sound.m4a'); hasProp=!hasProp; fan(hasProp); render(); };
+function updateFan(){ fan(on && hasProp); }   /* o som da hélice só toca com a máquina ligada E a hélice ativa */
+powerBtn.onclick=function(){ sound('click_sound.m4a'); on=!on; rays(on); updateFan(); render(); };
+propBtn.onclick=function(){ sound('click_sound.m4a'); hasProp=!hasProp; updateFan(); render(); };
 plateBtn.onclick=function(){ sound('click_sound.m4a'); hasPlates=!hasPlates; if(hasPlates){ sound('plates.mp3'); } setBeam(); render(); };
 /* a página pai pede pra resetar/parar tudo ao sair da cena */
 window.addEventListener('message',function(e){ if(e&&e.data&&e.data.amp==='stop'){ on=false; hasProp=false; hasPlates=false; rays(false); fan(false); setBeam(); render(); } });
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
-document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(hasProp){ fan(true); } } });
+document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(on && hasProp){ fan(true); } } });
 setBeam();render();
 })();
 </script>
