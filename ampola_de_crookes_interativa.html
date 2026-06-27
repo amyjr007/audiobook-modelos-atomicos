@@ -1,10 +1,21 @@
 <h2 class="sr-only">Ampola de Crookes interativa em orientação vertical: botão liga/desliga que faz um raio catódico verde crescer do cátodo ao ânodo como um sabre de luz, com hélice e placas de deflexão removíveis e ligada a uma bateria.</h2>
 <style>
-:root{--bg-success:rgba(70,211,154,.18);--text-success:#46d39a;--border-success:rgba(70,211,154,.55);--bg-accent:rgba(255,122,24,.18);--text-accent:#ffab4d;--border-accent:rgba(255,122,24,.5);--text-secondary:rgba(255,255,255,.55)}
 html,body{margin:0;background:transparent;overflow:hidden}
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0 6px}
-.cbtn{padding:9px 12px;border-radius:11px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;font-weight:700;cursor:pointer;touch-action:manipulation}
-.cbtn i{display:none}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
+.amp-wrap{position:relative;width:100%}
+/* controles compactos DENTRO do retângulo (faixa de baixo) */
+.amp-ctrls{position:absolute;left:0;right:0;bottom:1.6%;display:flex;align-items:center;justify-content:center;gap:clamp(10px,4vw,18px);padding:0 8px}
+.amp-sw{position:relative;width:52px;height:27px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);cursor:pointer;padding:0;flex-shrink:0;transition:background .25s,border-color .25s;-webkit-tap-highlight-color:transparent}
+.amp-sw::after{content:'';position:absolute;top:2.5px;left:2.5px;width:20px;height:20px;border-radius:50%;background:#cfd6dd;transition:left .28s cubic-bezier(.4,1.4,.5,1),background .25s,box-shadow .25s}
+.amp-sw.on{background:rgba(57,255,20,.22);border-color:rgba(57,255,20,.6)}
+.amp-sw.on::after{left:27px;background:#39ff14;box-shadow:0 0 11px rgba(57,255,20,.85)}
+.amp-ib{position:relative;width:42px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#cdd3da;flex-shrink:0;transition:background .25s,border-color .25s,color .25s;-webkit-tap-highlight-color:transparent}
+.amp-ib svg{width:21px;height:21px;display:block}
+.amp-ib .led{position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);transition:background .25s,box-shadow .25s}
+.amp-ib.helice.on{border-color:rgba(80,150,255,.6);background:rgba(80,150,255,.16);color:#9cc8ff}
+.amp-ib.helice.on .led{background:#4d8bff;box-shadow:0 0 8px rgba(80,150,255,.95)}
+.amp-ib.placas.on{border-color:rgba(255,138,92,.6);background:rgba(255,138,92,.16);color:#ffb38f}
+.amp-ib.placas.on .led{background:#ff8a5c;box-shadow:0 0 8px rgba(255,138,92,.95)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 #amp .seg{stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset .72s cubic-bezier(.2,.7,.2,1);stroke-linecap:round;fill:none}
 #amp.on .seg{stroke-dashoffset:0}
@@ -32,6 +43,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0 6
 .cbtn{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px}
 </style>
 
+<div class="amp-wrap">
 <svg id="amp" width="100%" viewBox="0 0 380 620" role="img" xmlns="http://www.w3.org/2000/svg">
 <title>Ampola de Crookes interativa</title>
 <desc>Tubo de vidro vertical com cátodo embaixo e ânodo em cima, raio catódico verde, hélice e placas de deflexão, ligado a uma bateria.</desc>
@@ -120,11 +132,10 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0 6
 </g>
 </svg>
 
-<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
-<button id="powerBtn" class="cbtn"><i class="ti ti-power" aria-hidden="true"></i><span>Ligar</span></button>
-<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;">
-<button id="propBtn" class="cbtn"><i class="ti ti-propeller" aria-hidden="true"></i><span>Hélice</span></button>
-<button id="plateBtn" class="cbtn"><i class="ti ti-layout-distribute-horizontal" aria-hidden="true"></i><span>Placas</span></button>
+<div class="amp-ctrls">
+<button id="powerBtn" class="amp-sw" aria-label="Ligar/Desligar" aria-pressed="false"></button>
+<button id="propBtn" class="amp-ib helice" aria-label="Hélice" aria-pressed="false"><span class="led"></span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="2.1"/><g><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g><g transform="rotate(120 12 12)"><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g><g transform="rotate(240 12 12)"><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g></svg></button>
+<button id="plateBtn" class="amp-ib placas" aria-label="Placas" aria-pressed="false"><span class="led"></span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="4.5" width="3.2" height="15" rx="1.2"/><rect x="14.8" y="4.5" width="3.2" height="15" rx="1.2"/></svg></button>
 </div>
 </div>
 
@@ -138,28 +149,20 @@ var segs=document.querySelectorAll('#beamGroup .seg');
 var powerBtn=document.getElementById('powerBtn');
 var propBtn=document.getElementById('propBtn');
 var plateBtn=document.getElementById('plateBtn');
-var on=false, hasProp=true, hasPlates=true;
+var on=false, hasProp=false, hasPlates=false;
 var straightD="M190 505 Q190 360 190 158";
 var bentD="M190 505 Q216 360 190 158";
 function setBeam(){var d=hasPlates?bentD:straightD;segs.forEach(function(p){p.setAttribute('d',d);});}
 function render(){
  amp.classList.toggle('on',on);
- powerBtn.querySelector('span').textContent=on?'Desligar':'Ligar';
- powerBtn.querySelector('i').className=on?'ti ti-bolt':'ti ti-power';
- powerBtn.style.background=on?'var(--bg-success)':'';
- powerBtn.style.color=on?'var(--text-success)':'';
- powerBtn.style.borderColor=on?'var(--border-success)':'';
+ powerBtn.classList.toggle('on',on);
  powerBtn.setAttribute('aria-pressed',on);
  prop.classList.toggle('gone',!hasProp);
- propBtn.style.background=hasProp?'var(--bg-accent)':'';
- propBtn.style.color=hasProp?'var(--text-accent)':'var(--text-secondary)';
- propBtn.style.borderColor=hasProp?'var(--border-accent)':'';
+ propBtn.classList.toggle('on',hasProp);
  propBtn.setAttribute('aria-pressed',hasProp);
  plateL.classList.toggle('gone',!hasPlates);
  plateR.classList.toggle('gone',!hasPlates);
- plateBtn.style.background=hasPlates?'var(--bg-accent)':'';
- plateBtn.style.color=hasPlates?'var(--text-accent)':'var(--text-secondary)';
- plateBtn.style.borderColor=hasPlates?'var(--border-accent)':'';
+ plateBtn.classList.toggle('on',hasPlates);
  plateBtn.setAttribute('aria-pressed',hasPlates);
 }
 powerBtn.onclick=function(){on=!on;render();};
