@@ -19,6 +19,10 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 #amp .seg{stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset .72s cubic-bezier(.2,.7,.2,1);stroke-linecap:round;fill:none}
 #amp.on .seg{stroke-dashoffset:0}
+/* raio catódico intermitente (pisca de vez em quando, não fica contínuo) */
+#amp.on #beamGroup{animation:rayFlicker 4.8s linear infinite}
+#amp.on .cglow{animation:rayFlicker 4.8s linear infinite}
+@keyframes rayFlicker{0%{opacity:1}18%{opacity:1}19%{opacity:.4}20.5%{opacity:1}46%{opacity:1}47%{opacity:.6}47.7%{opacity:1}48.5%{opacity:.35}49.8%{opacity:1}74%{opacity:1}75%{opacity:.5}76.5%{opacity:1}100%{opacity:1}}
 #amp .cglow{opacity:0;transition:opacity .5s ease .12s}
 #amp.on .cglow{opacity:1}
 #amp .tubeglow{opacity:0;transition:opacity .6s ease .1s}
@@ -35,10 +39,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 #plateL.gone{opacity:0;transform:translateX(-32px)}
 #plateR.gone{opacity:0;transform:translateX(32px)}
 @media (prefers-reduced-motion: no-preference){
-#amp.on #prop:not(.gone) .wheel{animation:spin 1.05s linear infinite}
 #amp.on .flow{animation:march 1s linear infinite}
 }
-@keyframes spin{to{transform:rotate(360deg)}}
 @keyframes march{to{stroke-dashoffset:-130}}
 .cbtn{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px}
 </style>
@@ -109,8 +111,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 </g>
 
 <g id="prop">
-<rect x="187" y="386" width="6" height="70" rx="1" fill="#5b626b"/>
-<rect x="174" y="456" width="32" height="8" rx="2" fill="#474d56"/>
+<rect x="70" y="357" width="122" height="6" rx="3" fill="#5b626b"/>
+<rect x="62" y="349" width="10" height="22" rx="2.5" fill="#474d56"/>
 <g class="wheel">
 <rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(0 190 360)"/>
 <rect class="bl" x="184" y="333" width="12" height="20" rx="2" transform="rotate(60 190 360)"/>
@@ -153,6 +155,21 @@ var on=false, hasProp=false, hasPlates=false;
 var straightD="M190 505 Q190 360 190 158";
 var bentD="M190 505 Q216 360 190 158";
 function setBeam(){var d=hasPlates?bentD:straightD;segs.forEach(function(p){p.setAttribute('d',d);});}
+/* gira a hélice via JS: começa devagarzinho (fazendo força) e acelera; sentido invertido */
+var wheelEl=document.querySelector('#prop .wheel');
+var wAngle=0, wVel=0, wRAF=0, wLast=0;
+function wheelTick(ts){
+ if(!wLast){ wLast=ts; }
+ var dt=Math.min(0.05,(ts-wLast)/1000); wLast=ts;
+ var spinning=(on && hasProp);
+ var target=spinning?300:0;                 /* deg/s no regime */
+ wVel += (target-wVel)*Math.min(1,dt*0.8);  /* rampa lenta no início */
+ wAngle=(wAngle - wVel*dt)%360;             /* sinal negativo = sentido invertido */
+ if(wheelEl){ wheelEl.style.transform='rotate('+wAngle.toFixed(2)+'deg)'; }
+ if(spinning || wVel>0.4){ wRAF=requestAnimationFrame(wheelTick); }
+ else { wVel=0; wLast=0; wRAF=0; }
+}
+function syncWheel(){ if(!wRAF){ wLast=0; wRAF=requestAnimationFrame(wheelTick); } }
 function render(){
  amp.classList.toggle('on',on);
  powerBtn.classList.toggle('on',on);
@@ -164,6 +181,7 @@ function render(){
  plateR.classList.toggle('gone',!hasPlates);
  plateBtn.classList.toggle('on',hasPlates);
  plateBtn.setAttribute('aria-pressed',hasPlates);
+ syncWheel();
 }
 var raysAudio=null, fanAudio=null, sfx={};
 function rays(state){
