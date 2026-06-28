@@ -17,6 +17,14 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 .amp-ib.helice.on .led{background:#4d8bff;box-shadow:0 0 8px rgba(80,150,255,.95)}
 .amp-ib.placas.on{border-color:rgba(255,138,92,.6);background:rgba(255,138,92,.16);color:#ffb38f}
 .amp-ib.placas.on .led{background:#ff8a5c;box-shadow:0 0 8px rgba(255,138,92,.95)}
+/* botão travado: aparece apagado e não responde ao toque */
+.amp-sw.locked,.amp-ib.locked{opacity:.4;pointer-events:none;filter:saturate(.4)}
+/* mãozinha "Ligue a máquina" apontando p/ o botão On/off */
+.amp-hint{position:absolute;right:15%;bottom:6.5%;display:flex;align-items:center;gap:5px;z-index:6;opacity:0;transform:translateX(10px);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
+.amp-hint.in{opacity:1;transform:translateX(0)}
+.amp-hint-txt{font:700 12.5px/1.05 'Plus Jakarta Sans',system-ui,sans-serif;color:#ffe0b0;background:rgba(18,12,6,.74);padding:5px 8px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.amp-hint-hand{font-size:23px;animation:ampPoint 1s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+@keyframes ampPoint{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 #amp .seg{stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset .72s cubic-bezier(.2,.7,.2,1);stroke-linecap:round;fill:none}
 #amp.on .seg{stroke-dashoffset:0}
@@ -171,6 +179,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 <button id="propBtn" class="amp-ib helice" aria-label="Hélice" aria-pressed="false"><span class="led"></span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="2.1"/><g><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g><g transform="rotate(120 12 12)"><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g><g transform="rotate(240 12 12)"><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g></svg></button>
 <button id="plateBtn" class="amp-ib placas" aria-label="Placas" aria-pressed="false"><span class="led"></span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.4" y="4" width="5.7" height="16" rx="1.6" fill="#74b6ff"/><rect x="13.9" y="4" width="5.7" height="16" rx="1.6" fill="#ff8a72"/></svg></button>
 </div>
+<div class="amp-hint" id="ampHint"><span class="amp-hint-txt">Ligue a máquina</span><span class="amp-hint-hand" aria-hidden="true">👉</span></div>
 </div>
 
 <script>
@@ -244,13 +253,28 @@ function updateFan(){   /* o som da hélice só toca enquanto ela GIRA (máquina
  else { fan(false); if(wasSpinning){ sound('micro_fan_off.mp3'); } }   /* ao parar: corta o micro_fan e toca o "off" uma vez */
  wasSpinning=spin;
 }
-powerBtn.onclick=function(){ sound('click_sound.m4a'); on=!on; rays(on); updateFan(); render(); };
-propBtn.onclick=function(){ sound('click_sound2.mp3'); hasProp=!hasProp; updateFan(); render(); };
-plateBtn.onclick=function(){ hasPlates=!hasPlates; sound('plates.mp3'); setBeam(); render(); };   /* mesmo som na entrada e na saída */
-/* a página pai pede pra resetar/parar tudo ao sair da cena */
-window.addEventListener('message',function(e){ if(e&&e.data&&e.data.amp==='stop'){ on=false; hasProp=false; hasPlates=false; wasSpinning=false; rays(false); fan(false); setBeam(); render(); } });
+/* estado de travamento dos botões (controlado pela página pai). true = travado */
+var ampHint=document.getElementById('ampHint');
+var btnLock={power:true,prop:true,plate:true};   /* tudo travado por padrão até a página pai liberar */
+function applyLocks(){
+ powerBtn.classList.toggle('locked', btnLock.power);
+ propBtn.classList.toggle('locked', btnLock.prop);
+ plateBtn.classList.toggle('locked', btnLock.plate);
+}
+function showHint(s){ if(ampHint){ ampHint.classList.toggle('in', !!s); } }
+powerBtn.onclick=function(){ if(btnLock.power){ return; } sound('click_sound.m4a'); on=!on; rays(on); updateFan(); render(); if(on){ showHint(false); try{ parent.postMessage({ampEvt:'userPowerOn'},'*'); }catch(_){} } };
+propBtn.onclick=function(){ if(btnLock.prop){ return; } sound('click_sound2.mp3'); hasProp=!hasProp; updateFan(); render(); };
+plateBtn.onclick=function(){ if(btnLock.plate){ return; } hasPlates=!hasPlates; sound('plates.mp3'); setBeam(); render(); };   /* mesmo som na entrada e na saída */
+/* mensagens da página pai */
+window.addEventListener('message',function(e){
+ var d=e&&e.data; if(!d||!d.amp){ return; }
+ if(d.amp==='stop'){ on=false; hasProp=false; hasPlates=false; wasSpinning=false; rays(false); fan(false); btnLock={power:true,prop:true,plate:true}; applyLocks(); showHint(false); setBeam(); render(); return; }   /* reset + trava tudo */
+ if(d.amp==='btns'){ if(d.power!=null){ btnLock.power=!d.power; } if(d.prop!=null){ btnLock.prop=!d.prop; } if(d.plate!=null){ btnLock.plate=!d.plate; } applyLocks(); return; }   /* libera/trava botões */
+ if(d.amp==='power'){ on=!!d.on; rays(on); updateFan(); render(); if(!on){ showHint(false); } return; }   /* liga/desliga programático */
+ if(d.amp==='hand'){ showHint(!!d.show); return; }   /* mãozinha */
+});
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(on && hasProp){ fan(true); } } });
-setBeam();render();
+applyLocks();setBeam();render();
 })();
 </script>
