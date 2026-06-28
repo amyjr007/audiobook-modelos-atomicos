@@ -23,8 +23,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 .amp-hint{position:absolute;right:15%;bottom:6.5%;display:flex;align-items:center;gap:5px;z-index:6;opacity:0;transform:translateX(10px);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
 .amp-hint.in{opacity:1;transform:translateX(0)}
 .amp-hint-txt{font:700 12.5px/1.05 'Plus Jakarta Sans',system-ui,sans-serif;color:#ffe0b0;background:rgba(18,12,6,.74);padding:5px 8px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.4)}
-.amp-hint-hand{font-size:23px;animation:ampPoint 1s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
-@keyframes ampPoint{0%,100%{transform:translateX(0)}50%{transform:translateX(7px)}}
+.amp-hint-hand{font-size:28px;animation:ampPoint 1s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+@keyframes ampPoint{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
 #amp .seg{stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset .72s cubic-bezier(.2,.7,.2,1);stroke-linecap:round;fill:none}
 #amp.on .seg{stroke-dashoffset:0}
@@ -36,8 +36,8 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 #amp.on .cglow{opacity:1}
 #amp .tubeglow{opacity:0;transition:opacity .6s ease .1s}
 #amp.on .tubeglow{opacity:.13}
-#amp .raylabel{opacity:0;transition:opacity .4s ease .35s}
-#amp.on .raylabel{opacity:1}
+#amp .raylabel{opacity:0;transition:opacity .5s ease}
+#amp.on.showlabel .raylabel{opacity:1}   /* o nome "Raios catódicos" só aparece quando a pág. pai pedir */
 #amp .flow{opacity:0}
 #amp.on .flow{opacity:.9}
 #prop{transform-box:fill-box;transform-origin:center;opacity:1;transform:translateY(0);transition:opacity .42s ease,transform .42s cubic-bezier(.34,1.4,.5,1)}
@@ -179,7 +179,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 <button id="propBtn" class="amp-ib helice" aria-label="Hélice" aria-pressed="false"><span class="led"></span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="2.1"/><g><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g><g transform="rotate(120 12 12)"><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g><g transform="rotate(240 12 12)"><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g></svg></button>
 <button id="plateBtn" class="amp-ib placas" aria-label="Placas" aria-pressed="false"><span class="led"></span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.4" y="4" width="5.7" height="16" rx="1.6" fill="#74b6ff"/><rect x="13.9" y="4" width="5.7" height="16" rx="1.6" fill="#ff8a72"/></svg></button>
 </div>
-<div class="amp-hint" id="ampHint"><span class="amp-hint-txt">Ligue a máquina</span><span class="amp-hint-hand" aria-hidden="true">👉</span></div>
+<div class="amp-hint" id="ampHint"><span class="amp-hint-txt">Ligue a máquina</span><span class="amp-hint-hand" aria-hidden="true">☝️</span></div>
 </div>
 
 <script>
@@ -268,10 +268,11 @@ plateBtn.onclick=function(){ if(btnLock.plate){ return; } hasPlates=!hasPlates; 
 /* mensagens da página pai */
 window.addEventListener('message',function(e){
  var d=e&&e.data; if(!d||!d.amp){ return; }
- if(d.amp==='stop'){ on=false; hasProp=false; hasPlates=false; wasSpinning=false; rays(false); fan(false); btnLock={power:true,prop:true,plate:true}; applyLocks(); showHint(false); setBeam(); render(); return; }   /* reset + trava tudo */
+ if(d.amp==='stop'){ on=false; hasProp=false; hasPlates=false; wasSpinning=false; rays(false); fan(false); btnLock={power:true,prop:true,plate:true}; applyLocks(); showHint(false); amp.classList.remove('showlabel'); setBeam(); render(); return; }   /* reset + trava tudo */
  if(d.amp==='btns'){ if(d.power!=null){ btnLock.power=!d.power; } if(d.prop!=null){ btnLock.prop=!d.prop; } if(d.plate!=null){ btnLock.plate=!d.plate; } applyLocks(); return; }   /* libera/trava botões */
- if(d.amp==='power'){ on=!!d.on; rays(on); updateFan(); render(); if(!on){ showHint(false); } return; }   /* liga/desliga programático */
+ if(d.amp==='power'){ on=!!d.on; rays(on); updateFan(); render(); if(!on){ showHint(false); amp.classList.remove('showlabel'); } return; }   /* liga/desliga programático */
  if(d.amp==='hand'){ showHint(!!d.show); return; }   /* mãozinha */
+ if(d.amp==='raylabel'){ amp.classList.toggle('showlabel', !!d.show); return; }   /* nome "Raios catódicos" */
 });
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(on && hasProp){ fan(true); } } });
