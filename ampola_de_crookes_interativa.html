@@ -244,8 +244,8 @@ function updateFan(){   /* o som da hélice só toca enquanto ela GIRA (máquina
  wasSpinning=spin;
 }
 powerBtn.onclick=function(){ sound('click_sound.m4a'); on=!on; rays(on); updateFan(); render(); };
-propBtn.onclick=function(){ sound('click_sound.m4a'); hasProp=!hasProp; updateFan(); render(); };
-plateBtn.onclick=function(){ sound('click_sound.m4a'); hasPlates=!hasPlates; if(hasPlates){ sound('plates.mp3'); } setBeam(); render(); };
+propBtn.onclick=function(){ sound('click_sound2.mp3'); hasProp=!hasProp; updateFan(); render(); };
+plateBtn.onclick=function(){ hasPlates=!hasPlates; if(hasPlates){ sound('plates.mp3'); } setBeam(); render(); };
 /* a página pai pede pra resetar/parar tudo ao sair da cena */
 window.addEventListener('message',function(e){ if(e&&e.data&&e.data.amp==='stop'){ on=false; hasProp=false; hasPlates=false; wasSpinning=false; rays(false); fan(false); setBeam(); render(); } });
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
