@@ -5,7 +5,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 .amp-wrap{position:relative;width:100%}
 /* controles compactos DENTRO do retângulo (faixa de baixo) */
 /* controles na lateral DIREITA do retângulo, de baixo p/ cima: On/off, hélice, placas */
-.amp-ctrls{position:absolute;right:3.5%;bottom:5%;display:flex;flex-direction:column-reverse;align-items:center;gap:clamp(9px,2.6vw,15px)}
+.amp-ctrls{position:absolute;right:3.5%;bottom:9%;display:flex;flex-direction:column-reverse;align-items:center;gap:clamp(9px,2.6vw,15px)}
 .amp-sw{position:relative;width:52px;height:27px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);cursor:pointer;padding:0;flex-shrink:0;transition:background .25s,border-color .25s;-webkit-tap-highlight-color:transparent}
 .amp-sw::after{content:'';position:absolute;top:2.5px;left:2.5px;width:20px;height:20px;border-radius:50%;background:#cfd6dd;transition:left .28s cubic-bezier(.4,1.4,.5,1),background .25s,box-shadow .25s}
 .amp-sw.on{background:rgba(57,255,20,.22);border-color:rgba(57,255,20,.6)}
@@ -20,8 +20,9 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 /* botão travado: aparece apagado e não responde ao toque */
 .amp-sw.locked,.amp-ib.locked{opacity:.4;pointer-events:none;filter:saturate(.4)}
 /* mãozinha "Ligue a máquina" apontando p/ o botão On/off */
-.amp-hint{position:absolute;right:15%;bottom:6.5%;display:flex;align-items:center;gap:5px;z-index:6;opacity:0;transform:translateX(10px);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
-.amp-hint.in{opacity:1;transform:translateX(0)}
+/* mãozinha logo ABAIXO do botão On/off (☝️ apontando p/ cima nele) */
+.amp-hint{position:absolute;right:calc(3.5% + 12px);bottom:3%;display:flex;align-items:center;gap:5px;z-index:6;opacity:0;transform:translateY(8px);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
+.amp-hint.in{opacity:1;transform:translateY(0)}
 .amp-hint-txt{font:700 12.5px/1.05 'Plus Jakarta Sans',system-ui,sans-serif;color:#ffe0b0;background:rgba(18,12,6,.74);padding:5px 8px;border-radius:8px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 .amp-hint-hand{font-size:28px;animation:ampPoint 1s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
 @keyframes ampPoint{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
@@ -38,6 +39,10 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 #amp.on .tubeglow{opacity:.13}
 #amp .raylabel{opacity:0;transition:opacity .5s ease}
 #amp.on.showlabel .raylabel{opacity:1}   /* o nome "Raios catódicos" só aparece quando a pág. pai pedir */
+/* "cátodo (–)" pulsa por ~1s quando a pág. pai pedir */
+.catlabel{transform-box:fill-box;transform-origin:center}
+.catlabel.pulse{animation:catPulse .34s ease-in-out 3}
+@keyframes catPulse{0%,100%{transform:scale(1);fill:#cdd3da}50%{transform:scale(1.2);fill:#ffd24a}}
 #amp .flow{opacity:0}
 #amp.on .flow{opacity:.9}
 #prop{transform-box:fill-box;transform-origin:center;opacity:1;transform:translateY(0);transition:opacity .42s ease,transform .42s cubic-bezier(.34,1.4,.5,1)}
@@ -167,7 +172,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 <path d="M150 222 C 132 262 128 300 134 342" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/>
 
 <text x="214" y="153" text-anchor="start" font-size="12.5" fill="#cdd3da">ânodo (+)</text>
-<text x="214" y="509" text-anchor="start" font-size="12.5" fill="#cdd3da">cátodo (–)</text>
+<text x="214" y="509" text-anchor="start" font-size="12.5" fill="#cdd3da" class="catlabel">cátodo (–)</text>
 <g class="raylabel">
 <line x1="221" y1="250" x2="194" y2="252" stroke="#5fae53" stroke-width="1" stroke-dasharray="3 3"/>
 <text x="223" y="247" text-anchor="start" font-size="12" fill="#8dff77">Raios catódicos</text>
@@ -273,6 +278,7 @@ window.addEventListener('message',function(e){
  if(d.amp==='power'){ on=!!d.on; rays(on); updateFan(); render(); if(!on){ showHint(false); amp.classList.remove('showlabel'); } return; }   /* liga/desliga programático */
  if(d.amp==='hand'){ showHint(!!d.show); return; }   /* mãozinha */
  if(d.amp==='raylabel'){ amp.classList.toggle('showlabel', !!d.show); return; }   /* nome "Raios catódicos" */
+ if(d.amp==='pulseCathode'){ var cl=document.querySelector('.catlabel'); if(cl){ cl.classList.remove('pulse'); cl.getBoundingClientRect(); cl.classList.add('pulse'); setTimeout(function(){ cl.classList.remove('pulse'); }, 1150); } return; }   /* pulsa "cátodo (–)" ~1s */
 });
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(on && hasProp){ fan(true); } } });
