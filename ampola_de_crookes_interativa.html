@@ -142,7 +142,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 </g>
 
 <g id="prop">
-<rect x="88" y="277" width="104" height="6" rx="3" fill="url(#metalH)" filter="url(#softShadow)"/>
+<rect x="88" y="277.3" width="104" height="5.4" rx="2.7" fill="url(#metalH)" filter="url(#softShadow)"/>
 <rect x="80" y="269" width="10" height="22" rx="2.5" fill="url(#metalV)" stroke="#3f464e" stroke-width="0.6"/>
 <g class="wheel">
 <rect class="bl" x="184" y="253" width="12" height="20" rx="2" transform="rotate(0 190 280)"/>
@@ -226,7 +226,7 @@ var FAN_LOOP_START=2.5, FAN_LOOP_END=10.0;   /* loop só na seção do meio do m
 function fan(state){
  try{
   if(!fanAudio){
-   fanAudio=new Audio('audio/micro_fan.mp3'); fanAudio.loop=false;
+   fanAudio=new Audio('audio/micro_fan.mp3'); fanAudio.loop=false; fanAudio.volume=0.5;   /* -50% intensidade */
    fanAudio.addEventListener('timeupdate',function(){ if(fanAudio.currentTime>=FAN_LOOP_END){ try{ fanAudio.currentTime=FAN_LOOP_START; }catch(_){} } });
    fanAudio.addEventListener('ended',function(){ try{ fanAudio.currentTime=FAN_LOOP_START; var pp=fanAudio.play(); if(pp&&pp.catch){ pp.catch(function(){}); } }catch(_){} });   /* segurança: não recomeça do 0 */
   }
@@ -235,7 +235,8 @@ function fan(state){
  }catch(_){}
 }
 /* efeito sonoro curto (one-shot): clique dos botões, som das placas */
-function sound(name){ try{ var a=sfx[name]; if(!a){ a=sfx[name]=new Audio('audio/'+name); } try{ a.currentTime=0; }catch(_){} var p=a.play(); if(p&&p.catch){ p.catch(function(){}); } }catch(_){} }
+var SFX_VOL={ 'click_sound2.mp3':0.5, 'micro_fan_off.mp3':0.5 };   /* -50% intensidade */
+function sound(name){ try{ var a=sfx[name]; if(!a){ a=sfx[name]=new Audio('audio/'+name); if(SFX_VOL[name]!=null){ a.volume=SFX_VOL[name]; } } try{ a.currentTime=0; }catch(_){} var p=a.play(); if(p&&p.catch){ p.catch(function(){}); } }catch(_){} }
 var wasSpinning=false;
 function updateFan(){   /* o som da hélice só toca enquanto ela GIRA (máquina ligada E hélice ativa) */
  var spin=(on && hasProp);
@@ -245,7 +246,7 @@ function updateFan(){   /* o som da hélice só toca enquanto ela GIRA (máquina
 }
 powerBtn.onclick=function(){ sound('click_sound.m4a'); on=!on; rays(on); updateFan(); render(); };
 propBtn.onclick=function(){ sound('click_sound2.mp3'); hasProp=!hasProp; updateFan(); render(); };
-plateBtn.onclick=function(){ hasPlates=!hasPlates; if(hasPlates){ sound('plates.mp3'); } setBeam(); render(); };
+plateBtn.onclick=function(){ hasPlates=!hasPlates; sound('plates.mp3'); setBeam(); render(); };   /* mesmo som na entrada e na saída */
 /* a página pai pede pra resetar/parar tudo ao sair da cena */
 window.addEventListener('message',function(e){ if(e&&e.data&&e.data.amp==='stop'){ on=false; hasProp=false; hasPlates=false; wasSpinning=false; rays(false); fan(false); setBeam(); render(); } });
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
