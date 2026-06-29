@@ -277,6 +277,7 @@ window.addEventListener('message',function(e){
  if(d.amp==='btns'){ if(d.power!=null){ btnLock.power=!d.power; } if(d.prop!=null){ btnLock.prop=!d.prop; } if(d.plate!=null){ btnLock.plate=!d.plate; } applyLocks(); return; }   /* libera/trava botões */
  if(d.amp==='power'){ on=!!d.on; rays(on); updateFan(); render(); if(!on){ showHint(false); amp.classList.remove('showlabel'); } return; }   /* liga/desliga programático */
  if(d.amp==='prop'){ hasProp=!!d.on; updateFan(); render(); return; }   /* liga/desliga a hélice programaticamente */
+ if(d.amp==='plate'){ hasPlates=!!d.on; setBeam(); render(); return; }   /* coloca/tira as placas programaticamente */
  if(d.amp==='hand'){ showHint(!!d.show); return; }   /* mãozinha */
  if(d.amp==='raylabel'){ amp.classList.toggle('showlabel', !!d.show); return; }   /* nome "Raios catódicos" */
  if(d.amp==='pulseCathode'){ var cl=document.querySelector('.catlabel'); if(cl){ cl.classList.remove('pulse'); cl.getBoundingClientRect(); cl.classList.add('pulse'); setTimeout(function(){ cl.classList.remove('pulse'); }, 1150); } return; }   /* pulsa "cátodo (–)" ~1s */
