@@ -321,18 +321,20 @@ var e9flow=document.getElementById('e9flow');
 var e9feat=document.getElementById('e9feat');
 var e9featTrans=e9feat?e9feat.querySelector('.ftrans'):null;
 var e9label=document.getElementById('e9label');
-var e9St={on:false, arc:false, raf:0, last:0, acc:0, parts:[]};
+var e9St={active:false, raf:0, last:0, acc:0, parts:[]};
 var E9_SPAWN=0.30;                 /* novo elétron a cada 0.30s */
 var E9_SPEED=0.42;                 /* t por segundo (~2.4s do cátodo ao ânodo) */
 var E9P0={x:190,y:503}, E9C={x:258,y:330}, E9P2={x:190,y:160};   /* cátodo -> (arco rumo à placa +) -> ânodo */
-function e9pos(t,arc){
- if(!arc){ return {x:190, y:E9P0.y+(E9P2.y-E9P0.y)*t}; }
+/* MESMA lógica do raio: trajetória curva só com as placas; sem placas é reta */
+function e9pos(t){
+ if(!hasPlates){ return {x:190, y:E9P0.y+(E9P2.y-E9P0.y)*t}; }
  var u=1-t;
  return { x:u*u*E9P0.x + 2*u*t*E9C.x + t*t*E9P2.x, y:u*u*E9P0.y + 2*u*t*E9C.y + t*t*E9P2.y };
 }
+function e9clear(){ for(var k=0;k<e9St.parts.length;k++){ var ek=e9St.parts[k].el; if(ek&&ek.parentNode){ ek.parentNode.removeChild(ek); } } e9St.parts=[]; e9St.acc=0; }
 function e9spawn(){
  if(!e9flow){ return; }
- var g=document.createElementNS(SVGNS,'g'); g.setAttribute('class','e9p'+(e9St.arc?' arc':''));
+ var g=document.createElementNS(SVGNS,'g'); g.setAttribute('class','e9p'+(hasPlates?' arc':'')); g._arc=hasPlates;
  var c=document.createElementNS(SVGNS,'circle'); c.setAttribute('r','3.2');
  var s=document.createElementNS(SVGNS,'text'); s.setAttribute('class','sgn'); s.setAttribute('x','0'); s.setAttribute('y','2.3'); s.setAttribute('text-anchor','middle'); s.textContent='−';
  g.appendChild(c); g.appendChild(s); e9flow.appendChild(g);
@@ -341,27 +343,28 @@ function e9spawn(){
 function e9tick(ts){
  if(!e9St.last){ e9St.last=ts; }
  var dt=Math.min(0.05,(ts-e9St.last)/1000); e9St.last=ts;
- if(e9St.on){ e9St.acc+=dt; while(e9St.acc>=E9_SPAWN){ e9St.acc-=E9_SPAWN; e9spawn(); } }
- for(var i=e9St.parts.length-1;i>=0;i--){
-  var p=e9St.parts[i]; p.t+=E9_SPEED*dt;
-  if(p.t>=1){ if(p.el&&p.el.parentNode){ p.el.parentNode.removeChild(p.el); } e9St.parts.splice(i,1); continue; }
-  var q=e9pos(p.t,e9St.arc); p.el.setAttribute('transform','translate('+q.x.toFixed(1)+' '+q.y.toFixed(1)+')');
+ if(!on){ e9clear(); }                          /* máquina desligada: sem bolinhas (igual ao raio) */
+ else {
+  if(e9St.active){ e9St.acc+=dt; while(e9St.acc>=E9_SPAWN){ e9St.acc-=E9_SPAWN; e9spawn(); } }
+  for(var i=e9St.parts.length-1;i>=0;i--){
+   var p=e9St.parts[i]; p.t+=E9_SPEED*dt;
+   if(p.t>=1){ if(p.el&&p.el.parentNode){ p.el.parentNode.removeChild(p.el); } e9St.parts.splice(i,1); continue; }
+   var q=e9pos(p.t); p.el.setAttribute('transform','translate('+q.x.toFixed(1)+' '+q.y.toFixed(1)+')');
+   if(p.el._arc!==hasPlates){ p.el.classList.toggle('arc', hasPlates); p.el._arc=hasPlates; }   /* sinal − segue as placas */
+  }
  }
- if(e9St.on || e9St.parts.length){ e9St.raf=requestAnimationFrame(e9tick); } else { e9St.raf=0; e9St.last=0; }
+ if(e9St.active || e9St.parts.length){ e9St.raf=requestAnimationFrame(e9tick); } else { e9St.raf=0; e9St.last=0; }
 }
 function e9go(){ if(!e9St.raf){ e9St.last=0; e9St.raf=requestAnimationFrame(e9tick); } }
 function e9(act){
  if(act==='reset'){
-  e9St.on=false; e9St.arc=false; e9St.acc=0;
-  for(var i=0;i<e9St.parts.length;i++){ var el=e9St.parts[i].el; if(el&&el.parentNode){ el.parentNode.removeChild(el); } }
-  e9St.parts=[]; amp.classList.remove('e9hide');
+  e9St.active=false; e9clear(); amp.classList.remove('e9hide');
   if(e9feat){ e9feat.classList.remove('in'); } if(e9label){ e9label.classList.remove('in'); }
   if(e9featTrans){ e9featTrans.style.transition='none'; e9featTrans.style.transform='translate(190px,503px) scale(0.12)'; }
   return;
  }
  if(act==='hideRays'){ amp.classList.add('e9hide'); return; }
- if(act==='flow'){ e9St.on=true; e9go(); return; }
- if(act==='deflect'){ e9St.arc=true; for(var j=0;j<e9St.parts.length;j++){ e9St.parts[j].el.classList.add('arc'); } return; }
+ if(act==='flow'){ e9St.active=true; e9go(); return; }
  if(act==='feature'){
   if(!e9feat||!e9featTrans){ return; }
   e9feat.classList.add('in');
