@@ -259,10 +259,15 @@ function render(){
  syncWheel();
 }
 var raysAudio=null, fanAudio=null, sfx={};
+var RAYS_LOOP_START=3.0, RAYS_LOOP_END=7.0;   /* loopa só o trecho ESTÁVEL (3s-7s) -> som contínuo, sem fade in/out do começo/fim */
 function rays(state){
  try{
-  if(!raysAudio){ raysAudio=new Audio('audio/raios_catodicos.mp3'); raysAudio.loop=true; raysAudio.volume=0.3; }   /* -70% e em loop contínuo */
-  if(state){ var p=raysAudio.play(); if(p&&p.catch){ p.catch(function(){}); } } else { try{ raysAudio.pause(); }catch(_){} }
+  if(!raysAudio){
+   raysAudio=new Audio('audio/raios_catodicos.mp3'); raysAudio.loop=false; raysAudio.volume=0.3;   /* -70% */
+   raysAudio.addEventListener('timeupdate',function(){ if(raysAudio.currentTime>=RAYS_LOOP_END){ try{ raysAudio.currentTime=RAYS_LOOP_START; }catch(_){} } });
+   raysAudio.addEventListener('ended',function(){ try{ raysAudio.currentTime=RAYS_LOOP_START; var pp=raysAudio.play(); if(pp&&pp.catch){ pp.catch(function(){}); } }catch(_){} });   /* segurança: nunca recomeça do 0 */
+  }
+  if(state){ try{ if(raysAudio.currentTime<RAYS_LOOP_START || raysAudio.currentTime>=RAYS_LOOP_END){ raysAudio.currentTime=RAYS_LOOP_START; } }catch(_){} var p=raysAudio.play(); if(p&&p.catch){ p.catch(function(){}); } } else { try{ raysAudio.pause(); }catch(_){} }
  }catch(_){}
 }
 var FAN_LOOP_START=2.5, FAN_LOOP_END=10.0;   /* loop só na seção do meio do micro_fan.mp3 (12s) */
