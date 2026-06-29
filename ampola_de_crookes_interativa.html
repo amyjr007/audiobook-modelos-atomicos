@@ -60,6 +60,19 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 }
 @keyframes march{to{stroke-dashoffset:-130}}
 .cbtn{display:flex;align-items:center;justify-content:center;gap:8px;font-size:15px}
+/* dialogo3.5.9: somem os raios + fluxo de elétrons */
+#amp.e9hide #beamGroup{animation:none !important;opacity:0;transition:opacity .8s ease}
+#amp.e9hide .cglow{animation:none !important;opacity:0;transition:opacity .8s ease}
+.e9p circle{fill:#bfe6ff;filter:drop-shadow(0 0 2px rgba(120,210,255,.85))}
+.e9p .sgn{font:700 6.6px 'Plus Jakarta Sans',system-ui,sans-serif;fill:#082233;opacity:0}
+.e9p.arc .sgn{opacity:1}
+#e9feat{opacity:0;transition:opacity .55s ease}
+#e9feat.in{opacity:1}
+#e9feat .ftrans{transform-box:view-box;transform-origin:0 0;transform:translate(190px,503px) scale(0.12);transition:transform 1.1s cubic-bezier(.25,.9,.3,1)}
+#e9feat .fglow{animation:e9pulse 2.4s ease-in-out infinite}
+@keyframes e9pulse{0%,100%{opacity:.16}50%{opacity:.32}}
+#e9label{opacity:0;transition:opacity .55s ease}
+#e9label.in{opacity:1}
 </style>
 
 <div class="amp-wrap">
@@ -80,6 +93,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 <filter id="glassBlur" x="-60%" y="-20%" width="220%" height="140%"><feGaussianBlur stdDeviation="2.7"/></filter>
 <linearGradient id="glassWall" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#070e18" stop-opacity="0.38"/><stop offset="0.28" stop-color="#0c1824" stop-opacity="0.06"/><stop offset="0.5" stop-color="#0c1824" stop-opacity="0"/><stop offset="0.72" stop-color="#0c1824" stop-opacity="0.08"/><stop offset="1" stop-color="#070e18" stop-opacity="0.42"/></linearGradient>
 <radialGradient id="glassSheen" cx="0.4" cy="0.28" r="0.75"><stop offset="0" stop-color="#eaf7ff" stop-opacity="0.16"/><stop offset="0.5" stop-color="#eaf7ff" stop-opacity="0.04"/><stop offset="1" stop-color="#eaf7ff" stop-opacity="0"/></radialGradient>
+<radialGradient id="e9grad" cx="0.38" cy="0.34" r="0.78"><stop offset="0" stop-color="#eaf9ff"/><stop offset="0.42" stop-color="#8fd6ff"/><stop offset="1" stop-color="#2f8fd6"/></radialGradient>
 </defs>
 
 <rect x="6" y="6" width="368" height="608" rx="22" fill="url(#panelBg)" stroke="#2a3543" stroke-width="1.2"/>
@@ -180,6 +194,17 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 <line x1="221" y1="250" x2="194" y2="252" stroke="#5fae53" stroke-width="1" stroke-dasharray="3 3"/>
 <text x="223" y="247" text-anchor="start" font-size="12" fill="#8dff77">Raios catódicos</text>
 </g>
+<!-- dialogo3.5.9: fluxo de elétrons (partículas) + elétron em destaque -->
+<g id="e9flow"></g>
+<g id="e9feat">
+<g class="ftrans">
+<circle class="fglow" r="31" fill="#5cc8ff" opacity="0.16"/>
+<circle r="21" fill="#9fe0ff" opacity="0.26"/>
+<circle r="15" fill="url(#e9grad)" stroke="#e3f6ff" stroke-width="1"/>
+<text x="0" y="6.5" text-anchor="middle" font-size="22" font-weight="700" fill="#082233">−</text>
+<g id="e9label"><line x1="17" y1="0" x2="28" y2="0" stroke="#bfe6ff" stroke-width="1.2"/><text x="34" y="6" text-anchor="start" font-family="'Plus Jakarta Sans',system-ui,sans-serif" font-weight="700" font-size="17" fill="#d4eeff">Elétron</text></g>
+</g>
+</g>
 </svg>
 
 <div class="amp-ctrls">
@@ -277,7 +302,7 @@ plateBtn.onclick=function(){ if(btnLock.plate){ return; } hasPlates=!hasPlates; 
 /* mensagens da página pai */
 window.addEventListener('message',function(e){
  var d=e&&e.data; if(!d||!d.amp){ return; }
- if(d.amp==='stop'){ on=false; hasProp=false; hasPlates=false; wasSpinning=false; rays(false); fan(false); btnLock={power:true,prop:true,plate:true}; applyLocks(); showHint(false); amp.classList.remove('showlabel'); setBeam(); render(); return; }   /* reset + trava tudo */
+ if(d.amp==='stop'){ on=false; hasProp=false; hasPlates=false; wasSpinning=false; rays(false); fan(false); btnLock={power:true,prop:true,plate:true}; applyLocks(); showHint(false); amp.classList.remove('showlabel'); e9('reset'); setBeam(); render(); return; }   /* reset + trava tudo */
  if(d.amp==='btns'){ if(d.power!=null){ btnLock.power=!d.power; } if(d.prop!=null){ btnLock.prop=!d.prop; } if(d.plate!=null){ btnLock.plate=!d.plate; } applyLocks(); return; }   /* libera/trava botões */
  if(d.amp==='power'){ on=!!d.on; rays(on); updateFan(); render(); if(!on){ showHint(false); amp.classList.remove('showlabel'); } return; }   /* liga/desliga programático */
  if(d.amp==='prop'){ hasProp=!!d.on; updateFan(); render(); return; }   /* liga/desliga a hélice programaticamente */
@@ -286,9 +311,67 @@ window.addEventListener('message',function(e){
  if(d.amp==='raylabel'){ amp.classList.toggle('showlabel', !!d.show); return; }   /* nome "Raios catódicos" */
  if(d.amp==='pulseCathode'){ var cl=document.querySelector('.catlabel'); if(cl){ cl.classList.remove('pulse'); cl.getBoundingClientRect(); cl.classList.add('pulse'); setTimeout(function(){ cl.classList.remove('pulse'); }, 1150); } return; }   /* pulsa "cátodo (–)" ~1s */
  if(d.amp==='pulsePlate'){ var pr=document.getElementById('plateR'); if(pr){ pr.classList.remove('emph'); pr.getBoundingClientRect(); pr.classList.add('emph'); setTimeout(function(){ pr.classList.remove('emph'); }, 1100); } return; }   /* enfatiza a placa positiva */
+ if(d.amp==='e9'){ e9(d.act); return; }   /* dialogo3.5.9: fluxo de elétrons */
 });
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(on && hasProp){ fan(true); } } });
+/* ===================== dialogo3.5.9: fluxo de elétrons ===================== */
+var SVGNS='http://www.w3.org/2000/svg';
+var e9flow=document.getElementById('e9flow');
+var e9feat=document.getElementById('e9feat');
+var e9featTrans=e9feat?e9feat.querySelector('.ftrans'):null;
+var e9label=document.getElementById('e9label');
+var e9St={on:false, arc:false, raf:0, last:0, acc:0, parts:[]};
+var E9_SPAWN=0.30;                 /* novo elétron a cada 0.30s */
+var E9_SPEED=0.42;                 /* t por segundo (~2.4s do cátodo ao ânodo) */
+var E9P0={x:190,y:503}, E9C={x:258,y:330}, E9P2={x:190,y:160};   /* cátodo -> (arco rumo à placa +) -> ânodo */
+function e9pos(t,arc){
+ if(!arc){ return {x:190, y:E9P0.y+(E9P2.y-E9P0.y)*t}; }
+ var u=1-t;
+ return { x:u*u*E9P0.x + 2*u*t*E9C.x + t*t*E9P2.x, y:u*u*E9P0.y + 2*u*t*E9C.y + t*t*E9P2.y };
+}
+function e9spawn(){
+ if(!e9flow){ return; }
+ var g=document.createElementNS(SVGNS,'g'); g.setAttribute('class','e9p'+(e9St.arc?' arc':''));
+ var c=document.createElementNS(SVGNS,'circle'); c.setAttribute('r','3.2');
+ var s=document.createElementNS(SVGNS,'text'); s.setAttribute('class','sgn'); s.setAttribute('x','0'); s.setAttribute('y','2.3'); s.setAttribute('text-anchor','middle'); s.textContent='−';
+ g.appendChild(c); g.appendChild(s); e9flow.appendChild(g);
+ e9St.parts.push({el:g,t:0});
+}
+function e9tick(ts){
+ if(!e9St.last){ e9St.last=ts; }
+ var dt=Math.min(0.05,(ts-e9St.last)/1000); e9St.last=ts;
+ if(e9St.on){ e9St.acc+=dt; while(e9St.acc>=E9_SPAWN){ e9St.acc-=E9_SPAWN; e9spawn(); } }
+ for(var i=e9St.parts.length-1;i>=0;i--){
+  var p=e9St.parts[i]; p.t+=E9_SPEED*dt;
+  if(p.t>=1){ if(p.el&&p.el.parentNode){ p.el.parentNode.removeChild(p.el); } e9St.parts.splice(i,1); continue; }
+  var q=e9pos(p.t,e9St.arc); p.el.setAttribute('transform','translate('+q.x.toFixed(1)+' '+q.y.toFixed(1)+')');
+ }
+ if(e9St.on || e9St.parts.length){ e9St.raf=requestAnimationFrame(e9tick); } else { e9St.raf=0; e9St.last=0; }
+}
+function e9go(){ if(!e9St.raf){ e9St.last=0; e9St.raf=requestAnimationFrame(e9tick); } }
+function e9(act){
+ if(act==='reset'){
+  e9St.on=false; e9St.arc=false; e9St.acc=0;
+  for(var i=0;i<e9St.parts.length;i++){ var el=e9St.parts[i].el; if(el&&el.parentNode){ el.parentNode.removeChild(el); } }
+  e9St.parts=[]; amp.classList.remove('e9hide');
+  if(e9feat){ e9feat.classList.remove('in'); } if(e9label){ e9label.classList.remove('in'); }
+  if(e9featTrans){ e9featTrans.style.transition='none'; e9featTrans.style.transform='translate(190px,503px) scale(0.12)'; }
+  return;
+ }
+ if(act==='hideRays'){ amp.classList.add('e9hide'); return; }
+ if(act==='flow'){ e9St.on=true; e9go(); return; }
+ if(act==='deflect'){ e9St.arc=true; for(var j=0;j<e9St.parts.length;j++){ e9St.parts[j].el.classList.add('arc'); } return; }
+ if(act==='feature'){
+  if(!e9feat||!e9featTrans){ return; }
+  e9feat.classList.add('in');
+  e9featTrans.style.transition='none'; e9featTrans.style.transform='translate(190px,503px) scale(0.12)'; e9featTrans.getBoundingClientRect();
+  e9featTrans.style.transition='';
+  requestAnimationFrame(function(){ e9featTrans.style.transform='translate(292px,232px) scale(1)'; });
+  return;
+ }
+ if(act==='label'){ if(e9label){ e9label.classList.add('in'); } return; }
+}
 applyLocks();setBeam();render();
 })();
 </script>
