@@ -235,7 +235,7 @@ var wAngle=0, wVel=0, wRAF=0, wLast=0;
 function wheelTick(ts){
  if(!wLast){ wLast=ts; }
  var dt=Math.min(0.05,(ts-wLast)/1000); wLast=ts;
- var spinning=(on && hasProp);
+ var spinning=(on && hasProp && !hasPlates);   /* só gira com o raio RETO (sem placas/desvio) */
  var MAXV=60;                               /* máx = 20% da velocidade anterior (300) */
  if(spinning){ wVel += (6 + wVel*0.5)*dt; if(wVel>MAXV){ wVel=MAXV; } }      /* ease-in: começa bem devagarzinho e acelera */
  else { wVel += (0 - wVel)*Math.min(1, dt*1.6); if(wVel<0.4){ wVel=0; } }    /* desacelera ao parar */
@@ -281,8 +281,8 @@ function fan(state){
 var SFX_VOL={ 'click_sound2.mp3':0.5, 'micro_fan_off.mp3':0.5 };   /* -50% intensidade */
 function sound(name){ try{ var a=sfx[name]; if(!a){ a=sfx[name]=new Audio('audio/'+name); if(SFX_VOL[name]!=null){ a.volume=SFX_VOL[name]; } } try{ a.currentTime=0; }catch(_){} var p=a.play(); if(p&&p.catch){ p.catch(function(){}); } }catch(_){} }
 var wasSpinning=false;
-function updateFan(){   /* o som da hélice só toca enquanto ela GIRA (máquina ligada E hélice ativa) */
- var spin=(on && hasProp);
+function updateFan(){   /* o som da hélice só toca enquanto ela GIRA (máquina ligada, hélice ativa E raio reto) */
+ var spin=(on && hasProp && !hasPlates);
  if(spin){ fan(true); }
  else { fan(false); if(wasSpinning){ sound('micro_fan_off.mp3'); } }   /* ao parar: corta o micro_fan e toca o "off" uma vez */
  wasSpinning=spin;
@@ -298,7 +298,7 @@ function applyLocks(){
 function showHint(s){ if(ampHint){ ampHint.classList.toggle('in', !!s); } }
 powerBtn.onclick=function(){ if(btnLock.power){ return; } sound('click_sound.m4a'); on=!on; rays(on); updateFan(); render(); if(on){ showHint(false); try{ parent.postMessage({ampEvt:'userPowerOn'},'*'); }catch(_){} } };
 propBtn.onclick=function(){ if(btnLock.prop){ return; } sound('click_sound2.mp3'); hasProp=!hasProp; updateFan(); render(); };
-plateBtn.onclick=function(){ if(btnLock.plate){ return; } hasPlates=!hasPlates; sound('plates.mp3'); setBeam(); render(); };   /* mesmo som na entrada e na saída */
+plateBtn.onclick=function(){ if(btnLock.plate){ return; } hasPlates=!hasPlates; sound('plates.mp3'); setBeam(); updateFan(); render(); };   /* mesmo som na entrada e na saída; placas param/retomam a hélice */
 /* mensagens da página pai */
 window.addEventListener('message',function(e){
  var d=e&&e.data; if(!d||!d.amp){ return; }
@@ -306,7 +306,7 @@ window.addEventListener('message',function(e){
  if(d.amp==='btns'){ if(d.power!=null){ btnLock.power=!d.power; } if(d.prop!=null){ btnLock.prop=!d.prop; } if(d.plate!=null){ btnLock.plate=!d.plate; } applyLocks(); return; }   /* libera/trava botões */
  if(d.amp==='power'){ on=!!d.on; rays(on); updateFan(); render(); if(!on){ showHint(false); amp.classList.remove('showlabel'); } return; }   /* liga/desliga programático */
  if(d.amp==='prop'){ hasProp=!!d.on; updateFan(); render(); return; }   /* liga/desliga a hélice programaticamente */
- if(d.amp==='plate'){ hasPlates=!!d.on; setBeam(); render(); return; }   /* coloca/tira as placas programaticamente */
+ if(d.amp==='plate'){ hasPlates=!!d.on; setBeam(); updateFan(); render(); return; }   /* coloca/tira as placas programaticamente; placas param/retomam a hélice */
  if(d.amp==='hand'){ showHint(!!d.show); return; }   /* mãozinha */
  if(d.amp==='raylabel'){ amp.classList.toggle('showlabel', !!d.show); return; }   /* nome "Raios catódicos" */
  if(d.amp==='pulseCathode'){ var cl=document.querySelector('.catlabel'); if(cl){ cl.classList.remove('pulse'); cl.getBoundingClientRect(); cl.classList.add('pulse'); setTimeout(function(){ cl.classList.remove('pulse'); }, 1150); } return; }   /* pulsa "cátodo (–)" ~1s */
@@ -314,7 +314,7 @@ window.addEventListener('message',function(e){
  if(d.amp==='e9'){ e9(d.act); return; }   /* dialogo3.5.9: fluxo de elétrons */
 });
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
-document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(on && hasProp){ fan(true); } } });
+document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(on && hasProp && !hasPlates){ fan(true); } } });
 /* ===================== dialogo3.5.9: fluxo de elétrons ===================== */
 var SVGNS='http://www.w3.org/2000/svg';
 var e9flow=document.getElementById('e9flow');
