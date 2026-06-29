@@ -43,6 +43,9 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 .catlabel{transform-box:fill-box;transform-origin:center}
 .catlabel.pulse{animation:catPulse .34s ease-in-out 3}
 @keyframes catPulse{0%,100%{transform:scale(1);fill:#cdd3da}50%{transform:scale(1.2);fill:#ffd24a}}
+/* ênfase na placa positiva (quando a pág. pai pedir) */
+#plateR.emph{animation:platePulse .5s ease-in-out 2}
+@keyframes platePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.13)}}
 #amp .flow{opacity:0}
 #amp.on .flow{opacity:.9}
 #prop{transform-box:fill-box;transform-origin:center;opacity:1;transform:translateY(0);transition:opacity .42s ease,transform .42s cubic-bezier(.34,1.4,.5,1)}
@@ -102,6 +105,21 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 <path d="M190 92 C 210 92 218 112 218 150 C 219 188 256 196 270 330 C 256 466 219 474 218 512 C 218 548 210 568 190 568 C 170 568 162 548 162 512 C 161 474 124 466 110 330 C 124 196 161 188 162 150 C 162 112 170 92 190 92 Z" fill="url(#glassBody)"/>
 <path d="M190 92 C 210 92 218 112 218 150 C 219 188 256 196 270 330 C 256 466 219 474 218 512 C 218 548 210 568 190 568 C 170 568 162 548 162 512 C 161 474 124 466 110 330 C 124 196 161 188 162 150 C 162 112 170 92 190 92 Z" fill="url(#glassWall)" clip-path="url(#glassClip)"/>
 <ellipse class="tubeglow" cx="190" cy="358" rx="74" ry="180" fill="#39ff14" clip-path="url(#glassClip)"/>
+<!-- hélice DENTRO da ampola (atrás dos reflexos do vidro) -->
+<g id="prop">
+<rect x="82" y="277" width="83" height="6" rx="3" fill="url(#metalH)" filter="url(#softShadow)"/>
+<rect x="74" y="269" width="10" height="22" rx="2.5" fill="url(#metalV)" stroke="#3f464e" stroke-width="0.6"/>
+<g class="wheel">
+<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(0 163 280)"/>
+<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(60 163 280)"/>
+<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(120 163 280)"/>
+<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(180 163 280)"/>
+<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(240 163 280)"/>
+<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(300 163 280)"/>
+<circle cx="163" cy="280" r="7" fill="url(#metalH)" stroke="#5a626b" stroke-width="0.8"/>
+<circle cx="163" cy="280" r="2.4" fill="#3f464e"/>
+</g>
+</g>
 <g clip-path="url(#glassClip)">
 <ellipse cx="184" cy="232" rx="64" ry="124" fill="url(#glassSheen)"/>
 <path d="M178 140 C 146 230 146 460 178 520" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="12" stroke-linecap="round" filter="url(#glassBlur)"/>
@@ -154,21 +172,6 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;padding:0}
 </g>
 </g>
 
-<g id="prop">
-<rect x="82" y="277" width="83" height="6" rx="3" fill="url(#metalH)" filter="url(#softShadow)"/>
-<rect x="74" y="269" width="10" height="22" rx="2.5" fill="url(#metalV)" stroke="#3f464e" stroke-width="0.6"/>
-<g class="wheel">
-<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(0 163 280)"/>
-<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(60 163 280)"/>
-<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(120 163 280)"/>
-<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(180 163 280)"/>
-<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(240 163 280)"/>
-<rect class="bl" x="157" y="253" width="12" height="20" rx="2" transform="rotate(300 163 280)"/>
-<circle cx="163" cy="280" r="7" fill="url(#metalH)" stroke="#5a626b" stroke-width="0.8"/>
-<circle cx="163" cy="280" r="2.4" fill="#3f464e"/>
-</g>
-</g>
-
 <path d="M150 222 C 132 262 128 300 134 342" fill="none" stroke="#ffffff" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/>
 
 <text x="214" y="153" text-anchor="start" font-size="12.5" fill="#cdd3da">ânodo (+)</text>
@@ -199,7 +202,7 @@ var propBtn=document.getElementById('propBtn');
 var plateBtn=document.getElementById('plateBtn');
 var on=false, hasProp=false, hasPlates=false;
 var straightD="M190 505 Q190 360 190 158";
-var bentD="M190 505 Q216 360 190 158";
+var bentD="M190 505 Q236 360 190 158";   /* atração mais exagerada em direção à placa + */
 function setBeam(){var d=hasPlates?bentD:straightD;segs.forEach(function(p){p.setAttribute('d',d);});}
 /* gira a hélice via JS: começa devagarzinho (fazendo força) e acelera; sentido invertido */
 var wheelEl=document.querySelector('#prop .wheel');
@@ -208,8 +211,9 @@ function wheelTick(ts){
  if(!wLast){ wLast=ts; }
  var dt=Math.min(0.05,(ts-wLast)/1000); wLast=ts;
  var spinning=(on && hasProp);
- var target=spinning?300:0;                 /* deg/s no regime */
- wVel += (target-wVel)*Math.min(1,dt*0.8);  /* rampa lenta no início */
+ var MAXV=60;                               /* máx = 20% da velocidade anterior (300) */
+ if(spinning){ wVel += (6 + wVel*0.5)*dt; if(wVel>MAXV){ wVel=MAXV; } }      /* ease-in: começa bem devagarzinho e acelera */
+ else { wVel += (0 - wVel)*Math.min(1, dt*1.6); if(wVel<0.4){ wVel=0; } }    /* desacelera ao parar */
  wAngle=(wAngle - wVel*dt)%360;             /* sinal negativo = sentido invertido */
  if(wheelEl){ wheelEl.style.transform='rotate('+wAngle.toFixed(2)+'deg)'; }
  if(spinning || wVel>0.4){ wRAF=requestAnimationFrame(wheelTick); }
@@ -232,7 +236,7 @@ function render(){
 var raysAudio=null, fanAudio=null, sfx={};
 function rays(state){
  try{
-  if(!raysAudio){ raysAudio=new Audio('audio/raios_catodicos.mp3'); raysAudio.loop=true; }
+  if(!raysAudio){ raysAudio=new Audio('audio/raios_catodicos.mp3'); raysAudio.loop=true; raysAudio.volume=0.3; }   /* -70% e em loop contínuo */
   if(state){ var p=raysAudio.play(); if(p&&p.catch){ p.catch(function(){}); } } else { try{ raysAudio.pause(); }catch(_){} }
  }catch(_){}
 }
@@ -281,6 +285,7 @@ window.addEventListener('message',function(e){
  if(d.amp==='hand'){ showHint(!!d.show); return; }   /* mãozinha */
  if(d.amp==='raylabel'){ amp.classList.toggle('showlabel', !!d.show); return; }   /* nome "Raios catódicos" */
  if(d.amp==='pulseCathode'){ var cl=document.querySelector('.catlabel'); if(cl){ cl.classList.remove('pulse'); cl.getBoundingClientRect(); cl.classList.add('pulse'); setTimeout(function(){ cl.classList.remove('pulse'); }, 1150); } return; }   /* pulsa "cátodo (–)" ~1s */
+ if(d.amp==='pulsePlate'){ var pr=document.getElementById('plateR'); if(pr){ pr.classList.remove('emph'); pr.getBoundingClientRect(); pr.classList.add('emph'); setTimeout(function(){ pr.classList.remove('emph'); }, 1100); } return; }   /* enfatiza a placa positiva */
 });
 /* pausa os sons de fundo ao perder o foco; retoma o que estiver ligado ao voltar */
 document.addEventListener('visibilitychange',function(){ if(document.hidden){ if(raysAudio){try{raysAudio.pause();}catch(_){}} if(fanAudio){try{fanAudio.pause();}catch(_){}} } else { if(on){ rays(true); } if(on && hasProp){ fan(true); } } });
