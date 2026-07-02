@@ -2721,7 +2721,7 @@ function goChapter(i){
     ch3Init(); ch3Reset(); ch3Start();   /* abre tocando o dialogo3A + intro */
   } else if(chapters[i].topic === 3){
     document.getElementById('topic-ch4').classList.add('active');
-    ch4Init(); ch4Reset(); ch4Start();   /* abre tocando o dialogo4 */
+    ch4Init(); ch4Reset();   /* abre com o ▶ parado; toque no play inicia o dialogo4 */
   } else {
     document.getElementById('chSoonNum').textContent = 'Capítulo ' + (i+1);
     document.getElementById('chSoonTitle').textContent = chapters[i].title;
