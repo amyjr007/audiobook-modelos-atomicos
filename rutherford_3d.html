@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Experimento de Rutherford 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background:#000;
+  width:100vw; height:100vh;
+  overflow:hidden;
+  font-family:'Fredoka',sans-serif;
+  user-select:none; touch-action:none;
+}
+#c { position:absolute; inset:0; width:100%; height:100%; display:block; }
+#hint {
+  position:fixed; bottom:16px; left:50%;
+  transform:translateX(-50%);
+  font-family:'Share Tech Mono',monospace;
+  font-size:.62rem; letter-spacing:.12em;
+  color:rgba(255,255,255,0.32);
+  pointer-events:none; white-space:nowrap;
+  text-align:center;
+}
+#label {
+  position:fixed; top:14px; left:50%;
+  transform:translateX(-50%);
+  font-size:clamp(.7rem,2vw,.9rem);
+  letter-spacing:.22em; font-weight:600;
+  color:rgba(255,220,80,0.65);
+  text-shadow:0 0 18px rgba(255,200,0,0.35);
+  pointer-events:none; white-space:nowrap;
+}
+#obsBtn {
+  position: fixed; top: 48px; left: 16px;
+  background: rgba(20, 20, 35, 0.88);
+  border: 1px solid rgba(255,220,80,0.35);
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem; font-weight: 600; letter-spacing: 0.08em;
+  color: rgba(255,220,80,0.85);
+  cursor: pointer; z-index: 200;
+  display: flex; align-items: center; gap: 0.4rem;
+  transition: background 0.2s, border-color 0.2s;
+  touch-action: manipulation;
+  backdrop-filter: blur(6px);
+}
+#obsBtn:hover { background: rgba(40,40,60,0.95); border-color: rgba(255,220,80,0.6); }
+#obsBtn .obs-arrow { font-size: 0.65rem; transition: transform 0.25s; display: inline-block; }
+#obsBtn.open .obs-arrow { transform: rotate(180deg); }
+
+.obs-card {
+  position: fixed;
+  left: 0 !important;
+  width: 100vw;
+  background: rgba(10, 12, 26, 0.88);
+  border: none;
+  border-top: 1px solid rgba(255,220,80,0.22);
+  border-bottom: 1px solid rgba(255,220,80,0.22);
+  border-radius: 0;
+  padding: 0.5rem 1.1rem;
+  z-index: 300;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 18px rgba(0,0,0,0.55);
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+  transform: translateY(6px);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  box-sizing: border-box;
+}
+.obs-card.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.obs-card:active  { background: rgba(20, 22, 38, 0.92); }
+.obs-card-header  { flex-shrink: 0; display: flex; align-items: center; }
+.obs-card-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(255,220,80,0.14);
+  border: 1.5px solid rgba(255,220,80,0.5);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem; font-weight: 700;
+  color: rgba(255,220,80,0.95);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.obs-card-title { display: none; }
+.obs-card-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(0.8rem, 2.3vw, 0.95rem);
+  line-height: 1.35;
+  color: rgba(215, 220, 240, 0.90);
+  font-weight: 400;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+.obs-card::after {
+  content: '›';
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: rgba(255,220,80,0.55);
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+}
+#powerBtn {
+  position:fixed; bottom: 58px; right: 24px;
+  width: 68px; height: 68px; border-radius: 50%;
+  border: none; cursor: pointer;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  background: radial-gradient(circle at 38% 32%, #3a3a44, #111116);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.08), 0 4px 18px rgba(0,0,0,0.7);
+  transition: all 0.22s ease;
+  z-index: 100; touch-action: manipulation;
+}
+#powerBtn:hover { transform: scale(1.07); }
+#powerBtn.on {
+  background: radial-gradient(circle at 38% 32%, #1a4a1a, #0a1a0a);
+  box-shadow: 0 0 0 2px rgba(80,255,80,0.3), 0 0 22px rgba(80,255,80,0.25), 0 4px 18px rgba(0,0,0,0.7);
+}
+#powerBtn.off {
+  background: radial-gradient(circle at 38% 32%, #4a1a1a, #1a0a0a);
+  box-shadow: 0 0 0 2px rgba(255,80,60,0.3), 0 0 22px rgba(255,80,60,0.2), 0 4px 18px rgba(0,0,0,0.7);
+}
+#powerIcon { font-size: 1.6rem; line-height: 1; transition: color 0.22s; }
+#powerBtn.on  #powerIcon { color: #66ff66; filter: drop-shadow(0 0 6px #44ff44); }
+#powerBtn.off #powerIcon { color: #ff5544; filter: drop-shadow(0 0 4px #ff3322); }
+#powerBtn:not(.on):not(.off) #powerIcon { color: #888899; }
+#powerLabel {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.48rem; letter-spacing: 0.14em;
+  text-transform: uppercase; transition: color 0.22s;
+}
+#powerBtn.on  #powerLabel { color: rgba(100,255,100,0.75); }
+#powerBtn.off #powerLabel { color: rgba(255,100,80,0.75); }
+#powerBtn:not(.on):not(.off) #powerLabel { color: rgba(180,180,200,0.5); }
+
+/* ── SUMMARY BUTTON ──────────────────────── */
+#summaryBtn {
+  position: fixed;
+  top: 48px;
+  right: 16px;
+  background: rgba(20, 20, 35, 0.88);
+  border: 1px solid rgba(150, 200, 255, 0.45);
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: rgba(180, 220, 255, 0.9);
+  cursor: pointer;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  backdrop-filter: blur(6px);
+  transition: background 0.2s, border-color 0.2s;
+  touch-action: manipulation;
+}
+#summaryBtn:hover {
+  background: rgba(40, 40, 60, 0.95);
+  border-color: rgba(150, 200, 255, 0.8);
+}
+
+/* ── SUMMARY MODAL ───────────────────────── */
+#summaryOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: radial-gradient(ellipse at center, rgba(10, 12, 30, 0.96) 0%, rgba(0, 0, 0, 0.98) 100%);
+  z-index: 550;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  backdrop-filter: blur(8px);
+  touch-action: auto !important;
+}
+#summaryOverlay.visible { display: block; opacity: 1; }
+
+#summaryScroll {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 70px 16px 80px;
+  box-sizing: border-box;
+  overscroll-behavior: contain;
+}
+#summaryScroll::-webkit-scrollbar { width: 6px; }
+#summaryScroll::-webkit-scrollbar-thumb { background: rgba(150,200,255,0.35); border-radius: 3px; }
+#summaryOverlay.visible { display: block; opacity: 1; }
+
+#summaryClose {
+  position: fixed; top: 14px; right: 14px;
+  background: rgba(20, 20, 35, 0.9);
+  border: 1px solid rgba(150, 200, 255, 0.5);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(200, 230, 255, 0.95);
+  cursor: pointer;
+  z-index: 560;
+  backdrop-filter: blur(6px);
+  transition: all 0.2s;
+  touch-action: manipulation;
+}
+#summaryClose:hover { background: rgba(50, 50, 75, 0.95); }
+
+#summaryContent {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+.summary-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(.95rem, 3vw, 1.3rem);
+  letter-spacing: 0.18em;
+  color: rgba(255, 220, 80, 0.9);
+  text-shadow: 0 0 18px rgba(255, 200, 0, 0.35);
+  text-align: center;
+  margin-bottom: 0.6rem;
+}
+.summary-lead {
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(.88rem, 2.4vw, 1rem);
+  line-height: 1.55;
+  color: rgba(215, 220, 240, 0.82);
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 1.6rem;
+  font-weight: 400;
+}
+.summary-section-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(.95rem, 2.6vw, 1.1rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(180, 220, 255, 0.95);
+  margin: 1.8rem 0 0.9rem;
+  padding-left: 0.4rem;
+  border-left: 3px solid rgba(150, 200, 255, 0.6);
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+/* Flip card */
+.flip-card {
+  perspective: 1200px;
+  min-height: 170px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 170px;
+  transition: transform 0.7s cubic-bezier(.45,.05,.3,1);
+  transform-style: preserve-3d;
+}
+.flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 1.1rem 1.05rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+.flip-face-front {
+  background: linear-gradient(145deg, rgba(30, 40, 70, 0.95), rgba(18, 22, 42, 0.95));
+  border: 1px solid rgba(150, 200, 255, 0.35);
+  justify-content: space-between;
+}
+.flip-face-back {
+  background: linear-gradient(145deg, rgba(40, 30, 60, 0.95), rgba(22, 18, 36, 0.95));
+  border: 1px solid rgba(255, 220, 120, 0.4);
+  transform: rotateY(180deg);
+  overflow-y: auto;
+}
+.flip-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.flip-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: rgba(150, 200, 255, 0.65);
+  text-transform: uppercase;
+}
+.flip-title {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: clamp(.95rem, 2.4vw, 1.05rem);
+  color: rgba(230, 240, 255, 0.95);
+  line-height: 1.3;
+}
+.flip-hint {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  color: rgba(150, 200, 255, 0.4);
+  margin-top: auto;
+}
+.flip-back-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  color: rgba(255, 220, 120, 0.75);
+  text-transform: uppercase;
+}
+.flip-back-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(.82rem, 2.1vw, .9rem);
+  line-height: 1.5;
+  color: rgba(230, 235, 250, 0.92);
+  font-weight: 400;
+  flex: 1;
+}
+.flip-back-text strong {
+  color: rgba(255, 220, 120, 0.95);
+  font-weight: 600;
+}
+.summary-closing {
+  margin-top: 2rem;
+  padding: 1.1rem 1.3rem;
+  background: linear-gradient(135deg, rgba(80, 60, 30, 0.35), rgba(40, 30, 50, 0.35));
+  border: 1px solid rgba(255, 220, 80, 0.35);
+  border-radius: 14px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(.88rem, 2.3vw, .95rem);
+  line-height: 1.55;
+  color: rgba(230, 235, 250, 0.95);
+  text-align: center;
+}
+.summary-closing strong {
+  color: rgba(255, 220, 80, 0.98);
+  font-weight: 700;
+}
+
+/* Wide closing card with planetary diagram */
+.summary-grid-solo { grid-template-columns: 1fr; }
+.flip-card-wide { min-height: 320px; }
+.flip-card-wide .flip-card-inner { min-height: 320px; }
+.flip-face-closing {
+  background: linear-gradient(135deg, rgba(80, 60, 30, 0.55), rgba(40, 30, 50, 0.65));
+  border: 1px solid rgba(255, 220, 80, 0.5);
+  text-align: left;
+  gap: 0.7rem;
+}
+.flip-face-closing .flip-title {
+  font-weight: 400;
+  font-size: clamp(.85rem, 2.3vw, .95rem);
+  line-height: 1.55;
+  color: rgba(230, 235, 250, 0.95);
+}
+.flip-face-closing .flip-label { color: rgba(255, 220, 80, 0.9); }
+.flip-face-diagram {
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(145deg, rgba(12, 18, 40, 0.95), rgba(4, 6, 20, 0.98));
+  border: 1px solid rgba(255, 220, 80, 0.5);
+}
+.atom-svg {
+  width: 100%;
+  max-width: 340px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+.atom-svg .proton-back { opacity: 0.65; }
+
+/* ── ATOMIC VIEW OVERLAY ───────────────────── */#atomicOverlay {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at center, #080818 0%, #000000 85%);
+  z-index: 500;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+#atomicOverlay.visible {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+#atomicCanvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+#atomicTitle {
+  position: absolute; top: 16px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(.65rem, 2vw, .82rem);
+  letter-spacing: 0.2em;
+  color: rgba(120, 220, 255, 0.85);
+  text-shadow: 0 0 14px rgba(0, 200, 255, 0.45);
+  white-space: nowrap;
+  pointer-events: none;
+}
+#atomicSubtitle {
+  position: absolute; bottom: 26px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Fredoka', sans-serif;
+  font-size: clamp(.75rem, 2.2vw, .88rem);
+  color: rgba(230, 230, 250, 0.55);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  pointer-events: none;
+  text-align: center;
+}
+#atomicClose {
+  position: absolute; top: 14px; right: 14px;
+  background: rgba(20, 20, 35, 0.85);
+  border: 1px solid rgba(120, 220, 255, 0.4);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem; font-weight: 600;
+  color: rgba(180, 230, 255, 0.9);
+  cursor: pointer;
+  z-index: 510;
+  backdrop-filter: blur(6px);
+  transition: all 0.2s;
+  touch-action: manipulation;
+}
+#atomicClose:hover {
+  background: rgba(40, 40, 60, 0.95);
+  border-color: rgba(120, 220, 255, 0.8);
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="label">EXPERIMENTO DE RUTHERFORD · 1909 · v22</div>
+<div id="hint">🖱 ARRASTAR: GIRAR · 🤏 PINÇA: ZOOM · ✌️ 2 DEDOS: MOVER · TOQUE NA FOLHA: VISÃO ATÔMICA</div>
+
+<button id="obsBtn">📋 Observações <span class="obs-arrow">▼</span></button>
+
+<div class="obs-card" id="obsCard1">
+  <div class="obs-card-header"><div class="obs-card-num">1</div><div class="obs-card-title">Observação</div></div>
+  <div class="obs-card-text">A maioria das partículas atravessa a folha em linha reta.</div>
+</div>
+<div class="obs-card" id="obsCard2">
+  <div class="obs-card-header"><div class="obs-card-num">2</div><div class="obs-card-title">Observação</div></div>
+  <div class="obs-card-text">Algumas poucas são desviadas em diferentes ângulos.</div>
+</div>
+<div class="obs-card" id="obsCard3">
+  <div class="obs-card-header"><div class="obs-card-num">3</div><div class="obs-card-title">Observação</div></div>
+  <div class="obs-card-text">Muito raramente, algumas batem e voltam para trás.</div>
+</div>
+<button id="powerBtn" title="Ligar / Desligar partículas">
+  <span id="powerIcon">⏻</span>
+  <span id="powerLabel">LIGAR</span>
+</button>
+
+<!-- SUMMARY BUTTON & MODAL -->
+<button id="summaryBtn">📖 Resumo</button>
+<div id="summaryOverlay">
+  <button id="summaryClose">✕ Fechar</button>
+  <div id="summaryScroll">
+    <div id="summaryContent">
+    <div class="summary-title">EXPERIMENTO DE RUTHERFORD</div>
+    <div class="summary-lead">
+      Ernest Rutherford bombardeou uma finíssima folha de ouro com partículas alfa (α), que possuem
+      carga positiva, provenientes de um material radioativo (Polônio). Toque nos cards abaixo para
+      virar e ver as definições.
+    </div>
+
+    <div class="summary-section-title">📝 Observações Práticas</div>
+    <div class="summary-grid">
+      <div class="flip-card" data-flip>
+        <div class="flip-card-inner">
+          <div class="flip-face flip-face-front">
+            <div class="flip-icon">➡️</div>
+            <div>
+              <div class="flip-label">Observação 1</div>
+              <div class="flip-title">A grande maioria das partículas atravessavam como se não tivesse nada no caminho.</div>
+            </div>
+            <div class="flip-hint">toque para ver ▸</div>
+          </div>
+          <div class="flip-face flip-face-back">
+            <div class="flip-back-label">Conclusão</div>
+            <div class="flip-back-text">
+              Parecia <strong>não existir obstáculo</strong> na parte interna da matéria.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" data-flip>
+        <div class="flip-card-inner">
+          <div class="flip-face flip-face-front">
+            <div class="flip-icon">↗️</div>
+            <div>
+              <div class="flip-label">Observação 2</div>
+              <div class="flip-title">Algumas poucas partículas eram desviadas de suas trajetórias.</div>
+            </div>
+            <div class="flip-hint">toque para ver ▸</div>
+          </div>
+          <div class="flip-face flip-face-back">
+            <div class="flip-back-label">Conclusão</div>
+            <div class="flip-back-text">
+              Era uma <strong>minoria</strong> das que atravessavam.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" data-flip>
+        <div class="flip-card-inner">
+          <div class="flip-face flip-face-front">
+            <div class="flip-icon">↩️</div>
+            <div>
+              <div class="flip-label">Observação 3</div>
+              <div class="flip-title">Muito raramente, uma partícula batia e voltava.</div>
+            </div>
+            <div class="flip-hint">toque para ver ▸</div>
+          </div>
+          <div class="flip-face flip-face-back">
+            <div class="flip-back-label">Conclusão</div>
+            <div class="flip-back-text">
+              Pelos cálculos dele, <strong>uma a cada 8 mil partículas</strong> batiam em
+              alguma coisa no átomo e voltavam.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-section-title">💡 Conclusões e o Novo Modelo</div>
+    <div class="summary-grid">
+      <div class="flip-card" data-flip>
+        <div class="flip-card-inner">
+          <div class="flip-face flip-face-front">
+            <div class="flip-icon">🕳️</div>
+            <div>
+              <div class="flip-label">Conclusão 1</div>
+              <div class="flip-title">O átomo é um imenso vazio</div>
+            </div>
+            <div class="flip-hint">toque para ver ▸</div>
+          </div>
+          <div class="flip-face flip-face-back">
+            <div class="flip-back-label">Espaço vazio</div>
+            <div class="flip-back-text">
+              Como a maioria das partículas passou direto, o átomo <strong>não é uma esfera
+              maciça</strong>, mas sim composto majoritariamente por espaços vazios.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" data-flip>
+        <div class="flip-card-inner">
+          <div class="flip-face flip-face-front">
+            <div class="flip-icon">⊕</div>
+            <div>
+              <div class="flip-label">Conclusão 2</div>
+              <div class="flip-title">O núcleo central</div>
+            </div>
+            <div class="flip-hint">toque para ver ▸</div>
+          </div>
+          <div class="flip-face flip-face-back">
+            <div class="flip-back-label">Núcleo denso e positivo</div>
+            <div class="flip-back-text">
+              Para que partículas fossem repelidas ou desviadas, deve existir uma região central
+              <strong>muito pequena, densa e com carga positiva</strong>, onde se concentra quase
+              toda a massa do átomo.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" data-flip>
+        <div class="flip-card-inner">
+          <div class="flip-face flip-face-front">
+            <div class="flip-icon">🪐</div>
+            <div>
+              <div class="flip-label">Conclusão 3</div>
+              <div class="flip-title">A eletrosfera</div>
+            </div>
+            <div class="flip-hint">toque para ver ▸</div>
+          </div>
+          <div class="flip-face flip-face-back">
+            <div class="flip-back-label">Elétrons em órbita</div>
+            <div class="flip-back-text">
+              Os elétrons (carga negativa) não estão mergulhados no núcleo: eles
+              <strong>giram ao redor dele</strong> em uma vasta região — a eletrosfera.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-section-title">🪐 Resumo Visual</div>
+    <div class="summary-grid summary-grid-solo">
+      <div class="flip-card flip-card-wide" data-flip>
+        <div class="flip-card-inner">
+          <div class="flip-face flip-face-front flip-face-closing">
+            <div class="flip-icon">🪐</div>
+            <div>
+              <div class="flip-label">Modelo Planetário</div>
+              <div class="flip-title">
+                O modelo ficou conhecido como Modelo Planetário, onde o núcleo é o Sol e
+                os elétrons são os planetas orbitando ao seu redor — derrubando o antigo
+                modelo do "Pudim de Passas" de Thomson.
+              </div>
+            </div>
+            <div class="flip-hint">toque para ver o desenho ▸</div>
+          </div>
+          <div class="flip-face flip-face-back flip-face-diagram">
+            <div class="flip-back-label">Átomo de Rutherford</div>
+            <svg class="atom-svg" viewBox="-140 -140 280 280" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="svgNucGlow" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0%"  stop-color="rgba(80,130,255,0.35)"/>
+                  <stop offset="100%" stop-color="rgba(80,130,255,0)"/>
+                </radialGradient>
+                <radialGradient id="svgProton" cx="0.35" cy="0.35" r="0.9">
+                  <stop offset="0%"   stop-color="#c8d8ff"/>
+                  <stop offset="45%"  stop-color="#3f6ff0"/>
+                  <stop offset="100%" stop-color="#0a1c5a"/>
+                </radialGradient>
+                <radialGradient id="svgElec" cx="0.35" cy="0.35" r="0.8">
+                  <stop offset="0%" stop-color="#ffffff"/>
+                  <stop offset="60%" stop-color="#9ec8ff"/>
+                  <stop offset="100%" stop-color="#1e4088"/>
+                </radialGradient>
+              </defs>
+
+              <!-- Orbits -->
+              <ellipse cx="0" cy="0" rx="110" ry="42" fill="none"
+                       stroke="rgba(180,210,255,0.55)" stroke-width="1.2"
+                       transform="rotate(0)"/>
+              <ellipse cx="0" cy="0" rx="110" ry="42" fill="none"
+                       stroke="rgba(180,210,255,0.55)" stroke-width="1.2"
+                       transform="rotate(60)"/>
+              <ellipse cx="0" cy="0" rx="110" ry="42" fill="none"
+                       stroke="rgba(180,210,255,0.55)" stroke-width="1.2"
+                       transform="rotate(-60)"/>
+
+              <!-- Nucleus: glow + proton cluster (same style as atomic view) -->
+              <circle cx="0" cy="0" r="38" fill="url(#svgNucGlow)"/>
+              <g class="nucleus-cluster">
+                <!-- back row (rendered first) -->
+                <g class="proton proton-back">
+                  <circle cx="-10" cy="4" r="7" fill="url(#svgProton)"
+                          stroke="rgba(5,12,48,0.9)" stroke-width="0.6"/>
+                  <path d="M-13.2,4 L-6.8,4 M-10,0.8 L-10,7.2" stroke="#ffdd33"
+                        stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                </g>
+                <g class="proton proton-back">
+                  <circle cx="8" cy="-8" r="7" fill="url(#svgProton)"
+                          stroke="rgba(5,12,48,0.9)" stroke-width="0.6"/>
+                  <path d="M4.8,-8 L11.2,-8 M8,-11.2 L8,-4.8" stroke="#ffdd33"
+                        stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                </g>
+                <!-- front row -->
+                <g class="proton">
+                  <circle cx="0" cy="0" r="8" fill="url(#svgProton)"
+                          stroke="rgba(5,12,48,0.9)" stroke-width="0.6"/>
+                  <path d="M-3.6,0 L3.6,0 M0,-3.6 L0,3.6" stroke="#ffdd33"
+                        stroke-width="1.6" stroke-linecap="round" fill="none"/>
+                </g>
+                <g class="proton">
+                  <circle cx="-7" cy="-9" r="7.5" fill="url(#svgProton)"
+                          stroke="rgba(5,12,48,0.9)" stroke-width="0.6"/>
+                  <path d="M-10.4,-9 L-3.6,-9 M-7,-12.4 L-7,-5.6" stroke="#ffdd33"
+                        stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                </g>
+                <g class="proton">
+                  <circle cx="10" cy="6" r="7.5" fill="url(#svgProton)"
+                          stroke="rgba(5,12,48,0.9)" stroke-width="0.6"/>
+                  <path d="M6.6,6 L13.4,6 M10,2.6 L10,9.4" stroke="#ffdd33"
+                        stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                </g>
+                <g class="proton">
+                  <circle cx="-2" cy="11" r="7" fill="url(#svgProton)"
+                          stroke="rgba(5,12,48,0.9)" stroke-width="0.6"/>
+                  <path d="M-5.2,11 L1.2,11 M-2,7.8 L-2,14.2" stroke="#ffdd33"
+                        stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                </g>
+              </g>
+
+              <!-- Static electrons on each orbit -->
+              <g transform="rotate(0)">
+                <circle cx="110" cy="0" r="5.5" fill="url(#svgElec)"
+                        stroke="#0a1a44" stroke-width="0.6"/>
+              </g>
+              <g transform="rotate(60)">
+                <circle cx="110" cy="0" r="5.5" fill="url(#svgElec)"
+                        stroke="#0a1a44" stroke-width="0.6"/>
+              </g>
+              <g transform="rotate(-60)">
+                <circle cx="110" cy="0" r="5.5" fill="url(#svgElec)"
+                        stroke="#0a1a44" stroke-width="0.6"/>
+              </g>
+
+              <!-- Labels -->
+              <text x="0" y="-52" text-anchor="middle"
+                    font-family="Share Tech Mono, monospace" font-size="9"
+                    fill="rgba(150,200,255,0.9)" letter-spacing="1.2">NÚCLEO (+)</text>
+              <text x="0" y="130" text-anchor="middle"
+                    font-family="Share Tech Mono, monospace" font-size="9"
+                    fill="rgba(180,210,255,0.75)" letter-spacing="1.2">ELETROSFERA</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<!-- ATOMIC VIEW OVERLAY -->
+<div id="atomicOverlay">
+  <canvas id="atomicCanvas"></canvas>
+  <div id="atomicTitle">VISÃO ATÔMICA · O ÁTOMO É QUASE TODO VAZIO</div>
+  <div id="atomicSubtitle">1 toque: partícula bate no núcleo · 2 toques: partícula desviada</div>
+  <button id="atomicClose">✕ Voltar</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+//  RENDERER + SCENE
+// ═══════════════════════════════════════════════
+const canvas   = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setClearColor(0x05050a, 1);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene  = new THREE.Scene();
+scene.fog = new THREE.Fog(0x05050a, 28, 60);
+
+const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 500);
+camera.position.set(-9, 8, 16);
+camera.lookAt(1, 0, 0);
+
+function resize() {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ── LIGHTING ──────────────────────────────────
+scene.add(new THREE.AmbientLight(0x222233, 1.5));
+
+const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
+keyLight.position.set(-5, 10, 6);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.set(1024, 1024);
+keyLight.shadow.camera.left = -12; keyLight.shadow.camera.right = 12;
+keyLight.shadow.camera.top  =  12; keyLight.shadow.camera.bottom = -12;
+keyLight.shadow.camera.near = 0.5; keyLight.shadow.camera.far    = 40;
+keyLight.shadow.bias = -0.0005;
+scene.add(keyLight);
+
+const fillLight = new THREE.DirectionalLight(0x4466aa, 0.35);
+fillLight.position.set(6, 2, -4);
+scene.add(fillLight);
+
+// Overhead warm lab-style spotlight for drama
+const spotLight = new THREE.SpotLight(0xffe8c0, 0.9, 24, Math.PI / 4.5, 0.5, 1.4);
+spotLight.position.set(1, 11, 2);
+spotLight.target.position.set(1, 0, 0);
+scene.add(spotLight); scene.add(spotLight.target);
+
+// ═══════════════════════════════════════════════
+//  PROCEDURAL WOOD TEXTURE
+// ═══════════════════════════════════════════════
+function makeWoodTexture(baseA, baseB) {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 512;
+  const ctx = cv.getContext('2d');
+  const grd = ctx.createLinearGradient(0, 0, 512, 0);
+  grd.addColorStop(0, baseA);
+  grd.addColorStop(0.5, baseB);
+  grd.addColorStop(1, baseA);
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 90; i++) {
+    const y = Math.random() * 512;
+    ctx.strokeStyle = `rgba(${15 + Math.random()*25},${8 + Math.random()*15},${4 + Math.random()*8},${0.12 + Math.random()*0.35})`;
+    ctx.lineWidth = 0.4 + Math.random() * 1.3;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x < 512; x += 6) {
+      ctx.lineTo(x, y + Math.sin(x * 0.03 + i) * (0.5 + Math.random() * 2));
+    }
+    ctx.stroke();
+  }
+  for (let i = 0; i < 5; i++) {
+    const cx = Math.random() * 512, cy = Math.random() * 512;
+    const r  = 8 + Math.random() * 22;
+    const kg = ctx.createRadialGradient(cx, cy, 1, cx, cy, r);
+    kg.addColorStop(0,   'rgba(25,14,6,0.85)');
+    kg.addColorStop(0.4, 'rgba(30,18,8,0.4)');
+    kg.addColorStop(1,   'rgba(30,18,8,0)');
+    ctx.fillStyle = kg;
+    ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+  }
+  const img = ctx.getImageData(0, 0, 512, 512);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const n = (Math.random() - 0.5) * 18;
+    img.data[i]   = Math.max(0, Math.min(255, img.data[i]   + n));
+    img.data[i+1] = Math.max(0, Math.min(255, img.data[i+1] + n));
+    img.data[i+2] = Math.max(0, Math.min(255, img.data[i+2] + n));
+  }
+  ctx.putImageData(img, 0, 0);
+  const tex = new THREE.CanvasTexture(cv);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  return tex;
+}
+const woodTopTex  = makeWoodTexture('#6d4927', '#825a32');
+const woodSideTex = makeWoodTexture('#4d321a', '#5c3d22');
+
+// ═══════════════════════════════════════════════
+//  WOODEN LAB TABLE
+// ═══════════════════════════════════════════════
+const TABLE_TOP_Y = -1.22;
+const TABLE_W     = 16;
+const TABLE_D     = 10.5;
+const TABLE_THICK = 0.22;
+const LEG_H       = 3.8;
+const LEG_R       = 0.22;
+
+const topMat  = new THREE.MeshPhongMaterial({ map: woodTopTex, color: 0x8c6538, specular: 0x221510, shininess: 14 });
+const sideMat = new THREE.MeshPhongMaterial({ map: woodSideTex, color: 0x6a4625, specular: 0x1a1208, shininess: 10 });
+
+const tableTopGeo = new THREE.BoxGeometry(TABLE_W, TABLE_THICK, TABLE_D);
+const tableTop = new THREE.Mesh(tableTopGeo, [ sideMat, sideMat, topMat, sideMat, sideMat, sideMat ]);
+tableTop.position.y = TABLE_TOP_Y - TABLE_THICK / 2;
+tableTop.receiveShadow = true; tableTop.castShadow = true;
+scene.add(tableTop);
+
+const tableEdge = new THREE.LineSegments(
+  new THREE.EdgesGeometry(tableTopGeo),
+  new THREE.LineBasicMaterial({ color: 0x3a2614, transparent: true, opacity: 0.55 })
+);
+tableEdge.position.copy(tableTop.position);
+scene.add(tableEdge);
+
+const legGeo = new THREE.CylinderGeometry(LEG_R * 0.85, LEG_R, LEG_H, 14);
+const legMat = new THREE.MeshPhongMaterial({ map: woodSideTex, color: 0x563822, specular: 0x140a06, shininess: 8 });
+const legInset = 0.55;
+[
+  [-TABLE_W/2 + legInset, -TABLE_D/2 + legInset],
+  [ TABLE_W/2 - legInset, -TABLE_D/2 + legInset],
+  [-TABLE_W/2 + legInset,  TABLE_D/2 - legInset],
+  [ TABLE_W/2 - legInset,  TABLE_D/2 - legInset],
+].forEach(([x, z]) => {
+  const leg = new THREE.Mesh(legGeo, legMat);
+  leg.position.set(x, TABLE_TOP_Y - TABLE_THICK - LEG_H / 2, z);
+  leg.castShadow = true; leg.receiveShadow = true;
+  scene.add(leg);
+  const footGeo = new THREE.CylinderGeometry(LEG_R * 1.1, LEG_R * 1.1, 0.08, 14);
+  const footMat = new THREE.MeshPhongMaterial({ color: 0x222228, specular: 0x666677, shininess: 40 });
+  const foot = new THREE.Mesh(footGeo, footMat);
+  foot.position.set(x, TABLE_TOP_Y - TABLE_THICK - LEG_H + 0.04, z);
+  foot.castShadow = true;
+  scene.add(foot);
+});
+
+// Floor so shadows land somewhere
+const floor = new THREE.Mesh(
+  new THREE.PlaneGeometry(120, 120),
+  new THREE.MeshPhongMaterial({ color: 0x0a0a10, specular: 0x050510, shininess: 3 })
+);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = TABLE_TOP_Y - TABLE_THICK - LEG_H;
+floor.receiveShadow = true;
+scene.add(floor);
+
+// ═══════════════════════════════════════════════
+//  LEAD BOX (radiation source) — enhanced
+// ═══════════════════════════════════════════════
+const boxGroup = new THREE.Group();
+scene.add(boxGroup);
+
+const BOX_W = 2.2, BOX_H = 2.2, BOX_D = 2.2;
+const boxGeo = new THREE.BoxGeometry(BOX_W, BOX_H, BOX_D);
+const boxMat = new THREE.MeshPhongMaterial({
+  color: 0x5e5e68, specular: 0x8a8aa0, shininess: 32, emissive: 0x141418,
+});
+const boxMesh = new THREE.Mesh(boxGeo, boxMat);
+boxMesh.castShadow = true; boxMesh.receiveShadow = true;
+boxGroup.add(boxMesh);
+
+boxGroup.add(new THREE.LineSegments(
+  new THREE.EdgesGeometry(boxGeo),
+  new THREE.LineBasicMaterial({ color: 0xaaaabb, transparent: true, opacity: 0.4 })
+));
+
+// Rivets at front face corners
+const rivetGeo = new THREE.SphereGeometry(0.07, 12, 10);
+const rivetMat = new THREE.MeshPhongMaterial({
+  color: 0x444450, specular: 0xbbbbdd, shininess: 70, emissive: 0x0a0a10,
+});
+[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx, sy]) => {
+  const r = new THREE.Mesh(rivetGeo, rivetMat);
+  r.position.set(sx * (BOX_W/2 - 0.18), sy * (BOX_H/2 - 0.18), BOX_D/2 + 0.02);
+  boxGroup.add(r);
+});
+
+// Nameplate label (Ra-226)
+const labelCv = document.createElement('canvas');
+labelCv.width = 256; labelCv.height = 64;
+const lctx = labelCv.getContext('2d');
+lctx.fillStyle = '#2a2a30'; lctx.fillRect(0, 0, 256, 64);
+lctx.strokeStyle = '#555560'; lctx.lineWidth = 3; lctx.strokeRect(2, 2, 252, 60);
+lctx.fillStyle = '#e8e8f0';
+lctx.font = 'bold 28px "Share Tech Mono", monospace';
+lctx.textAlign = 'center'; lctx.textBaseline = 'middle';
+lctx.fillText('Ra-226', 128, 34);
+const labelTex = new THREE.CanvasTexture(labelCv);
+const labelMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(0.72, 0.2),
+  new THREE.MeshPhongMaterial({ map: labelTex, specular: 0x222228, shininess: 20, emissive: 0x060608 })
+);
+labelMesh.position.set(0, -BOX_H/2 + 0.5, BOX_D/2 + 0.015);
+boxGroup.add(labelMesh);
+
+// Hazard stripe on top
+const hazardCv = document.createElement('canvas');
+hazardCv.width = 256; hazardCv.height = 32;
+const hctx = hazardCv.getContext('2d');
+for (let i = 0; i < 12; i++) {
+  hctx.fillStyle = i % 2 === 0 ? '#d4a820' : '#222222';
+  hctx.beginPath();
+  hctx.moveTo(i * 22, 0); hctx.lineTo((i+1) * 22, 0);
+  hctx.lineTo((i+1) * 22 + 14, 32); hctx.lineTo(i * 22 + 14, 32);
+  hctx.closePath(); hctx.fill();
+}
+const hazardTex = new THREE.CanvasTexture(hazardCv);
+const hazardMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.6, 0.22),
+  new THREE.MeshPhongMaterial({ map: hazardTex, specular: 0x222222, shininess: 15, emissive: 0x101008 })
+);
+// (hazard stripe removed — radiation trefoil takes the top face)
+
+// ── Radiation trefoil symbol on top ───────────
+function makeRadiationTexture() {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 512;
+  const ctx = cv.getContext('2d');
+  // Caution-yellow background
+  ctx.fillStyle = '#e6b810';
+  ctx.fillRect(0, 0, 512, 512);
+  // Soft darker vignette at edges
+  const vg = ctx.createRadialGradient(256, 256, 150, 256, 256, 300);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.32)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, 512, 512);
+  // Trefoil (ISO 361): central disc + three 60° blades at 120° intervals
+  ctx.fillStyle = '#000000';
+  const cx = 256, cy = 256;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 42, 0, Math.PI * 2);
+  ctx.fill();
+  const halfA = Math.PI / 6;  // 30° → blade spans 60°
+  for (let i = 0; i < 3; i++) {
+    const base = -Math.PI / 2 + i * (Math.PI * 2 / 3);  // one blade points up
+    ctx.beginPath();
+    ctx.arc(cx, cy, 210, base - halfA, base + halfA);
+    ctx.arc(cx, cy, 70,  base + halfA, base - halfA, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+  return new THREE.CanvasTexture(cv);
+}
+const radTex = makeRadiationTexture();
+const radMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.4, 1.4),
+  new THREE.MeshPhongMaterial({
+    map: radTex, specular: 0x222222, shininess: 20, emissive: 0x554010,
+    side: THREE.DoubleSide,
+  })
+);
+radMesh.rotation.x = -Math.PI / 2;
+radMesh.position.set(0, BOX_H/2 + 0.01, 0);  // centered on top face
+boxGroup.add(radMesh);
+
+// Barrel
+const BARREL_LEN = 0.24, BARREL_R = 0.18;
+const barrelMesh = new THREE.Mesh(
+  new THREE.CylinderGeometry(BARREL_R, BARREL_R, BARREL_LEN, 24),
+  new THREE.MeshPhongMaterial({ color: 0x4a4a54, specular: 0x8888aa, shininess: 65, emissive: 0x0a0a10 })
+);
+barrelMesh.rotation.x = Math.PI / 2;
+barrelMesh.position.set(0, 0, BOX_D/2 + BARREL_LEN/2 + 0.1);
+boxGroup.add(barrelMesh);
+
+const boreMesh = new THREE.Mesh(
+  new THREE.CylinderGeometry(BARREL_R * 0.55, BARREL_R * 0.55, 0.08, 20),
+  new THREE.MeshBasicMaterial({ color: 0x040406 })
+);
+boreMesh.rotation.x = Math.PI / 2;
+boreMesh.position.set(0, 0, BOX_D/2 + BARREL_LEN + 0.14);
+boxGroup.add(boreMesh);
+
+// ── Hinged cap at the barrel tip ───────────────
+const BARREL_TIP_Z = BOX_D/2 + BARREL_LEN + 0.1;
+const CAP_RADIUS   = BARREL_R + 0.06;
+
+// Pivot group: hinge lives at the TOP edge of the barrel tip
+const capTipGroup = new THREE.Group();
+capTipGroup.position.set(0, CAP_RADIUS, BARREL_TIP_Z + 0.02);
+boxGroup.add(capTipGroup);
+
+const capMat = new THREE.MeshPhongMaterial({
+  color: 0x888899, specular: 0xccccdd, shininess: 80, emissive: 0x1a1a22,
+});
+const capDisk = new THREE.Mesh(
+  new THREE.CylinderGeometry(CAP_RADIUS, CAP_RADIUS, 0.028, 28),
+  capMat
+);
+capDisk.rotation.x = Math.PI / 2;       // flat face points +Z when closed
+capDisk.position.y = -CAP_RADIUS;        // hangs down from the hinge
+capDisk.castShadow = true;
+capTipGroup.add(capDisk);
+
+// Hinge knuckle cylinder for visual detail
+const hingeKnuckle = new THREE.Mesh(
+  new THREE.CylinderGeometry(0.028, 0.028, CAP_RADIUS * 1.9, 12),
+  new THREE.MeshPhongMaterial({ color: 0x444454, specular: 0x999999, shininess: 60 })
+);
+hingeKnuckle.rotation.z = Math.PI / 2;
+capTipGroup.add(hingeKnuckle);
+
+// Knob/handle on the cap (red stop-button look)
+const capKnobMat = new THREE.MeshPhongMaterial({
+  color: 0xcc3311, specular: 0xff8844, shininess: 90, emissive: 0x331008,
+});
+const capKnob = new THREE.Mesh(new THREE.SphereGeometry(0.04, 14, 10), capKnobMat);
+capKnob.position.set(0, -(CAP_RADIUS + 0.042), 0.02);
+capTipGroup.add(capKnob);
+
+// Alias so the existing raycaster code still works
+const capMesh = capDisk;
+
+// Animation state for the hinge
+let capOpenAnim   = 0;   // currently interpolated 0→1
+let capOpenTarget = 0;   // 0 = closed, 1 = open
+const CAP_OPEN_ANGLE = -Math.PI * 0.6;  // ~-108° — flap swings up and slightly back
+
+// Box wooden pedestal on table
+const BOX_Y = 0;
+const boxPedH = (BOX_Y - BOX_H/2) - TABLE_TOP_Y;
+if (boxPedH > 0.005) {
+  const boxPed = new THREE.Mesh(
+    new THREE.BoxGeometry(BOX_W + 0.2, boxPedH, BOX_D + 0.2),
+    new THREE.MeshPhongMaterial({ color: 0x1e1e24, specular: 0x3a3a44, shininess: 30 })
+  );
+  boxPed.position.set(-6.5, TABLE_TOP_Y + boxPedH/2, 0);
+  boxPed.castShadow = true; boxPed.receiveShadow = true;
+  scene.add(boxPed);
+}
+
+boxGroup.position.set(-6.5, BOX_Y, 0);
+boxGroup.rotation.y = Math.PI / 2;  // barrel points +X
+
+// ═══════════════════════════════════════════════
+//  SLIT PLATE (collimator) — enhanced
+// ═══════════════════════════════════════════════
+const slitGroup = new THREE.Group();
+scene.add(slitGroup);
+slitGroup.position.set(-3.5, 0, 0);
+
+const SLIT_W = 1.6, SLIT_H = 1.8, SLIT_D = 0.18;
+const HOLE_H = 0.28;
+
+function makeSlit(offsetY, halfH) {
+  const g = new THREE.BoxGeometry(SLIT_D, halfH, SLIT_W);
+  const m = new THREE.MeshPhongMaterial({
+    color: 0xa6a6b0, specular: 0xffffff, shininess: 55, emissive: 0x101014,
+  });
+  const mesh = new THREE.Mesh(g, m);
+  mesh.position.y = offsetY;
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  return mesh;
+}
+const slitTop = makeSlit( (SLIT_H/2 - (SLIT_H/2 - HOLE_H/2)/2), SLIT_H/2 - HOLE_H/2);
+const slitBot = makeSlit(-(SLIT_H/2 - (SLIT_H/2 - HOLE_H/2)/2), SLIT_H/2 - HOLE_H/2);
+slitGroup.add(slitTop, slitBot);
+
+const slitEdgeMat = new THREE.LineBasicMaterial({ color: 0x556677, transparent: true, opacity: 0.4 });
+const et = new THREE.LineSegments(new THREE.EdgesGeometry(slitTop.geometry), slitEdgeMat);
+et.position.y = slitTop.position.y; slitGroup.add(et);
+const eb = new THREE.LineSegments(new THREE.EdgesGeometry(slitBot.geometry), slitEdgeMat);
+eb.position.y = slitBot.position.y; slitGroup.add(eb);
+
+// Slit metal base pedestal on table
+const slitBaseH = (-SLIT_H/2) - TABLE_TOP_Y;
+const slitBase = new THREE.Mesh(
+  new THREE.BoxGeometry(SLIT_D + 0.8, slitBaseH, SLIT_W + 0.4),
+  new THREE.MeshPhongMaterial({ color: 0x2a2a32, specular: 0x666677, shininess: 45, emissive: 0x0a0a10 })
+);
+slitBase.position.set(0, TABLE_TOP_Y + slitBaseH/2 - slitGroup.position.y, 0);
+slitBase.castShadow = true; slitBase.receiveShadow = true;
+slitGroup.add(slitBase);
+
+// Decorative trim on slit base (top corners)
+const trimMat = new THREE.MeshPhongMaterial({
+  color: 0x888899, specular: 0xccccdd, shininess: 60, emissive: 0x181820,
+});
+[-1, 1].forEach(sign => {
+  const trim = new THREE.Mesh(
+    new THREE.BoxGeometry(SLIT_D + 0.82, 0.04, 0.06),
+    trimMat
+  );
+  trim.position.set(0, TABLE_TOP_Y + slitBaseH - slitGroup.position.y - 0.02, sign * (SLIT_W/2 + 0.2));
+  slitGroup.add(trim);
+});
+
+// ═══════════════════════════════════════════════
+//  GOLD FOIL + frame + stand — enhanced
+// ═══════════════════════════════════════════════
+const foilGroup = new THREE.Group();
+scene.add(foilGroup);
+foilGroup.position.set(0, 0, 0);
+
+const FOIL_W_Z = 1.8, FOIL_H_Y = 2.0, FOIL_T_X = 0.012;
+const foilGeo = new THREE.BoxGeometry(FOIL_T_X, FOIL_H_Y, FOIL_W_Z);
+const foilMat = new THREE.MeshPhongMaterial({
+  color: 0xe8bc28, specular: 0xfff0a0, shininess: 110, emissive: 0x332200,
+});
+const foilMesh = new THREE.Mesh(foilGeo, foilMat);
+foilMesh.castShadow = true;
+foilGroup.add(foilMesh);
+
+// Bronze holder frame around the foil
+const FRAME_OUTER_Z = FOIL_W_Z + 0.22;
+const FRAME_OUTER_Y = FOIL_H_Y + 0.22;
+const FRAME_BAR_T   = 0.09;
+const FRAME_BAR_D   = 0.11;
+const frameMat = new THREE.MeshPhongMaterial({
+  color: 0x6a4a20, specular: 0xc8a858, shininess: 70, emissive: 0x1a1008,
+});
+[-1, 1].forEach(sy => {
+  const bar = new THREE.Mesh(
+    new THREE.BoxGeometry(FRAME_BAR_D, FRAME_BAR_T, FRAME_OUTER_Z),
+    frameMat
+  );
+  bar.position.set(0, sy * (FRAME_OUTER_Y/2 - FRAME_BAR_T/2), 0);
+  bar.castShadow = true;
+  foilGroup.add(bar);
+});
+[-1, 1].forEach(sz => {
+  const bar = new THREE.Mesh(
+    new THREE.BoxGeometry(FRAME_BAR_D, FRAME_OUTER_Y - FRAME_BAR_T * 2, FRAME_BAR_T),
+    frameMat
+  );
+  bar.position.set(0, 0, sz * (FRAME_OUTER_Z/2 - FRAME_BAR_T/2));
+  bar.castShadow = true;
+  foilGroup.add(bar);
+});
+
+// Two vertical support posts going down to the table
+const postTopY = -FRAME_OUTER_Y/2;
+const postBotY = TABLE_TOP_Y;   // foilGroup at y=0, so local = world
+const postH    = postTopY - postBotY;
+const postGeo  = new THREE.CylinderGeometry(0.055, 0.065, postH, 14);
+const postMat  = new THREE.MeshPhongMaterial({
+  color: 0x3a2a14, specular: 0xaa8844, shininess: 45, emissive: 0x0a0804,
+});
+[-1, 1].forEach(sz => {
+  const post = new THREE.Mesh(postGeo, postMat);
+  post.position.set(0, (postTopY + postBotY)/2, sz * (FOIL_W_Z/2 + 0.1));
+  post.castShadow = true;
+  foilGroup.add(post);
+  const foot = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.16, 0.18, 0.08, 16),
+    postMat
+  );
+  foot.position.set(0, postBotY + 0.04, sz * (FOIL_W_Z/2 + 0.1));
+  foot.castShadow = true; foot.receiveShadow = true;
+  foilGroup.add(foot);
+});
+
+// Tiny screws on each corner of the frame
+const smallScrewGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.02, 10);
+const smallScrewMat = new THREE.MeshPhongMaterial({
+  color: 0x222228, specular: 0xaaaabb, shininess: 80,
+});
+[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sy, sz]) => {
+  const s = new THREE.Mesh(smallScrewGeo, smallScrewMat);
+  s.rotation.z = Math.PI / 2;
+  s.position.set(
+    FRAME_BAR_D/2 + 0.011,
+    sy * (FRAME_OUTER_Y/2 - FRAME_BAR_T/2),
+    sz * (FRAME_OUTER_Z/2 - FRAME_BAR_T/2)
+  );
+  foilGroup.add(s);
+});
+
+// ═══════════════════════════════════════════════
+//  CYLINDRICAL SCREEN (photographic plate) — enhanced
+// ═══════════════════════════════════════════════
+const RING_R = 4.2, RING_H = 2.4, RING_THICK = 0.14;
+const GAP_HALF = 0.62;
+
+const plateMat = new THREE.MeshPhongMaterial({
+  color: 0xc8b88a, specular: 0xeeddbb, shininess: 28, emissive: 0x2a2018,
+  side: THREE.DoubleSide,
+});
+const plateRimMat = new THREE.MeshPhongMaterial({
+  color: 0xaa9870, specular: 0xddccaa, shininess: 35, emissive: 0x1e1810,
+});
+
+function makeCylArc(radius, height, startAngle, endAngle, segs) {
+  const geo = new THREE.BufferGeometry();
+  const positions = [], normals = [], uvs = [], indices = [];
+  const step = (endAngle - startAngle) / segs;
+  for (let i = 0; i <= segs; i++) {
+    const a = startAngle + i * step;
+    const cos = Math.cos(a), sin = Math.sin(a);
+    const u = i / segs;
+    positions.push(cos*radius, -height/2, sin*radius);
+    normals.push(cos, 0, sin); uvs.push(u, 0);
+    positions.push(cos*radius,  height/2, sin*radius);
+    normals.push(cos, 0, sin); uvs.push(u, 1);
+  }
+  for (let i = 0; i < segs; i++) {
+    const b = i * 2;
+    indices.push(b, b+1, b+2, b+1, b+3, b+2);
+  }
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('normal',   new THREE.Float32BufferAttribute(normals,   3));
+  geo.setAttribute('uv',       new THREE.Float32BufferAttribute(uvs,       2));
+  geo.setIndex(indices);
+  return geo;
+}
+
+const arcStart = Math.PI + GAP_HALF;
+const arcEnd   = Math.PI * 3 - GAP_HALF;
+const ARC_SEGS = 96;
+
+const outerCyl = new THREE.Mesh(makeCylArc(RING_R + RING_THICK, RING_H, arcStart, arcEnd, ARC_SEGS), plateMat);
+outerCyl.castShadow = true; outerCyl.receiveShadow = true;
+scene.add(outerCyl);
+
+const innerMat = plateMat.clone();
+innerMat.emissive.setHex(0x151008);
+innerMat.color.setHex(0x9a8a62);
+const innerCyl = new THREE.Mesh(makeCylArc(RING_R, RING_H, arcStart, arcEnd, ARC_SEGS), innerMat);
+scene.add(innerCyl);
+
+function makeRimArc(y) {
+  const pts = [];
+  for (let i = 0; i <= ARC_SEGS; i++) {
+    const a = arcStart + (i / ARC_SEGS) * (arcEnd - arcStart);
+    pts.push(new THREE.Vector3(
+      Math.cos(a) * (RING_R + RING_THICK * 0.5),
+      y,
+      Math.sin(a) * (RING_R + RING_THICK * 0.5)
+    ));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  const rimGeo = new THREE.TubeGeometry(curve, ARC_SEGS, RING_THICK * 0.7, 8, false);
+  const m = new THREE.Mesh(rimGeo, plateRimMat);
+  m.castShadow = true;
+  return m;
+}
+scene.add(makeRimArc( RING_H / 2));
+scene.add(makeRimArc(-RING_H / 2));
+
+// Ring wooden base (disc under the screen)
+const ringBase = new THREE.Mesh(
+  new THREE.CylinderGeometry(RING_R + RING_THICK + 0.35, RING_R + RING_THICK + 0.45, 0.10, 64),
+  new THREE.MeshPhongMaterial({ color: 0x3a2818, specular: 0x665540, shininess: 20 })
+);
+ringBase.position.y = TABLE_TOP_Y + 0.05;
+ringBase.castShadow = true; ringBase.receiveShadow = true;
+scene.add(ringBase);
+
+// Graduated marks around the base (every 15°) — skip the gap
+const markMat = new THREE.LineBasicMaterial({ color: 0x8a7050, transparent: true, opacity: 0.55 });
+for (let a = 0; a < Math.PI * 2; a += Math.PI / 12) {
+  if (Math.abs(a - Math.PI) < GAP_HALF - 0.05) continue;
+  const long = (Math.abs(a) < 0.02 || Math.abs(a - Math.PI/2) < 0.02 || Math.abs(a - 3*Math.PI/2) < 0.02) ? 0.18 : 0.10;
+  const r1 = RING_R + RING_THICK + 0.05;
+  const r2 = r1 + long;
+  const pts = [
+    new THREE.Vector3(Math.cos(a) * r1, TABLE_TOP_Y + 0.101, Math.sin(a) * r1),
+    new THREE.Vector3(Math.cos(a) * r2, TABLE_TOP_Y + 0.101, Math.sin(a) * r2),
+  ];
+  scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), markMat));
+}
+
+// ═══════════════════════════════════════════════
+//  FLASH SYSTEM
+// ═══════════════════════════════════════════════
+const flashGroup = new THREE.Group();
+scene.add(flashGroup);
+const flashes = [];
+
+function makeFlashSprite(r, g, b) {
+  const sz = 64;
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = sz;
+  const ctx2d = cv.getContext('2d');
+  const grd = ctx2d.createRadialGradient(sz/2,sz/2,0, sz/2,sz/2,sz/2);
+  grd.addColorStop(0,   `rgba(255,255,255,1)`);
+  grd.addColorStop(0.18,`rgba(${r},${g},${b},0.95)`);
+  grd.addColorStop(0.55,`rgba(${r},${g},${b},0.4)`);
+  grd.addColorStop(1,   `rgba(${r},${g},${b},0)`);
+  ctx2d.fillStyle = grd;
+  ctx2d.fillRect(0, 0, sz, sz);
+  return new THREE.CanvasTexture(cv);
+}
+const texStraight  = makeFlashSprite(160, 255, 100);
+const texDeflected = makeFlashSprite(255, 210, 50);
+const texBack      = makeFlashSprite(255, 70,  70);
+
+function spawnFlash(x, y, z, tex, sizeScale) {
+  const mat = new THREE.SpriteMaterial({
+    map: tex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  });
+  const sprite = new THREE.Sprite(mat);
+  const s = (0.55 + Math.random() * 0.35) * (sizeScale || 1);
+  sprite.scale.set(s, s, 1);
+  sprite.position.set(x, y, z);
+  flashGroup.add(sprite);
+  flashes.push({ sprite, mat, alpha: 1, decay: 0.012 + Math.random() * 0.008 });
+}
+
+let open       = false;
+let frameCount = 0;
+let lastStraight = -9999, lastDeflect = -9999, lastBack = -9999;
+const T_STRAIGHT = 55, T_DEFLECT = 600, T_BACK = 1800;
+
+function ringPos(theta, yOff) {
+  return new THREE.Vector3(
+    Math.cos(theta) * (RING_R + RING_THICK * 0.5 + 0.02),
+    yOff,
+    Math.sin(theta) * (RING_R + RING_THICK * 0.5 + 0.02)
+  );
+}
+function spawnStraight() {
+  const u1 = Math.random(), u2 = Math.random();
+  const gauss = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+  const theta = gauss * 0.08;
+  const yOff  = gauss * 0.18;
+  const p = ringPos(theta, yOff);
+  spawnFlash(p.x, p.y, p.z, texStraight, 1.0);
+}
+function spawnDeflected() {
+  const side  = Math.random() < 0.5 ? 1 : -1;
+  const theta = side * (0.45 + Math.random() * 2.0);
+  const yOff  = (Math.random() - 0.5) * RING_H * 0.55;
+  const p = ringPos(theta, yOff);
+  spawnFlash(p.x, p.y, p.z, texDeflected, 1.1);
+}
+function spawnBack() {
+  const side  = Math.random() < 0.5 ? 1 : -1;
+  const theta = Math.PI + side * (0.65 + Math.random() * 0.35);
+  const yOff  = (Math.random() - 0.5) * RING_H * 0.45;
+  const p = ringPos(theta, yOff);
+  spawnFlash(p.x, p.y, p.z, texBack, 1.3);
+}
+
+// ═══════════════════════════════════════════════
+//  UI — OBSERVATIONS CARDS
+// ═══════════════════════════════════════════════
+const obsBtn = document.getElementById('obsBtn');
+let cardsVisible = false;
+let currentCardIndex = -1;  // -1 = none visible; 0,1,2 = which one is showing
+const cardDefs = [ { id: 'obsCard1' }, { id: 'obsCard2' }, { id: 'obsCard3' } ];
+
+function positionCards() {
+  // All cards sit at the same top position — they replace each other
+  const top = 92;
+  cardDefs.forEach(def => {
+    const el = document.getElementById(def.id);
+    el.style.top = top + 'px';
+  });
+}
+
+function showCard(index) {
+  cardDefs.forEach((def, i) => {
+    document.getElementById(def.id).classList.toggle('visible', i === index);
+  });
+  currentCardIndex = index;
+}
+
+function toggleCards() {
+  cardsVisible = !cardsVisible;
+  obsBtn.classList.toggle('open', cardsVisible);
+  if (cardsVisible) {
+    positionCards();
+    showCard(0);
+  } else {
+    cardDefs.forEach(def => {
+      document.getElementById(def.id).classList.remove('visible');
+    });
+    currentCardIndex = -1;
+  }
+}
+
+function advanceCard() {
+  // Advance to next card, or hide all after the last
+  if (currentCardIndex < cardDefs.length - 1) {
+    showCard(currentCardIndex + 1);
+  } else {
+    cardDefs.forEach(def => {
+      document.getElementById(def.id).classList.remove('visible');
+    });
+    currentCardIndex = -1;
+    cardsVisible = false;
+    obsBtn.classList.remove('open');
+  }
+}
+
+obsBtn.addEventListener('click', e => { e.stopPropagation(); toggleCards(); });
+obsBtn.addEventListener('touchstart', e => {
+  e.stopPropagation(); e.preventDefault(); toggleCards();
+}, { passive: false });
+
+// Each card advances to the next on click/tap
+cardDefs.forEach(def => {
+  const el = document.getElementById(def.id);
+  el.addEventListener('click', e => { e.stopPropagation(); advanceCard(); });
+  el.addEventListener('touchstart', e => {
+    e.stopPropagation(); e.preventDefault(); advanceCard();
+  }, { passive: false });
+});
+
+// ═══════════════════════════════════════════════
+//  POWER BUTTON
+// ═══════════════════════════════════════════════
+const powerBtn   = document.getElementById('powerBtn');
+const powerLabel = document.getElementById('powerLabel');
+
+function setOpen(val) {
+  open = val;
+  capOpenTarget = val ? 1 : 0;
+  // Knob: red (stop) when closed, green (running) when open
+  capKnobMat.color.setHex(open ? 0x44cc44 : 0xcc3311);
+  capKnobMat.emissive.setHex(open ? 0x083308 : 0x331008);
+  powerBtn.className = open ? 'on' : 'off';
+  powerLabel.textContent = open ? 'DESLIGAR' : 'LIGAR';
+  if (!open) {
+    flashes.forEach(f => { flashGroup.remove(f.sprite); });
+    flashes.length = 0;
+    frameCount = 0; lastStraight = lastDeflect = lastBack = -9999;
+  }
+}
+powerBtn.addEventListener('click', e => { e.stopPropagation(); setOpen(!open); });
+powerBtn.addEventListener('touchstart', e => {
+  e.stopPropagation(); e.preventDefault(); setOpen(!open);
+}, { passive: false });
+
+// Raycaster for cap tap
+const raycaster = new THREE.Raycaster();
+const mouse2    = new THREE.Vector2();
+function getMouseNDC(e) {
+  const rect = canvas.getBoundingClientRect();
+  const touch = (e.touches && e.touches.length > 0) ? e.touches[0]
+              : (e.changedTouches && e.changedTouches.length > 0) ? e.changedTouches[0] : null;
+  const cx = touch ? touch.clientX : e.clientX;
+  const cy = touch ? touch.clientY : e.clientY;
+  if (cx === undefined || cy === undefined) return;
+  mouse2.x =  ((cx - rect.left) / rect.width)  * 2 - 1;
+  mouse2.y = -(((cy - rect.top)  / rect.height) * 2 - 1);
+}
+function handleTap(e) {
+  getMouseNDC(e);
+  raycaster.setFromCamera(mouse2, camera);
+  // Check cap first
+  const capHits = raycaster.intersectObjects(
+    [capDisk, capKnob, barrelMesh, boreMesh], false
+  );
+  if (capHits.length > 0) { setOpen(!open); return; }
+  // Check gold foil
+  const foilHits = raycaster.intersectObject(foilMesh, false);
+  if (foilHits.length > 0) { openAtomicView(); return; }
+}
+
+// ═══════════════════════════════════════════════
+//  CAMERA — ORBIT + ZOOM + PAN
+// ═══════════════════════════════════════════════
+const CAM_MIN = 4, CAM_MAX = 36;
+const camTarget = new THREE.Vector3(1, 0, 0);
+
+let camTheta = Math.atan2(camera.position.x - camTarget.x, camera.position.z - camTarget.z);
+let camPhi   = Math.acos(Math.max(-1, Math.min(1,
+  (camera.position.y - camTarget.y) / camera.position.distanceTo(camTarget)
+)));
+let camDist  = camera.position.distanceTo(camTarget);
+
+function applyCam() {
+  camDist = Math.max(CAM_MIN, Math.min(CAM_MAX, camDist));
+  camPhi  = Math.max(0.1, Math.min(Math.PI - 0.1, camPhi));
+  // Keep target inside sensible bounds so you don't get lost
+  camTarget.x = Math.max(-10, Math.min(10, camTarget.x));
+  camTarget.y = Math.max(-3,  Math.min(6,  camTarget.y));
+  camTarget.z = Math.max(-8,  Math.min(8,  camTarget.z));
+  camera.position.set(
+    camTarget.x + camDist * Math.sin(camPhi) * Math.sin(camTheta),
+    camTarget.y + camDist * Math.cos(camPhi),
+    camTarget.z + camDist * Math.sin(camPhi) * Math.cos(camTheta)
+  );
+  camera.lookAt(camTarget);
+  camera.updateMatrixWorld();
+}
+applyCam();
+
+// PAN: move camTarget in screen-space (right/up in camera basis)
+const _panRight = new THREE.Vector3();
+const _panUp    = new THREE.Vector3();
+const _panTmp   = new THREE.Vector3();
+function panCamera(dx, dy) {
+  camera.matrixWorld.extractBasis(_panRight, _panUp, _panTmp);
+  const panScale = camDist * 0.0018;
+  camTarget.addScaledVector(_panRight, -dx * panScale);
+  camTarget.addScaledVector(_panUp,     dy * panScale);
+  applyCam();
+}
+
+// Rotate state (one-finger / primary mouse)
+let isDragging = false, dragStartX = 0, dragStartY = 0, dragMoved = false;
+function onRotateStart(x, y) { isDragging = true; dragStartX = x; dragStartY = y; dragMoved = false; }
+function onRotateMove(x, y) {
+  if (!isDragging) return;
+  const dx = x - dragStartX, dy = y - dragStartY;
+  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
+  camTheta -= dx * 0.007;
+  camPhi   += dy * 0.007;
+  dragStartX = x; dragStartY = y;
+  applyCam();
+}
+function onRotateEnd() { isDragging = false; }
+
+// Mouse pan state (right-click or shift+drag)
+let isPanMouse = false, panPrevX = 0, panPrevY = 0;
+
+// Two-finger state (pinch zoom + pan simultaneously)
+let lastPinchDist = null, lastPinchMid = null;
+function getTouchDist(t) {
+  const dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+function getTouchMid(t) {
+  return { x: (t[0].clientX + t[1].clientX)/2, y: (t[0].clientY + t[1].clientY)/2 };
+}
+
+// ── MOUSE ─────────────────────────────────────
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+canvas.addEventListener('mousedown', e => {
+  if (e.button === 2 || e.shiftKey) {
+    isPanMouse = true; panPrevX = e.clientX; panPrevY = e.clientY;
+    e.preventDefault();
+  } else {
+    onRotateStart(e.clientX, e.clientY);
+  }
+});
+window.addEventListener('mousemove', e => {
+  if (isPanMouse) {
+    panCamera(e.clientX - panPrevX, e.clientY - panPrevY);
+    panPrevX = e.clientX; panPrevY = e.clientY;
+  } else if (isDragging) {
+    onRotateMove(e.clientX, e.clientY);
+  }
+});
+window.addEventListener('mouseup', () => {
+  if (isDragging) onRotateEnd();
+  isPanMouse = false;
+});
+canvas.addEventListener('click', e => { if (!dragMoved) handleTap(e); });
+
+window.addEventListener('wheel', e => {
+  e.preventDefault();
+  camDist += e.deltaY * 0.02;
+  applyCam();
+}, { passive: false });
+
+// ── TOUCH ─────────────────────────────────────
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    onRotateStart(e.touches[0].clientX, e.touches[0].clientY);
+    lastPinchDist = null; lastPinchMid = null;
+  } else if (e.touches.length === 2) {
+    isDragging = false;
+    lastPinchDist = getTouchDist(e.touches);
+    lastPinchMid  = getTouchMid(e.touches);
+  }
+}, { passive: false });
+
+window.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 2) {
+    const dist = getTouchDist(e.touches);
+    const mid  = getTouchMid(e.touches);
+    if (lastPinchDist !== null) {
+      camDist -= (dist - lastPinchDist) * 0.06;
+    }
+    if (lastPinchMid !== null) {
+      const mdx = mid.x - lastPinchMid.x;
+      const mdy = mid.y - lastPinchMid.y;
+      if (Math.abs(mdx) > 0.2 || Math.abs(mdy) > 0.2) {
+        panCamera(mdx, mdy);
+      } else {
+        applyCam();
+      }
+    } else {
+      applyCam();
+    }
+    lastPinchDist = dist;
+    lastPinchMid  = mid;
+  } else if (e.touches.length === 1) {
+    lastPinchDist = null; lastPinchMid = null;
+    onRotateMove(e.touches[0].clientX, e.touches[0].clientY);
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (e.touches.length < 2) { lastPinchDist = null; lastPinchMid = null; }
+  if (e.touches.length === 0) {
+    onRotateEnd();
+    if (!dragMoved && e.changedTouches.length === 1) handleTap(e);
+  } else if (e.touches.length === 1) {
+    // Smooth hand-off: when lifting one of two fingers, re-anchor for rotation
+    onRotateStart(e.touches[0].clientX, e.touches[0].clientY);
+  }
+}, { passive: false });
+
+// ═══════════════════════════════════════════════
+//  UPDATE + ANIMATE
+// ═══════════════════════════════════════════════
+function update() {
+  if (open) {
+    frameCount++;
+    if (frameCount - lastStraight > T_STRAIGHT) { spawnStraight(); lastStraight = frameCount; }
+    if (frameCount - lastDeflect  > T_DEFLECT)  { spawnDeflected(); lastDeflect  = frameCount; }
+    if (frameCount - lastBack     > T_BACK)     { spawnBack();      lastBack     = frameCount; }
+  }
+  for (let i = flashes.length - 1; i >= 0; i--) {
+    const f = flashes[i];
+    f.alpha -= f.decay;
+    f.mat.opacity = Math.max(0, f.alpha);
+    if (f.alpha <= 0) {
+      flashGroup.remove(f.sprite);
+      f.mat.dispose();
+      flashes.splice(i, 1);
+    }
+  }
+  // Smoothly ease hinge toward its target (open/closed)
+  capOpenAnim += (capOpenTarget - capOpenAnim) * 0.14;
+  capTipGroup.rotation.x = capOpenAnim * CAP_OPEN_ANGLE;
+
+  // Subtle pulse on the red knob when closed — hints it's tappable
+  if (!open) {
+    capKnob.scale.setScalar(1 + Math.sin(Date.now() * 0.003) * 0.14);
+  } else {
+    capKnob.scale.setScalar(1);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  ATOMIC VIEW (2D overlay canvas)
+// ═══════════════════════════════════════════════
+const atomicOverlay = document.getElementById('atomicOverlay');
+const atomicCanvas  = document.getElementById('atomicCanvas');
+const atomicCtx     = atomicCanvas.getContext('2d');
+const atomicClose   = document.getElementById('atomicClose');
+
+let atomicActive = false;
+let atomicFrame  = 0;
+const atomicParticles = [];
+const atomicNuclei    = [];
+
+// ── Electron overlay state ────────────────────
+// Electrons are drawn on top of the existing particles view — no camera change
+let electronsVisibleCount      = 0;   // grows 0 → 4, one at a time
+let electronsSuspendParticles  = false;
+let electronsSpawnTimer        = null;
+const electronOrbits           = [];
+const EL_ORBIT_R  = 468;  // pixel radius of electron orbit (+150% more)
+const EL_HEAD_R   = 2.0;
+const TRAIL_LEN   = 90;
+// Per-electron radius multipliers so each occupies an exclusive shell
+const EL_RADIUS_MULT = [0.78, 0.93, 1.07, 1.22];
+
+// ── View camera (only active once electrons appeared) ─────
+let atomicCamYaw   = 0;
+let atomicCamPitch = 0;
+let atomicCamZoom  = 1;
+const ATOMIC_ZOOM_MIN = 0.15;
+const ATOMIC_ZOOM_MAX = 3.2;
+
+function atomicTransform(x, y, z) {
+  const cy = Math.cos(atomicCamYaw),   sy = Math.sin(atomicCamYaw);
+  const cp = Math.cos(atomicCamPitch), sp = Math.sin(atomicCamPitch);
+  // Rotate around Y (yaw), then around X (pitch)
+  const x1 =  x * cy + z * sy;
+  const z1 = -x * sy + z * cy;
+  const y2 =  y * cp - z1 * sp;
+  const z2 =  y * sp + z1 * cp;
+  return {
+    x: x1 * atomicCamZoom,
+    y: y2 * atomicCamZoom,
+    z: z2 * atomicCamZoom,
+  };
+}
+
+function buildElectronOrbits() {
+  electronOrbits.length = 0;
+  // Tetrahedral normals — 4 maximally-separated orbit planes
+  const norms = [[ 1, 1, 1], [ 1,-1,-1], [-1, 1,-1], [-1,-1, 1]];
+  const invLen = 1 / Math.sqrt(3);
+  norms.forEach((n, i) => {
+    const normal = { x: n[0]*invLen, y: n[1]*invLen, z: n[2]*invLen };
+    let up = (Math.abs(normal.y) > 0.95) ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 };
+    const dot = up.x*normal.x + up.y*normal.y + up.z*normal.z;
+    const u = {
+      x: up.x - dot * normal.x,
+      y: up.y - dot * normal.y,
+      z: up.z - dot * normal.z,
+    };
+    const ul = Math.sqrt(u.x*u.x + u.y*u.y + u.z*u.z);
+    u.x /= ul; u.y /= ul; u.z /= ul;
+    const v = {
+      x: normal.y*u.z - normal.z*u.y,
+      y: normal.z*u.x - normal.x*u.z,
+      z: normal.x*u.y - normal.y*u.x,
+    };
+    electronOrbits.push({
+      u, v,
+      radius: EL_ORBIT_R * EL_RADIUS_MULT[i],
+      angVel: 0.034 + i * 0.009,
+      phase:  Math.random() * Math.PI * 2,
+      trail:  [],
+    });
+  });
+}
+
+function updateElectrons() {
+  // Only update the orbits whose electrons have already appeared
+  for (let i = 0; i < electronsVisibleCount; i++) {
+    const orb = electronOrbits[i];
+    if (!orb) continue;
+    orb.phase += orb.angVel;
+    const c = Math.cos(orb.phase), s = Math.sin(orb.phase);
+    const r = orb.radius;
+    orb.trail.push({
+      x: r * (c * orb.u.x + s * orb.v.x),
+      y: r * (c * orb.u.y + s * orb.v.y),
+      z: r * (c * orb.u.z + s * orb.v.z),
+    });
+    if (orb.trail.length > TRAIL_LEN) orb.trail.shift();
+  }
+}
+
+function startElectronAppearance() {
+  if (electronsSuspendParticles) return;      // already started
+  electronsSuspendParticles = true;
+  atomicParticles.length = 0;                 // stop in-flight α particles
+  if (electronOrbits.length === 0) buildElectronOrbits();
+  electronsVisibleCount = 0;
+  // Auto-fit zoom so the outermost orbit fits nicely in view
+  const vmin = Math.min(window.innerWidth, window.innerHeight);
+  const outerR = EL_ORBIT_R * EL_RADIUS_MULT[EL_RADIUS_MULT.length - 1];
+  atomicCamZoom = Math.max(ATOMIC_ZOOM_MIN, Math.min(1, (vmin * 0.45) / outerR));
+  const reveal = () => {
+    if (!atomicActive) return;
+    electronsVisibleCount++;
+    if (electronsVisibleCount < 4) {
+      electronsSpawnTimer = setTimeout(reveal, 550);
+    } else {
+      electronsSpawnTimer = null;
+    }
+  };
+  reveal();
+  const sub = document.getElementById('atomicSubtitle');
+  if (sub) sub.textContent = 'Modelo atômico · Arrastar: girar · Pinça/rolar: zoom';
+}
+
+function resizeAtomicCanvas() {
+  const dpr = Math.min(devicePixelRatio, 2);
+  atomicCanvas.width  = window.innerWidth  * dpr;
+  atomicCanvas.height = window.innerHeight * dpr;
+  atomicCanvas.style.width  = window.innerWidth  + 'px';
+  atomicCanvas.style.height = window.innerHeight + 'px';
+  atomicCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  buildAtomicNuclei();
+}
+
+function buildAtomicNuclei() {
+  atomicNuclei.length = 0;
+  const w = window.innerWidth, h = window.innerHeight;
+  // Single nucleus centered on the screen
+  const numProtons = 7;  // 1 center + 6 on sphere
+  const protons = [{ x: 0, y: 0, z: 0 }];
+  const surface = numProtons - 1;
+  const goldenA = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < surface; i++) {
+    const yy = 1 - (i / Math.max(1, surface - 1)) * 2;
+    const rr = Math.sqrt(1 - yy * yy);
+    const theta = goldenA * i;
+    protons.push({
+      x: Math.cos(theta) * rr,
+      y: yy,
+      z: Math.sin(theta) * rr,
+    });
+  }
+  // Random rotation of the whole cluster (Y then X)
+  const rotA = Math.random() * Math.PI * 2;
+  const rotB = (Math.random() - 0.5) * Math.PI * 0.7;
+  const cA = Math.cos(rotA), sA = Math.sin(rotA);
+  const cB = Math.cos(rotB), sB = Math.sin(rotB);
+  for (const p of protons) {
+    const x1 =  p.x * cA - p.z * sA;
+    const z1 =  p.x * sA + p.z * cA;
+    const y2 =  p.y * cB - z1 * sB;
+    const z2 =  p.y * sB + z1 * cB;
+    p.x = x1; p.y = y2; p.z = z2;
+  }
+  // Sort back-to-front (smaller z = further back)
+  protons.sort((a, b) => a.z - b.z);
+
+  atomicNuclei.push({
+    x: w / 2,
+    y: h / 2,
+    nucR: 16,             // collision radius of nucleus cluster
+    spacing: 9,           // pixel distance between proton centers
+    protons: protons,     // 3D unit positions (-1..1)
+  });
+}
+
+function spawnAtomicStraight() {
+  const h = window.innerHeight;
+  const n = atomicNuclei[0];
+  // Pick y well away from nucleus — guaranteed clear pass
+  const safe = 100;
+  let y;
+  if (Math.random() < 0.5) {
+    y = Math.random() * Math.max(40, n.y - safe);
+  } else {
+    const bot = n.y + safe;
+    y = bot + Math.random() * Math.max(40, h - bot - 40);
+  }
+  atomicParticles.push({ x: -30, y: y, vx: 5.2, vy: 0 });
+}
+
+function spawnAtomicHeadOn() {
+  const n = atomicNuclei[0];
+  const y = n.y + (Math.random() - 0.5) * 4;  // essentially on-axis
+  atomicParticles.push({ x: -30, y: y, vx: 5.2, vy: 0 });
+}
+
+function spawnAtomicDeflect() {
+  const n = atomicNuclei[0];
+  const side = Math.random() < 0.5 ? -1 : 1;
+  // Impact parameter well outside the nucleus collision radius (nucR=16)
+  // so the particle is deflected by pure Coulomb repulsion, no collision
+  const y = n.y + side * (40 + Math.random() * 20);
+  atomicParticles.push({ x: -30, y: y, vx: 5.2, vy: 0 });
+}
+
+function updateAtomicPhysics() {
+  const w = window.innerWidth, h = window.innerHeight;
+  for (let i = atomicParticles.length - 1; i >= 0; i--) {
+    const p = atomicParticles[i];
+    // Coulomb-like repulsion from each nucleus
+    for (const n of atomicNuclei) {
+      const dx = p.x - n.x, dy = p.y - n.y;
+      const d2 = dx*dx + dy*dy;
+      if (d2 < n.nucR * n.nucR) {
+        // Head-on collision: strong bounce
+        const d = Math.max(0.5, Math.sqrt(d2));
+        const nx = dx / d, ny = dy / d;
+        // Reflect velocity across the surface normal
+        const dot = p.vx * nx + p.vy * ny;
+        if (dot < 0) {
+          p.vx -= 2 * dot * nx;
+          p.vy -= 2 * dot * ny;
+        }
+        // And push outward
+        p.vx += nx * 1.2;
+        p.vy += ny * 1.2;
+      } else if (d2 < 16000) {
+        // Near-field Coulomb repulsion (inverse square, clamped)
+        const d = Math.sqrt(d2);
+        const f = 520 / d2;
+        p.vx += (dx / d) * f;
+        p.vy += (dy / d) * f;
+      }
+    }
+    p.x += p.vx;
+    p.y += p.vy;
+    // Remove if off-screen
+    if (p.x > w + 60 || p.x < -120 || p.y < -120 || p.y > h + 120) {
+      atomicParticles.splice(i, 1);
+    }
+  }
+}
+
+function drawAtomicView() {
+  const ctx = atomicCtx, w = window.innerWidth, h = window.innerHeight;
+
+  // Fade for trails (particles + electrons both leave trails)
+  ctx.fillStyle = 'rgba(5, 5, 15, 0.22)';
+  ctx.fillRect(0, 0, w, h);
+
+  // Alpha particles (bright yellow glowing dots)
+  for (const p of atomicParticles) {
+    const grd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 10);
+    grd.addColorStop(0,    'rgba(255, 255, 220, 0.95)');
+    grd.addColorStop(0.35, 'rgba(255, 220,  80, 0.7)');
+    grd.addColorStop(1,    'rgba(255, 180,  30, 0)');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Nuclei (3D cluster of blue proton balls with yellow + signs)
+  atomicNuclei.forEach(n => {
+    // Soft glow behind nucleus
+    const halo = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.nucR * 2.4);
+    halo.addColorStop(0, 'rgba(80, 130, 255, 0.25)');
+    halo.addColorStop(1, 'rgba(80, 130, 255, 0)');
+    ctx.fillStyle = halo;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.nucR * 2.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    const baseR = 7;           // base proton radius
+    const spacing = n.spacing; // 3D unit → px
+    // Transform each proton with camera, then sort back-to-front for occlusion
+    const tProtons = n.protons.map(p => {
+      const t = atomicTransform(p.x, p.y, p.z);
+      return { x: t.x, y: t.y, z: t.z };
+    });
+    tProtons.sort((a, b) => a.z - b.z);
+    for (const p of tProtons) {
+      const px = n.x + p.x * spacing;
+      const py = n.y + p.y * spacing;
+      const depth = (p.z + atomicCamZoom) / (2 * atomicCamZoom);  // 0 back → 1 front
+      const r = baseR * (0.78 + depth * 0.34) * atomicCamZoom;
+      const alpha = 0.55 + depth * 0.45;
+
+      ctx.globalAlpha = alpha;
+      const g = ctx.createRadialGradient(px - r*0.35, py - r*0.35, 0, px, py, r);
+      g.addColorStop(0,    '#c8d8ff');
+      g.addColorStop(0.4,  '#3f6ff0');
+      g.addColorStop(1,    '#0a1c5a');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(px, py, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(5, 12, 48, 0.9)';
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+
+      const plus = r * 0.42;
+      ctx.strokeStyle = '#ffdd33';
+      ctx.lineWidth = 1.3 + depth * 0.4;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(px - plus, py);
+      ctx.lineTo(px + plus, py);
+      ctx.moveTo(px, py - plus);
+      ctx.lineTo(px, py + plus);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  });
+}
+
+// Draws the 4 visible electrons (and their trails) integrated into the
+// existing particles view. Uses the same orthographic layout, centered on
+// the nucleus screen position, with z-order to handle front/back occlusion.
+function drawElectrons() {
+  const n = atomicNuclei[0];
+  if (!n || electronsVisibleCount === 0) return;
+  const ctx = atomicCtx;
+  // Collect trail segments + heads from visible electrons, plus nucleus slab
+  const items = [];
+  // Nucleus occlusion marker at z=0
+  items.push({ type: 'nucleusMark', z: 0 });
+  for (let i = 0; i < electronsVisibleCount && i < electronOrbits.length; i++) {
+    const orb = electronOrbits[i];
+    const tTrail = orb.trail.map(p => atomicTransform(p.x, p.y, p.z));
+    for (let j = 0; j < tTrail.length - 1; j++) {
+      const p1 = tTrail[j], p2 = tTrail[j+1];
+      const t  = j / Math.max(1, tTrail.length - 1);
+      items.push({
+        type: 'trail',
+        x1: n.x + p1.x, y1: n.y + p1.y,
+        x2: n.x + p2.x, y2: n.y + p2.y,
+        t,
+        z: (p1.z + p2.z) * 0.5,
+      });
+    }
+    const head = tTrail[tTrail.length - 1];
+    if (head) {
+      items.push({
+        type: 'head',
+        x: n.x + head.x,
+        y: n.y + head.y,
+        z: head.z,
+      });
+    }
+  }
+  // Back first (smaller z = behind nucleus), then nucleus, then front
+  items.sort((a, b) => a.z - b.z);
+  const zoom = atomicCamZoom;
+  for (const it of items) {
+    if (it.type === 'nucleusMark') continue;  // nucleus already drawn above
+    const rangeZ  = EL_ORBIT_R * EL_RADIUS_MULT[3] * zoom;
+    const depth   = (it.z + rangeZ) / (2 * rangeZ);   // 0=back, 1=front
+    const dimBack = 0.35 + Math.max(0, Math.min(1, depth)) * 0.65;
+    if (it.type === 'trail') {
+      const alpha = (0.05 + it.t * 0.75) * dimBack;
+      const width = (0.15 + it.t * 1.3) * (0.7 + depth * 0.5) * zoom;
+      ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+      ctx.lineWidth   = Math.max(0.15, width);
+      ctx.lineCap     = 'round';
+      ctx.beginPath();
+      ctx.moveTo(it.x1, it.y1);
+      ctx.lineTo(it.x2, it.y2);
+      ctx.stroke();
+    } else if (it.type === 'head') {
+      const gr = 9 * (0.7 + depth * 0.6) * zoom;
+      const glow = ctx.createRadialGradient(it.x, it.y, 0, it.x, it.y, gr);
+      glow.addColorStop(0,   `rgba(255, 255, 255, ${0.85 * dimBack})`);
+      glow.addColorStop(0.4, `rgba(220, 230, 255, ${0.35 * dimBack})`);
+      glow.addColorStop(1,   'rgba(200, 220, 255, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(it.x, it.y, gr, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(255, 255, 255, ${dimBack})`;
+      ctx.beginPath();
+      ctx.arc(it.x, it.y, EL_HEAD_R * (0.85 + depth * 0.4) * zoom, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+
+function atomicLoop() {
+  if (!atomicActive) return;
+  atomicFrame++;
+  if (!electronsSuspendParticles) {
+    if (atomicFrame % 7 === 0) spawnAtomicStraight();
+    updateAtomicPhysics();
+  }
+  if (electronsVisibleCount > 0) updateElectrons();
+  drawAtomicView();
+  drawElectrons();
+  requestAnimationFrame(atomicLoop);
+}
+
+function openAtomicView() {
+  if (atomicActive) return;
+  atomicActive = true;
+  atomicFrame  = 0;
+  atomicParticles.length = 0;
+  electronsSuspendParticles = false;
+  electronsVisibleCount = 0;
+  if (electronsSpawnTimer) { clearTimeout(electronsSpawnTimer); electronsSpawnTimer = null; }
+  electronOrbits.length = 0;
+  atomicCamYaw = 0; atomicCamPitch = 0; atomicCamZoom = 1;
+  const sub = document.getElementById('atomicSubtitle');
+  if (sub) sub.textContent = '1 toque: partícula bate no núcleo · 2 toques: partícula desviada · Segure 1s: ver elétrons';
+  atomicOverlay.classList.add('visible');
+  resizeAtomicCanvas();
+  // clear fully on open
+  atomicCtx.fillStyle = '#000';
+  atomicCtx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  atomicLoop();
+}
+
+function closeAtomicView() {
+  atomicActive = false;
+  atomicOverlay.classList.remove('visible');
+  atomicParticles.length = 0;
+  electronsSuspendParticles = false;
+  electronsVisibleCount = 0;
+  if (electronsSpawnTimer) { clearTimeout(electronsSpawnTimer); electronsSpawnTimer = null; }
+  electronOrbits.length = 0;
+}
+
+atomicClose.addEventListener('click', e => { e.stopPropagation(); closeAtomicView(); });
+atomicClose.addEventListener('touchstart', e => {
+  e.stopPropagation(); e.preventDefault(); closeAtomicView();
+}, { passive: false });
+
+// ═══════════════════════════════════════════════
+//  ATOMIC VIEW INTERACTION
+//    Before long-press (particles active):
+//      · 1 tap    → head-on collision
+//      · 2 taps   → near-miss deflection
+//      · long press (1s) → stop particles, electrons appear
+//    After electrons appeared:
+//      · drag   → rotate view (yaw/pitch)
+//      · pinch / wheel → zoom in/out
+// ═══════════════════════════════════════════════
+let aDown = false;
+let aDownX = 0, aDownY = 0;
+let aPrevX = 0, aPrevY = 0;
+let aMoved = false;
+let aLongTimer = null;
+let aLongFired = false;
+let aTapTimer  = null;
+const ATOMIC_DOUBLE_MS = 280;
+const ATOMIC_MOVE_THRESH = 8;
+
+let aPinchDist = null;
+function atomicPinchDistance(t) {
+  const dx = t[0].clientX - t[1].clientX;
+  const dy = t[0].clientY - t[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+function onAtomicDown(x, y) {
+  aDown = true;
+  aDownX = aPrevX = x;
+  aDownY = aPrevY = y;
+  aMoved = false;
+  aLongFired = false;
+  if (aLongTimer) { clearTimeout(aLongTimer); aLongTimer = null; }
+  if (!electronsSuspendParticles) {
+    aLongTimer = setTimeout(() => {
+      aLongTimer = null;
+      if (aDown && !aMoved) {
+        startElectronAppearance();
+        aLongFired = true;
+      }
+    }, 1000);
+  }
+}
+function onAtomicMove(x, y) {
+  if (!aDown) return;
+  const tdx = x - aDownX, tdy = y - aDownY;
+  if (!aMoved && (tdx*tdx + tdy*tdy) > ATOMIC_MOVE_THRESH * ATOMIC_MOVE_THRESH) {
+    aMoved = true;
+    if (aLongTimer) { clearTimeout(aLongTimer); aLongTimer = null; }
+  }
+  if (electronsSuspendParticles) {
+    // Rotate the camera
+    const dx = x - aPrevX, dy = y - aPrevY;
+    atomicCamYaw   += dx * 0.009;
+    atomicCamPitch -= dy * 0.009;
+    atomicCamPitch = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, atomicCamPitch));
+  }
+  aPrevX = x; aPrevY = y;
+}
+function onAtomicUp() {
+  if (!aDown) return;
+  aDown = false;
+  if (aLongTimer) { clearTimeout(aLongTimer); aLongTimer = null; }
+  if (aLongFired || aMoved) return;
+  if (electronsSuspendParticles) return;   // no particle taps once electrons appeared
+  if (aTapTimer) {
+    clearTimeout(aTapTimer);
+    aTapTimer = null;
+    spawnAtomicDeflect();
+  } else {
+    aTapTimer = setTimeout(() => {
+      aTapTimer = null;
+      spawnAtomicHeadOn();
+    }, ATOMIC_DOUBLE_MS);
+  }
+}
+
+atomicCanvas.addEventListener('mousedown', e => {
+  e.preventDefault(); e.stopPropagation();
+  onAtomicDown(e.clientX, e.clientY);
+});
+window.addEventListener('mousemove', e => { if (atomicActive) onAtomicMove(e.clientX, e.clientY); });
+window.addEventListener('mouseup',   () => { if (atomicActive) onAtomicUp(); });
+
+atomicCanvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    onAtomicDown(e.touches[0].clientX, e.touches[0].clientY);
+    aPinchDist = null;
+  } else if (e.touches.length === 2) {
+    if (aDown) {
+      aDown = false;
+      if (aLongTimer) { clearTimeout(aLongTimer); aLongTimer = null; }
+    }
+    aPinchDist = atomicPinchDistance(e.touches);
+  }
+}, { passive: false });
+
+atomicCanvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1) {
+    onAtomicMove(e.touches[0].clientX, e.touches[0].clientY);
+  } else if (e.touches.length === 2 && electronsSuspendParticles) {
+    const d = atomicPinchDistance(e.touches);
+    if (aPinchDist !== null && aPinchDist > 0) {
+      atomicCamZoom *= d / aPinchDist;
+      atomicCamZoom = Math.max(ATOMIC_ZOOM_MIN, Math.min(ATOMIC_ZOOM_MAX, atomicCamZoom));
+    }
+    aPinchDist = d;
+  }
+}, { passive: false });
+
+atomicCanvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (e.touches.length === 0) { onAtomicUp(); aPinchDist = null; }
+  else if (e.touches.length === 1) { aPinchDist = null; }
+}, { passive: false });
+
+atomicCanvas.addEventListener('wheel', e => {
+  if (!electronsSuspendParticles) return;
+  e.preventDefault();
+  const factor = Math.exp(-e.deltaY * 0.0015);
+  atomicCamZoom *= factor;
+  atomicCamZoom = Math.max(ATOMIC_ZOOM_MIN, Math.min(ATOMIC_ZOOM_MAX, atomicCamZoom));
+}, { passive: false });
+
+window.addEventListener('resize', () => { if (atomicActive) resizeAtomicCanvas(); });
+
+// ═══════════════════════════════════════════════
+//  SUMMARY MODAL + FLIP CARDS
+// ═══════════════════════════════════════════════
+const summaryBtn     = document.getElementById('summaryBtn');
+const summaryOverlay = document.getElementById('summaryOverlay');
+const summaryClose   = document.getElementById('summaryClose');
+
+function openSummary() {
+  summaryOverlay.classList.add('visible');
+  const sc = document.getElementById('summaryScroll');
+  if (sc) sc.scrollTop = 0;
+}
+function closeSummary() {
+  summaryOverlay.classList.remove('visible');
+  document.querySelectorAll('.flip-card.flipped').forEach(c => c.classList.remove('flipped'));
+}
+summaryBtn.addEventListener('click', e => { e.stopPropagation(); openSummary(); });
+summaryBtn.addEventListener('touchstart', e => {
+  e.stopPropagation(); e.preventDefault(); openSummary();
+}, { passive: false });
+summaryClose.addEventListener('click', e => { e.stopPropagation(); closeSummary(); });
+summaryClose.addEventListener('touchstart', e => {
+  e.stopPropagation(); e.preventDefault(); closeSummary();
+}, { passive: false });
+
+document.querySelectorAll('.flip-card[data-flip]').forEach(card => {
+  const flip = e => { e.stopPropagation(); card.classList.toggle('flipped'); };
+  card.addEventListener('click', flip);
+});
+
+// ─── Manual touch-based scroll (the body's touch-action:none + overflow:hidden
+//     blocks native scrolling inside the modal, so we implement it ourselves)
+(function setupSummaryTouchScroll() {
+  const sc = document.getElementById('summaryScroll');
+  if (!sc) return;
+  let lastY = 0;
+  let velocity = 0;
+  let lastT = 0;
+  let momentumId = null;
+
+  function cancelMomentum() {
+    if (momentumId !== null) { cancelAnimationFrame(momentumId); momentumId = null; }
+  }
+  function momentum() {
+    if (Math.abs(velocity) < 0.3) { momentumId = null; return; }
+    sc.scrollTop -= velocity;
+    velocity *= 0.93;
+    momentumId = requestAnimationFrame(momentum);
+  }
+
+  sc.addEventListener('touchstart', e => {
+    e.stopPropagation();
+    cancelMomentum();
+    lastY = e.touches[0].clientY;
+    lastT = performance.now();
+    velocity = 0;
+  }, { passive: true });
+
+  sc.addEventListener('touchmove', e => {
+    e.stopPropagation();
+    e.preventDefault();       // bypass the body's touch-action:none behavior
+    const y = e.touches[0].clientY;
+    const dy = y - lastY;
+    const now = performance.now();
+    const dt = Math.max(1, now - lastT);
+    velocity = dy / dt * 16;  // approx per-frame velocity
+    sc.scrollTop -= dy;
+    lastY = y;
+    lastT = now;
+  }, { passive: false });
+
+  sc.addEventListener('touchend', e => {
+    e.stopPropagation();
+    momentum();
+  }, { passive: true });
+})();
+
+function animate() {
+  requestAnimationFrame(animate);
+  update();
+  renderer.render(scene, camera);
+}
+animate();
+</script>
+</body>
+</html>
