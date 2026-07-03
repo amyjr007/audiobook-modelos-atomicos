@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.74</div>
+<div class="app-version" id="appVersion">v1.3.75</div>
 
 </div>
 <script>
@@ -7920,7 +7920,7 @@ var ch4Segs = [
 ];
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.74';
+var CH4V='?v=1.3.75';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }

@@ -112,39 +112,6 @@ body {
   font-family: 'Fredoka', sans-serif;
   font-weight: 600;
 }
-#powerBtn {
-  position:fixed; bottom: 58px; right: 24px;
-  width: 68px; height: 68px; border-radius: 50%;
-  border: none; cursor: pointer;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 3px;
-  background: radial-gradient(circle at 38% 32%, #3a3a44, #111116);
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.08), 0 4px 18px rgba(0,0,0,0.7);
-  transition: all 0.22s ease;
-  z-index: 100; touch-action: manipulation;
-}
-#powerBtn:hover { transform: scale(1.07); }
-#powerBtn.on {
-  background: radial-gradient(circle at 38% 32%, #1a4a1a, #0a1a0a);
-  box-shadow: 0 0 0 2px rgba(80,255,80,0.3), 0 0 22px rgba(80,255,80,0.25), 0 4px 18px rgba(0,0,0,0.7);
-}
-#powerBtn.off {
-  background: radial-gradient(circle at 38% 32%, #4a1a1a, #1a0a0a);
-  box-shadow: 0 0 0 2px rgba(255,80,60,0.3), 0 0 22px rgba(255,80,60,0.2), 0 4px 18px rgba(0,0,0,0.7);
-}
-#powerIcon { font-size: 1.6rem; line-height: 1; transition: color 0.22s; }
-#powerBtn.on  #powerIcon { color: #66ff66; filter: drop-shadow(0 0 6px #44ff44); }
-#powerBtn.off #powerIcon { color: #ff5544; filter: drop-shadow(0 0 4px #ff3322); }
-#powerBtn:not(.on):not(.off) #powerIcon { color: #888899; }
-#powerLabel {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.48rem; letter-spacing: 0.14em;
-  text-transform: uppercase; transition: color 0.22s;
-}
-#powerBtn.on  #powerLabel { color: rgba(100,255,100,0.75); }
-#powerBtn.off #powerLabel { color: rgba(255,100,80,0.75); }
-#powerBtn:not(.on):not(.off) #powerLabel { color: rgba(180,180,200,0.5); }
-
 /* ── SUMMARY BUTTON ──────────────────────── */
 #summaryBtn {
   position: fixed;
@@ -478,11 +445,6 @@ body {
   <div class="obs-card-header"><div class="obs-card-num">3</div><div class="obs-card-title">Observação</div></div>
   <div class="obs-card-text">Muito raramente, algumas batem e voltam para trás.</div>
 </div>
-<button id="powerBtn" title="Ligar / Desligar partículas">
-  <span id="powerIcon">⏻</span>
-  <span id="powerLabel">LIGAR</span>
-</button>
-
 <!-- SUMMARY BUTTON & MODAL -->
 <button id="summaryBtn">📖 Resumo</button>
 <div id="summaryOverlay">
@@ -1463,27 +1425,23 @@ cardDefs.forEach(def => {
 // ═══════════════════════════════════════════════
 //  POWER BUTTON
 // ═══════════════════════════════════════════════
-const powerBtn   = document.getElementById('powerBtn');
-const powerLabel = document.getElementById('powerLabel');
-
 function setOpen(val) {
   open = val;
   capOpenTarget = val ? 1 : 0;
   // Knob: red (stop) when closed, green (running) when open
   capKnobMat.color.setHex(open ? 0x44cc44 : 0xcc3311);
   capKnobMat.emissive.setHex(open ? 0x083308 : 0x331008);
-  powerBtn.className = open ? 'on' : 'off';
-  powerLabel.textContent = open ? 'DESLIGAR' : 'LIGAR';
+  // Radiation sign = power button: glows bright green when the machine is ON,
+  // back to its normal caution-yellow look when OFF
+  radMesh.material.color.setHex(open ? 0x3bff5c : 0xffffff);
+  radMesh.material.emissive.setHex(open ? 0x22c23a : 0x554010);
+  radMesh.material.emissiveIntensity = open ? 1.5 : 1;
   if (!open) {
     flashes.forEach(f => { flashGroup.remove(f.sprite); });
     flashes.length = 0;
     frameCount = 0; lastStraight = lastDeflect = lastBack = -9999;
   }
 }
-powerBtn.addEventListener('click', e => { e.stopPropagation(); setOpen(!open); });
-powerBtn.addEventListener('touchstart', e => {
-  e.stopPropagation(); e.preventDefault(); setOpen(!open);
-}, { passive: false });
 
 // Raycaster for cap tap
 const raycaster = new THREE.Raycaster();
@@ -1501,9 +1459,9 @@ function getMouseNDC(e) {
 function handleTap(e) {
   getMouseNDC(e);
   raycaster.setFromCamera(mouse2, camera);
-  // Check cap first
+  // Check cap / radiation sign first — both toggle the machine on/off
   const capHits = raycaster.intersectObjects(
-    [capDisk, capKnob, barrelMesh, boreMesh], false
+    [capDisk, capKnob, barrelMesh, boreMesh, radMesh], false
   );
   if (capHits.length > 0) { setOpen(!open); return; }
   // Check gold foil
