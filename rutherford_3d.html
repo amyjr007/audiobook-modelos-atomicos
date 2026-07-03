@@ -1486,13 +1486,11 @@ function handleTap(e) {
 //  CAMERA — ORBIT + ZOOM + PAN
 // ═══════════════════════════════════════════════
 const CAM_MIN = 4, CAM_MAX = 36;
-const camTarget = new THREE.Vector3(1, 0, 0);
-
-let camTheta = Math.atan2(camera.position.x - camTarget.x, camera.position.z - camTarget.z);
-let camPhi   = Math.acos(Math.max(-1, Math.min(1,
-  (camera.position.y - camTarget.y) / camera.position.distanceTo(camTarget)
-)));
-let camDist  = CAM_MAX;   /* começa no zoom-out máximo: o aparelho inteiro cabe na tela vertical do celular */
+// Câmera inicia na posição "set1" (é a mesma que o experimento assume ao subir).
+const camTarget = new THREE.Vector3(-1.287, -2.102, -0.995);
+let camTheta = -0.7173;
+let camPhi   = 0.7778;
+let camDist  = 26.541;
 // Câmera travada p/ o usuário: sem girar, zoom (in/out) ou pan. Só os movimentos
 // roteirizados (presets set1/2/3 via tweenCamTo) mexem a câmera.
 let camLocked = true;
@@ -1518,9 +1516,9 @@ applyCam();
 // set1 = the default rise-in view (max zoom-out, whole apparatus on a phone).
 // set2 = a zoomed-in view captured from the live app (press "C" to capture).
 const CAM_PRESETS = {
-  set1: { target: [1, 0, 0], theta: -0.5586, phi: 1.1696, dist: 36 },
+  set1: { target: [-1.287, -2.102, -0.995], theta: -0.7173, phi: 0.7778, dist: 26.541 },
   set2: { target: [-6.772, -0.217, -0.424], theta: 0.3841, phi: 1.2024, dist: 12.039 },
-  set3: { target: [-0.031, 0.171, -0.725], theta: -0.5493, phi: 1.1884, dist: 9.585 },
+  set3: { target: [-0.218, -1.492, -0.884], theta: -1.5806, phi: 0.8058, dist: 27.190 },
   set4: { target: [2.299, -1.215, -0.464], theta: -1.3846, phi: 0.9504, dist: 17.915 },
 };
 let camTween = null;
