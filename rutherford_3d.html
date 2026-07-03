@@ -2391,6 +2391,11 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
+// Tell the audiobook the experiment is loaded, so it can (re)apply the lock state.
+if (window.parent && window.parent !== window) {
+  try { window.parent.postMessage({ type: 'ruthReady' }, '*'); } catch (_) {}
+}
 </script>
 </body>
 </html>
