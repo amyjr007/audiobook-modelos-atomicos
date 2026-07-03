@@ -1350,6 +1350,7 @@ function spawnFlash(x, y, z, tex, sizeScale) {
 }
 
 let open       = false;
+let machineLocked = false;   // when true, tapping the sign/cap can't toggle the machine (set by parent during narration)
 let frameCount = 0;
 let lastStraight = -9999, lastDeflect = -9999, lastBack = -9999;
 const T_STRAIGHT = 55, T_DEFLECT = 600, T_BACK = 1800;
@@ -1453,7 +1454,7 @@ cardDefs.forEach(def => {
 // ═══════════════════════════════════════════════
 //  POWER BUTTON
 // ═══════════════════════════════════════════════
-function setOpen(val) {
+function setOpen(val, silent) {
   open = val;
   capOpenTarget = val ? 1 : 0;
   // Knob: red (stop) when closed, green (running) when open
@@ -1468,6 +1469,11 @@ function setOpen(val) {
     flashes.forEach(f => { flashGroup.remove(f.sprite); });
     flashes.length = 0;
     frameCount = 0; lastStraight = lastDeflect = lastBack = -9999;
+  }
+  // Tell the audiobook (parent) the machine was toggled — unless this was a
+  // silent/programmatic set. It drives dialogo4.5A / 4.5B off these events.
+  if (!silent && window.parent && window.parent !== window) {
+    try { window.parent.postMessage({ type: 'ruthMachine', on: open }, '*'); } catch (_) {}
   }
 }
 
@@ -1491,7 +1497,7 @@ function handleTap(e) {
   const capHits = raycaster.intersectObjects(
     [capDisk, capKnob, barrelMesh, boreMesh, radMesh], false
   );
-  if (capHits.length > 0) { setOpen(!open); return; }
+  if (capHits.length > 0) { if (!machineLocked) setOpen(!open); return; }
   // Check gold foil
   const foilHits = raycaster.intersectObject(foilMesh, false);
   if (foilHits.length > 0) { openAtomicView(); return; }
@@ -1532,6 +1538,7 @@ applyCam();
 const CAM_PRESETS = {
   set1: { target: [1, 0, 0], theta: -0.5586, phi: 1.1696, dist: 36 },
   set2: { target: [-5.823, -0.528, -2.461], theta: 0.1554, phi: 1.1418, dist: 8.619 },
+  set3: { target: [-0.679, 0.575, -1.251], theta: -0.3113, phi: 1.3051, dist: 6.280 },
 };
 let camTween = null;
 function tweenCamTo(name, dur) {
@@ -1557,11 +1564,16 @@ function updateCamTween() {
   if (k >= 1) camTween = null;
 }
 
-// The audiobook (parent frame) drives the camera: { type:'ruthCam', preset:'set2', dur:2500 }
+// The audiobook (parent frame) drives the experiment:
+//  { type:'ruthCam', preset:'set2', dur:2500 } — tween camera to a preset
+//  { type:'ruthLock', locked:true }            — block/allow toggling the machine
+//  { type:'ruthSet', on:false }                — set machine state silently (no notify back)
 window.addEventListener('message', (ev) => {
   const d = ev.data;
   if (!d || typeof d !== 'object') return;
-  if (d.type === 'ruthCam' && d.preset) { tweenCamTo(d.preset, d.dur); }
+  if (d.type === 'ruthCam' && d.preset) { tweenCamTo(d.preset, d.dur); return; }
+  if (d.type === 'ruthLock') { machineLocked = !!d.locked; return; }
+  if (d.type === 'ruthSet')  { setOpen(!!d.on, true); return; }
 });
 
 // DEV: press "C" to capture the current camera as a ready-to-paste preset line.
