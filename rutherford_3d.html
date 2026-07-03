@@ -1433,6 +1433,11 @@ cardDefs.forEach(def => {
 // ═══════════════════════════════════════════════
 //  POWER BUTTON
 // ═══════════════════════════════════════════════
+// Click sound when the user turns the machine on/off
+const clickSound = new Audio('audio/click_sound.m4a');
+clickSound.preload = 'auto';
+function playClick() { try { clickSound.currentTime = 0; const p = clickSound.play(); if (p && p.catch) p.catch(function(){}); } catch (_) {} }
+
 function setOpen(val, silent) {
   open = val;
   capOpenTarget = val ? 1 : 0;
@@ -1449,10 +1454,13 @@ function setOpen(val, silent) {
     flashes.length = 0;
     frameCount = 0; lastStraight = lastDeflect = lastBack = -9999;
   }
-  // Tell the audiobook (parent) the machine was toggled — unless this was a
-  // silent/programmatic set. It drives dialogo4.5A / 4.5B off these events.
-  if (!silent && window.parent && window.parent !== window) {
-    try { window.parent.postMessage({ type: 'ruthMachine', on: open }, '*'); } catch (_) {}
+  // On a real (user) toggle: play the click sound and tell the audiobook (parent),
+  // which drives dialogo4.5A / 4.5B off these events. Skipped on silent/programmatic sets.
+  if (!silent) {
+    playClick();
+    if (window.parent && window.parent !== window) {
+      try { window.parent.postMessage({ type: 'ruthMachine', on: open }, '*'); } catch (_) {}
+    }
   }
 }
 
@@ -1487,10 +1495,10 @@ function handleTap(e) {
 // ═══════════════════════════════════════════════
 const CAM_MIN = 4, CAM_MAX = 36;
 // Câmera inicia na posição "set1" (é a mesma que o experimento assume ao subir).
-const camTarget = new THREE.Vector3(-1.287, -2.102, -0.995);
-let camTheta = -0.7173;
-let camPhi   = 0.7778;
-let camDist  = 26.541;
+const camTarget = new THREE.Vector3(-0.523, -2.017, -0.359);
+let camTheta = -0.8946;
+let camPhi   = 0.8980;
+let camDist  = 35.267;
 // Câmera travada p/ o usuário: sem girar, zoom (in/out) ou pan. Só os movimentos
 // roteirizados (presets set1/2/3 via tweenCamTo) mexem a câmera.
 let camLocked = true;
@@ -1516,9 +1524,9 @@ applyCam();
 // set1 = the default rise-in view (max zoom-out, whole apparatus on a phone).
 // set2 = a zoomed-in view captured from the live app (press "C" to capture).
 const CAM_PRESETS = {
-  set1: { target: [-1.287, -2.102, -0.995], theta: -0.7173, phi: 0.7778, dist: 26.541 },
-  set2: { target: [-6.772, -0.217, -0.424], theta: 0.3841, phi: 1.2024, dist: 12.039 },
-  set3: { target: [-0.218, -1.492, -0.884], theta: -1.5806, phi: 0.8058, dist: 27.190 },
+  set1: { target: [-0.523, -2.017, -0.359], theta: -0.8946, phi: 0.8980, dist: 35.267 },
+  set2: { target: [-0.218, -1.492, -0.884], theta: -1.5806, phi: 0.8058, dist: 27.190 },
+  set3: { target: [0.428, -1.020, -0.415], theta: -1.5853, phi: 0.8093, dist: 33.861 },
   set4: { target: [2.299, -1.215, -0.464], theta: -1.3846, phi: 0.9504, dist: 17.915 },
 };
 let camTween = null;
