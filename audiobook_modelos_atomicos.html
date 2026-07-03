@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.84</div>
+<div class="app-version" id="appVersion">v1.3.85</div>
 
 </div>
 <script>
@@ -7919,7 +7919,8 @@ var ch4Segs = [
   { src:'audio/dialogo4.4.mp3?v=1.3.72' },   /* ▶ -> dialogo4.5 */
   { src:'audio/dialogo4.5.mp3?v=1.3.79' },   /* dialogo4.5: 5s -> zoom set2; ao fim SEM play, espera LIGAR a máquina */
   { src:'audio/dialogo4.5A.mp3?v=1.3.79', hideFab:true },  /* ligou a máquina -> toca; botão da máquina travado; ao fim libera */
-  { src:'audio/dialogo4.5B.mp3?v=1.3.79', hideFab:true }   /* desligou a máquina -> toca + câmera vai p/ set3 */
+  { src:'audio/dialogo4.5B.mp3?v=1.3.79', hideFab:true },  /* desligou a máquina -> toca + câmera vai p/ set3; ao fim aparece o play */
+  { src:'audio/dialogo4.5C.mp3?v=1.3.85' }                 /* play -> toca; 6s câmera p/ set4, 18s volta p/ set1; ao fim tira o play e libera a máquina */
 ];
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
 function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
@@ -7932,8 +7933,8 @@ function ch4ExpSet(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){
 function ch4OnMachine(on){
   if(on && ch4.awaitMachine==='machineOn'){        /* LIGOU -> dialogo4.5A (trava o botão durante o áudio) */
     ch4.awaitMachine=null; ch4ExpLock(true); ch4StartSegment(7);
-  } else if(!on && ch4.awaitMachine==='machineOff'){ /* DESLIGOU -> câmera p/ set3 + dialogo4.5B */
-    ch4.awaitMachine=null; ch4ExpCam('set3', 2500); ch4StartSegment(8);
+  } else if(!on && ch4.awaitMachine==='machineOff'){ /* DESLIGOU -> trava o botão, câmera p/ set3 + dialogo4.5B */
+    ch4.awaitMachine=null; ch4ExpLock(true); ch4ExpCam('set3', 2500); ch4StartSegment(8);
   }
 }
 window.addEventListener('message', function(ev){
@@ -7943,7 +7944,7 @@ window.addEventListener('message', function(ev){
 });
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.84';
+var CH4V='?v=1.3.85';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
@@ -8192,9 +8193,18 @@ ch4Segs[6].onEnded=function(){ ch4ExpLock(false); ch4.awaitMachine='machineOn'; 
 /* dialogo4.5A (seg 7): tocou ao LIGAR a máquina (botão travado). Ao fim, libera o botão
    e passa a esperar o clique pra DESLIGAR. */
 ch4Segs[7].onEnded=function(){ ch4ExpLock(false); ch4.awaitMachine='machineOff'; ch4ShowFab(false); ch4SetFab(false); };
-/* dialogo4.5B (seg 8): tocou ao DESLIGAR a máquina + câmera foi p/ set3. Fim: sem play,
-   experimento segue interativo. */
-ch4Segs[8].onEnded=function(){ ch4ShowFab(false); ch4SetFab(false); };
+/* dialogo4.5B (seg 8): tocou ao DESLIGAR a máquina + câmera foi p/ set3. Fim: aparece o
+   play (máquina segue travada); ▶ -> dialogo4.5C. */
+ch4Segs[8].onEnded=function(){ ch4ShowFab(true); ch4SetFab(false); };
+/* dialogo4.5C (seg 9): 6s -> câmera p/ set4; 18s -> volta p/ set1. Ao fim: tira o play e
+   LIBERA o botão de ligar/desligar a máquina (interação livre daí em diante). */
+ch4Segs[9].build=function(){
+  return [
+    { t:6.0,  done:false, fn:function(){ ch4ExpCam('set4', 2500); } },   /* zoom/giro p/ set4 */
+    { t:18.0, done:false, fn:function(){ ch4ExpCam('set1', 2500); } }    /* volta p/ set1 */
+  ];
+};
+ch4Segs[9].onEnded=function(){ ch4ShowFab(false); ch4SetFab(false); ch4.awaitMachine=null; ch4ExpLock(false); };
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 function ch4ShowFab(show){ var f=ch4El('ch4Fab'); if(f){ f.style.display = show ? '' : 'none'; } }
 function ch4SetFab(playing){ var ic=ch4El('ch4FabIcon'); if(ic){ ic.textContent = playing ? '⏸' : '▶'; } }

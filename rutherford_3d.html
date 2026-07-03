@@ -1351,6 +1351,7 @@ function spawnFlash(x, y, z, tex, sizeScale) {
 
 let open       = false;
 let machineLocked = false;   // when true, tapping the sign/cap can't toggle the machine (set by parent during narration)
+let atomicUnlocked = false;  // hidden atomic/electron view (gold-foil tap) — disabled until explicitly enabled later
 let frameCount = 0;
 let lastStraight = -9999, lastDeflect = -9999, lastBack = -9999;
 const T_STRAIGHT = 55, T_DEFLECT = 600, T_BACK = 1800;
@@ -1542,6 +1543,7 @@ const CAM_PRESETS = {
   set1: { target: [1, 0, 0], theta: -0.5586, phi: 1.1696, dist: 36 },
   set2: { target: [-6.772, -0.217, -0.424], theta: 0.3841, phi: 1.2024, dist: 12.039 },
   set3: { target: [-0.031, 0.171, -0.725], theta: -0.5493, phi: 1.1884, dist: 9.585 },
+  set4: { target: [2.299, -1.215, -0.464], theta: -1.3846, phi: 0.9504, dist: 17.915 },
 };
 let camTween = null;
 function tweenCamTo(name, dur) {
@@ -1577,6 +1579,7 @@ window.addEventListener('message', (ev) => {
   if (d.type === 'ruthCam' && d.preset) { tweenCamTo(d.preset, d.dur); return; }
   if (d.type === 'ruthLock') { machineLocked = !!d.locked; return; }
   if (d.type === 'ruthSet')  { setOpen(!!d.on, true); return; }
+  if (d.type === 'ruthAtomic') { atomicUnlocked = !!d.on; return; }   // liga/desliga a interação oculta (visão atômica)
 });
 
 // DEV: press "C" to capture the current camera as a ready-to-paste preset line.
@@ -2160,6 +2163,7 @@ function atomicLoop() {
 }
 
 function openAtomicView() {
+  if (!atomicUnlocked) return;   // interação oculta desativada por enquanto
   if (atomicActive) return;
   atomicActive = true;
   atomicFrame  = 0;
