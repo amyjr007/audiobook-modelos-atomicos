@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.76</div>
+<div class="app-version" id="appVersion">v1.3.77</div>
 
 </div>
 <script>
@@ -7916,11 +7916,14 @@ var ch4Segs = [
   { src:'audio/dialogo4.1.mp3?v=1.3.72' },   /* ▶ -> dialogo4.2 */
   { src:'audio/dialogo4.2.mp3?v=1.3.72' },   /* ▶ -> dialogo4.3 */
   { src:'audio/dialogo4.3.mp3?v=1.3.72' },   /* ▶ -> dialogo4.4 */
-  { src:'audio/dialogo4.4.mp3?v=1.3.72' }
+  { src:'audio/dialogo4.4.mp3?v=1.3.72' },   /* ▶ -> dialogo4.5 */
+  { src:'audio/dialogo4.5.mp3?v=1.3.77' }    /* dialogo4.5: 5s -> zoom in do experimento p/ a posição "set2" */
 ];
+/* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/...) */
+function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.76';
+var CH4V='?v=1.3.77';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
@@ -8149,6 +8152,12 @@ ch4Segs[5].build=function(){
     { t:8.3,  done:false, fn:function(){ ch4RadReset(); ch4ImgDrama('rutherford_team.png'); } }, /* rutherford_team: entrada dramática */
     { t:14.0, done:false, fn:function(){ var d=(ch4.audio && isFinite(ch4.audio.duration)) ? Math.max(8, ch4.audio.duration-14) : 24; ch4ImgKB(d); } }, /* ken burns até o áudio acabar */
     { t:21.0, done:false, fn:function(){ ch4ExpRise(); } }                                /* tudo sobe e sai; o experimento rutherford_3d sobe de baixo (tela cheia vertical) */
+  ];
+};
+/* dialogo4.5 (seg 6): o experimento já está na tela (set1); aos 5s dá um zoom in até "set2" */
+ch4Segs[6].build=function(){
+  return [
+    { t:5.0,  done:false, fn:function(){ ch4ExpCam('set2', 2500); } }                     /* zoom in suave: set1 -> set2 */
   ];
 };
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }

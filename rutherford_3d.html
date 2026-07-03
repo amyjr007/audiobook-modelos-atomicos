@@ -1526,6 +1526,56 @@ function applyCam() {
 }
 applyCam();
 
+// ── Named camera presets + smooth tween ─────────
+// set1 = the default rise-in view (max zoom-out, whole apparatus on a phone).
+// set2 = a zoomed-in view captured from the live app (press "C" to capture).
+const CAM_PRESETS = {
+  set1: { target: [1, 0, 0], theta: -0.5586, phi: 1.1696, dist: 36 },
+  // TODO set2: placeholder zoom-in until the real capture is pasted in.
+  set2: { target: [0, 0, 0], theta: -0.5586, phi: 1.1696, dist: 14 },
+};
+let camTween = null;
+function tweenCamTo(name, dur) {
+  const p = CAM_PRESETS[name];
+  if (!p) return;
+  camTween = {
+    t0: performance.now(), dur: Math.max(1, dur || 1800),
+    from: { theta: camTheta, phi: camPhi, dist: camDist, tx: camTarget.x, ty: camTarget.y, tz: camTarget.z },
+    to:   { theta: p.theta,  phi: p.phi,  dist: p.dist,  tx: p.target[0], ty: p.target[1], tz: p.target[2] },
+  };
+}
+function cancelCamTween() { camTween = null; }
+function updateCamTween() {
+  if (!camTween) return;
+  const k = Math.min(1, (performance.now() - camTween.t0) / camTween.dur);
+  const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;  // easeInOutQuad
+  const a = camTween.from, b = camTween.to;
+  camTheta = a.theta + (b.theta - a.theta) * e;
+  camPhi   = a.phi   + (b.phi   - a.phi)   * e;
+  camDist  = a.dist  + (b.dist  - a.dist)  * e;
+  camTarget.set(a.tx + (b.tx - a.tx) * e, a.ty + (b.ty - a.ty) * e, a.tz + (b.tz - a.tz) * e);
+  applyCam();
+  if (k >= 1) camTween = null;
+}
+
+// The audiobook (parent frame) drives the camera: { type:'ruthCam', preset:'set2', dur:2500 }
+window.addEventListener('message', (ev) => {
+  const d = ev.data;
+  if (!d || typeof d !== 'object') return;
+  if (d.type === 'ruthCam' && d.preset) { tweenCamTo(d.preset, d.dur); }
+});
+
+// DEV: press "C" to capture the current camera as a ready-to-paste preset line.
+window.addEventListener('keydown', (ev) => {
+  if (ev.key !== 'c' && ev.key !== 'C') return;
+  const line = 'set?: { target: [' + camTarget.x.toFixed(3) + ', ' + camTarget.y.toFixed(3) + ', ' +
+    camTarget.z.toFixed(3) + '], theta: ' + camTheta.toFixed(4) + ', phi: ' + camPhi.toFixed(4) +
+    ', dist: ' + camDist.toFixed(3) + ' }';
+  console.log('[CAM]', line);
+  try { if (navigator.clipboard) navigator.clipboard.writeText(line); } catch (_) {}
+  try { alert(line); } catch (_) {}
+});
+
 // PAN: move camTarget in screen-space (right/up in camera basis)
 const _panRight = new THREE.Vector3();
 const _panUp    = new THREE.Vector3();
@@ -1540,7 +1590,7 @@ function panCamera(dx, dy) {
 
 // Rotate state (one-finger / primary mouse)
 let isDragging = false, dragStartX = 0, dragStartY = 0, dragMoved = false;
-function onRotateStart(x, y) { isDragging = true; dragStartX = x; dragStartY = y; dragMoved = false; }
+function onRotateStart(x, y) { cancelCamTween(); isDragging = true; dragStartX = x; dragStartY = y; dragMoved = false; }
 function onRotateMove(x, y) {
   if (!isDragging) return;
   const dx = x - dragStartX, dy = y - dragStartY;
@@ -1591,6 +1641,7 @@ canvas.addEventListener('click', e => { if (!dragMoved) handleTap(e); });
 
 window.addEventListener('wheel', e => {
   e.preventDefault();
+  cancelCamTween();
   camDist += e.deltaY * 0.02;
   applyCam();
 }, { passive: false });
@@ -1602,6 +1653,7 @@ canvas.addEventListener('touchstart', e => {
     onRotateStart(e.touches[0].clientX, e.touches[0].clientY);
     lastPinchDist = null; lastPinchMid = null;
   } else if (e.touches.length === 2) {
+    cancelCamTween();
     isDragging = false;
     lastPinchDist = getTouchDist(e.touches);
     lastPinchMid  = getTouchMid(e.touches);
@@ -1651,6 +1703,7 @@ canvas.addEventListener('touchend', e => {
 //  UPDATE + ANIMATE
 // ═══════════════════════════════════════════════
 function update() {
+  updateCamTween();
   if (open) {
     frameCount++;
     if (frameCount - lastStraight > T_STRAIGHT) { spawnStraight(); lastStraight = frameCount; }
