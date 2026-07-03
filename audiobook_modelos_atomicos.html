@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.89</div>
+<div class="app-version" id="appVersion">v1.3.90</div>
 
 </div>
 <script>
@@ -7542,7 +7542,7 @@ window.addEventListener('message', function(e){
   var d=e&&e.data; if(!d || d.ampEvt!=='userPowerOn'){ return; }
   if(typeof ch3==='undefined'){ return; }
   if(ch3.seg===ch3SegIndex('dialogo3.5.2A')){ ch3AmpPost({amp:'hand', show:false}); ch3ShowFab(true); ch3StartSegment(ch3SegIndex('dialogo3.5.3')); return; }   /* liga -> 3.5.3 + reaparece o play/pause */
-  if(ch3.awaitD356){ ch3.awaitD356=false; var i356=ch3SegIndex('dialogo3.5.6'); if(i356>=0){ ch3ShowFab(true); ch3StartSegment(i356); } return; }   /* religar -> toca 3.5.6 */
+  if(ch3.awaitD356){ ch3.awaitD356=false; var i356=ch3SegIndex('dialogo3.5.6'); if(i356>=0){ var cur356=ch3.seg; setTimeout(function(){ if(ch3.seg!==cur356){ return; } ch3ShowFab(true); ch3StartSegment(i356); }, 3000); } return; }   /* religar -> delay 3s -> toca 3.5.6 */
   if(ch3.awaitD358){ ch3.awaitD358=false; var i358=ch3SegIndex('dialogo3.5.8'); if(i358>=0){ ch3ShowFab(true); ch3StartSegment(i358); } return; }   /* religar -> toca 3.5.8 */
 });
 /* pointerdown na janela (capture): decide pela POSIÇÃO se inicia o arraste do
