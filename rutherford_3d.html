@@ -1514,6 +1514,9 @@ let camPhi   = Math.acos(Math.max(-1, Math.min(1,
   (camera.position.y - camTarget.y) / camera.position.distanceTo(camTarget)
 )));
 let camDist  = CAM_MAX;   /* começa no zoom-out máximo: o aparelho inteiro cabe na tela vertical do celular */
+// Câmera travada p/ o usuário: sem girar, zoom (in/out) ou pan. Só os movimentos
+// roteirizados (presets set1/2/3 via tweenCamTo) mexem a câmera.
+let camLocked = true;
 
 function applyCam() {
   camDist = Math.max(CAM_MIN, Math.min(CAM_MAX, camDist));
@@ -1577,7 +1580,15 @@ window.addEventListener('message', (ev) => {
 });
 
 // DEV: press "C" to capture the current camera as a ready-to-paste preset line.
+// DEV: press "L" to toggle the camera lock (starts locked) — needed to navigate
+// the view when capturing new presets.
 window.addEventListener('keydown', (ev) => {
+  if (ev.key === 'l' || ev.key === 'L') {
+    camLocked = !camLocked;
+    console.log('[CAM] locked =', camLocked);
+    try { alert('camLocked = ' + camLocked); } catch (_) {}
+    return;
+  }
   if (ev.key !== 'c' && ev.key !== 'C') return;
   const line = 'set?: { target: [' + camTarget.x.toFixed(3) + ', ' + camTarget.y.toFixed(3) + ', ' +
     camTarget.z.toFixed(3) + '], theta: ' + camTheta.toFixed(4) + ', phi: ' + camPhi.toFixed(4) +
@@ -1592,6 +1603,7 @@ const _panRight = new THREE.Vector3();
 const _panUp    = new THREE.Vector3();
 const _panTmp   = new THREE.Vector3();
 function panCamera(dx, dy) {
+  if (camLocked) return;               // pan desabilitado
   camera.matrixWorld.extractBasis(_panRight, _panUp, _panTmp);
   const panScale = camDist * 0.0018;
   camTarget.addScaledVector(_panRight, -dx * panScale);
@@ -1601,14 +1613,15 @@ function panCamera(dx, dy) {
 
 // Rotate state (one-finger / primary mouse)
 let isDragging = false, dragStartX = 0, dragStartY = 0, dragMoved = false;
-function onRotateStart(x, y) { cancelCamTween(); isDragging = true; dragStartX = x; dragStartY = y; dragMoved = false; }
+function onRotateStart(x, y) { if (!camLocked) cancelCamTween(); isDragging = true; dragStartX = x; dragStartY = y; dragMoved = false; }
 function onRotateMove(x, y) {
   if (!isDragging) return;
   const dx = x - dragStartX, dy = y - dragStartY;
   if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
+  dragStartX = x; dragStartY = y;
+  if (camLocked) return;               // câmera travada: rastreia o toque (p/ distinguir tap) mas não gira
   camTheta -= dx * 0.007;
   camPhi   += dy * 0.007;
-  dragStartX = x; dragStartY = y;
   applyCam();
 }
 function onRotateEnd() { isDragging = false; }
@@ -1652,6 +1665,7 @@ canvas.addEventListener('click', e => { if (!dragMoved) handleTap(e); });
 
 window.addEventListener('wheel', e => {
   e.preventDefault();
+  if (camLocked) return;               // zoom desabilitado
   cancelCamTween();
   camDist += e.deltaY * 0.02;
   applyCam();
@@ -1664,7 +1678,7 @@ canvas.addEventListener('touchstart', e => {
     onRotateStart(e.touches[0].clientX, e.touches[0].clientY);
     lastPinchDist = null; lastPinchMid = null;
   } else if (e.touches.length === 2) {
-    cancelCamTween();
+    if (!camLocked) cancelCamTween();
     isDragging = false;
     lastPinchDist = getTouchDist(e.touches);
     lastPinchMid  = getTouchMid(e.touches);
@@ -1674,6 +1688,7 @@ canvas.addEventListener('touchstart', e => {
 window.addEventListener('touchmove', e => {
   e.preventDefault();
   if (e.touches.length === 2) {
+    if (camLocked) { lastPinchDist = getTouchDist(e.touches); lastPinchMid = getTouchMid(e.touches); return; }  // pinça (zoom/pan) desabilitada
     const dist = getTouchDist(e.touches);
     const mid  = getTouchMid(e.touches);
     if (lastPinchDist !== null) {
