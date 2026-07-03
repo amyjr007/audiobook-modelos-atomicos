@@ -1521,7 +1521,7 @@ let camTheta = Math.atan2(camera.position.x - camTarget.x, camera.position.z - c
 let camPhi   = Math.acos(Math.max(-1, Math.min(1,
   (camera.position.y - camTarget.y) / camera.position.distanceTo(camTarget)
 )));
-let camDist  = camera.position.distanceTo(camTarget);
+let camDist  = CAM_MAX;   /* começa no zoom-out máximo: o aparelho inteiro cabe na tela vertical do celular */
 
 function applyCam() {
   camDist = Math.max(CAM_MIN, Math.min(CAM_MAX, camDist));
