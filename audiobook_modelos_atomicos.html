@@ -309,8 +309,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 /* saída dramática (espelha a entrada): encolhe girando e sai em blur */
 .ch4-img-wrap.drama-out{animation:ch4DramaOut .8s cubic-bezier(.5,0,.75,0) both}
 @keyframes ch4DramaOut{0%{opacity:1;transform:scale(1) rotate(0);filter:blur(0)}100%{opacity:0;transform:scale(.24) rotate(8deg);filter:blur(16px)}}
-/* some na hora (dialogo4.4: entra o experimento por baixo, sem empurrar a imagem) */
-.ch4-img-wrap.up-exit{opacity:0;transition:none}
+/* sobe e sai por cima (dialogo4.4: o experimento entra por baixo e empurra a imagem pra fora) */
+.ch4-img-wrap.up-exit{animation:ch4UpExit .95s cubic-bezier(.5,0,.2,1) both}
+@keyframes ch4UpExit{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:1;transform:translateY(-135%) scale(.94)}}
 .ch4-img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
 /* rótulo preso à imagem (ex.: "Marie Curie") — some junto com a imagem */
 .ch4-img-label{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 12px;background:linear-gradient(0deg,rgba(0,0,0,.72),transparent);text-align:center;font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(15px,4.4vw,21px);color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.7);opacity:0;transition:opacity .5s ease}
@@ -2679,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.73</div>
+<div class="app-version" id="appVersion">v1.3.74</div>
 
 </div>
 <script>
@@ -7919,7 +7920,7 @@ var ch4Segs = [
 ];
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.73';
+var CH4V='?v=1.3.74';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
