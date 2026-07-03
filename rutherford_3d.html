@@ -1144,7 +1144,7 @@ const foilGroup = new THREE.Group();
 scene.add(foilGroup);
 foilGroup.position.set(0, 0, 0);
 
-const FOIL_W_Z = 1.8, FOIL_H_Y = 2.0, FOIL_T_X = 0.012;
+const FOIL_W_Z = 1.8, FOIL_H_Y = 2.0, FOIL_T_X = 0.004;
 const foilGeo = new THREE.BoxGeometry(FOIL_T_X, FOIL_H_Y, FOIL_W_Z);
 const foilMat = new THREE.MeshPhongMaterial({
   color: 0xe8bc28, specular: 0xfff0a0, shininess: 110, emissive: 0x332200,
@@ -1153,35 +1153,10 @@ const foilMesh = new THREE.Mesh(foilGeo, foilMat);
 foilMesh.castShadow = true;
 foilGroup.add(foilMesh);
 
-// Bronze holder frame around the foil
-const FRAME_OUTER_Z = FOIL_W_Z + 0.22;
-const FRAME_OUTER_Y = FOIL_H_Y + 0.22;
-const FRAME_BAR_T   = 0.09;
-const FRAME_BAR_D   = 0.11;
-const frameMat = new THREE.MeshPhongMaterial({
-  color: 0x6a4a20, specular: 0xc8a858, shininess: 70, emissive: 0x1a1008,
-});
-[-1, 1].forEach(sy => {
-  const bar = new THREE.Mesh(
-    new THREE.BoxGeometry(FRAME_BAR_D, FRAME_BAR_T, FRAME_OUTER_Z),
-    frameMat
-  );
-  bar.position.set(0, sy * (FRAME_OUTER_Y/2 - FRAME_BAR_T/2), 0);
-  bar.castShadow = true;
-  foilGroup.add(bar);
-});
-[-1, 1].forEach(sz => {
-  const bar = new THREE.Mesh(
-    new THREE.BoxGeometry(FRAME_BAR_D, FRAME_OUTER_Y - FRAME_BAR_T * 2, FRAME_BAR_T),
-    frameMat
-  );
-  bar.position.set(0, 0, sz * (FRAME_OUTER_Z/2 - FRAME_BAR_T/2));
-  bar.castShadow = true;
-  foilGroup.add(bar);
-});
+// (frame removed — the foil is a thin sheet held between the two posts)
 
-// Two vertical support posts going down to the table
-const postTopY = -FRAME_OUTER_Y/2;
+// Two vertical support posts flanking the foil, going down to the table
+const postTopY = FOIL_H_Y/2;
 const postBotY = TABLE_TOP_Y;   // foilGroup at y=0, so local = world
 const postH    = postTopY - postBotY;
 const postGeo  = new THREE.CylinderGeometry(0.055, 0.065, postH, 14);
@@ -1200,22 +1175,6 @@ const postMat  = new THREE.MeshPhongMaterial({
   foot.position.set(0, postBotY + 0.04, sz * (FOIL_W_Z/2 + 0.1));
   foot.castShadow = true; foot.receiveShadow = true;
   foilGroup.add(foot);
-});
-
-// Tiny screws on each corner of the frame
-const smallScrewGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.02, 10);
-const smallScrewMat = new THREE.MeshPhongMaterial({
-  color: 0x222228, specular: 0xaaaabb, shininess: 80,
-});
-[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sy, sz]) => {
-  const s = new THREE.Mesh(smallScrewGeo, smallScrewMat);
-  s.rotation.z = Math.PI / 2;
-  s.position.set(
-    FRAME_BAR_D/2 + 0.011,
-    sy * (FRAME_OUTER_Y/2 - FRAME_BAR_T/2),
-    sz * (FRAME_OUTER_Z/2 - FRAME_BAR_T/2)
-  );
-  foilGroup.add(s);
 });
 
 // ═══════════════════════════════════════════════
