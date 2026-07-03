@@ -966,10 +966,38 @@ function makeRadiationTexture() {
   return new THREE.CanvasTexture(cv);
 }
 const radTex = makeRadiationTexture();
+// Emissive mask: white on the trefoil blades, black elsewhere. Used as
+// emissiveMap so only the 3-blade fan lights up (green glow), never the
+// yellow square around it.
+function makeTrefoilMask() {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 512;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, 512, 512);
+  ctx.fillStyle = '#ffffff';
+  const cx = 256, cy = 256;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 42, 0, Math.PI * 2);
+  ctx.fill();
+  const halfA = Math.PI / 6;
+  for (let i = 0; i < 3; i++) {
+    const base = -Math.PI / 2 + i * (Math.PI * 2 / 3);
+    ctx.beginPath();
+    ctx.arc(cx, cy, 210, base - halfA, base + halfA);
+    ctx.arc(cx, cy, 70,  base + halfA, base - halfA, true);
+    ctx.closePath();
+    ctx.fill();
+  }
+  return new THREE.CanvasTexture(cv);
+}
+const radMaskTex = makeTrefoilMask();
 const radMesh = new THREE.Mesh(
   new THREE.PlaneGeometry(1.4, 1.4),
   new THREE.MeshPhongMaterial({
-    map: radTex, specular: 0x222222, shininess: 20, emissive: 0x554010,
+    map: radTex, specular: 0x222222, shininess: 20,
+    // emissive off by default; the mask confines the glow to the blades
+    emissive: 0x000000, emissiveMap: radMaskTex, emissiveIntensity: 0,
     side: THREE.DoubleSide,
   })
 );
@@ -1431,11 +1459,11 @@ function setOpen(val) {
   // Knob: red (stop) when closed, green (running) when open
   capKnobMat.color.setHex(open ? 0x44cc44 : 0xcc3311);
   capKnobMat.emissive.setHex(open ? 0x083308 : 0x331008);
-  // Radiation sign = power button: glows bright green when the machine is ON,
-  // back to its normal caution-yellow look when OFF
-  radMesh.material.color.setHex(open ? 0x3bff5c : 0xffffff);
-  radMesh.material.emissive.setHex(open ? 0x22c23a : 0x554010);
-  radMesh.material.emissiveIntensity = open ? 1.5 : 1;
+  // Radiation sign = power button: the 3-blade fan glows bright green when the
+  // machine is ON (emissive confined to the blades by the mask), and goes back
+  // to its normal black-on-yellow look when OFF. The yellow square is untouched.
+  radMesh.material.emissive.setHex(open ? 0x2bff55 : 0x000000);
+  radMesh.material.emissiveIntensity = open ? 2.4 : 0;
   if (!open) {
     flashes.forEach(f => { flashGroup.remove(f.sprite); });
     flashes.length = 0;
