@@ -438,9 +438,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch4-wall-atoms{position:absolute;top:50%;left:52%;transform:translate(-50%,-50%) scale(.18);opacity:0;
   display:flex;flex-direction:column;align-items:center;transition:transform 1.25s cubic-bezier(.52,.02,.35,1),opacity .8s ease}
 .ch4-wall.on .ch4-wall-atoms{transform:translate(-50%,-50%) scale(1);opacity:1}
-.ch4-wall-row{display:flex;margin-top:-4.2vmin}
+.ch4-wall-row{display:flex;margin-top:-6.2vmin}
 .ch4-wall-row:first-child{margin-top:0}
-.ch4-wall-atom{position:relative;width:19vmin;height:19vmin;margin:-2.2vmin;border-radius:50%;
+.ch4-wall-atom{position:relative;width:22vmin;height:22vmin;margin:0 -2.2vmin;border-radius:50%;
   background:radial-gradient(circle at 40% 34%, #fff2cf 0%, #ffdd8c 22%, #f0ab3e 55%, #b9741d 82%, rgba(150,90,20,0) 100%);
   box-shadow:0 0 22px 6px rgba(240,170,60,.28)}
 .ch4-wall-elec{position:absolute;width:1.7vmin;height:1.7vmin;border-radius:50%;background:radial-gradient(circle at 38% 34%,#5a4a36,#241a10);box-shadow:0 0 3px rgba(0,0,0,.6);transform:translate(-50%,-50%)}
@@ -2700,7 +2700,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.114</div>
+<div class="app-version" id="appVersion">v1.3.115</div>
 
 </div>
 <script>
@@ -7980,10 +7980,13 @@ function ch4ExpSummaryBtn(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentW
 var ch4WallBeamId=null;
 function ch4WallBuild(){
   var atoms=ch4El('ch4WallAtoms'); if(!atoms) return; atoms.innerHTML='';
-  var rows=6, cols=4;
+  var cols=2;                                                             /* só 2 camadas (espessura da folha) */
+  var vmin=Math.min(window.innerWidth, window.innerHeight);
+  var stepPx=(22-6.2)/100*vmin;                                           /* passo vertical entre fileiras (22vmin - overlap 6.2vmin) */
+  var rows=Math.ceil(window.innerHeight/stepPx)+2;                        /* fileiras suficientes p/ passar da tela em cima e embaixo */
   for(var r=0;r<rows;r++){
     var row=document.createElement('div'); row.className='ch4-wall-row';
-    if(r%2){ row.style.marginLeft='9vmin'; }                               /* fileiras alternadas deslocadas */
+    if(r%2){ row.style.marginLeft='11vmin'; }                             /* fileiras alternadas deslocadas (empacotamento) */
     for(var c=0;c<cols;c++){
       var a=document.createElement('div'); a.className='ch4-wall-atom';
       for(var k=0;k<3;k++){ var e=document.createElement('span'); e.className='ch4-wall-elec'; e.style.left=(24+Math.random()*52)+'%'; e.style.top=(24+Math.random()*52)+'%'; a.appendChild(e); }  /* elétrons embutidos */
@@ -8005,7 +8008,7 @@ function ch4WallBeamStart(){
 function ch4WallShow(){
   ch4WallReset(); ch4WallBuild();
   var w=ch4El('ch4Wall'); if(w){ void w.offsetWidth; w.classList.add('on'); }   /* backdrop + zoom-in dos átomos */
-  ch4.wallStartTimer=setTimeout(function(){ ch4.wallStartTimer=null; ch4WallBeamStart(); }, 1150);  /* feixe começa após o zoom */
+  /* sem feixe automático: as radiações entram só quando pedidas (ch4WallBeamStart) */
   abVibe(AB_VTXT);
 }
 function ch4WallReset(){
