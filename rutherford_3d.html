@@ -444,10 +444,12 @@ body {
 <canvas id="c"></canvas>
 <!-- Anotações roteirizadas (dialogo4.5): Chumbo / Polônio / Tampa, ancoradas em 3D -->
 <div id="annoLayer">
-  <svg id="annoSvg"><line id="annoLine-polonio" class="anno-line"/><line id="annoLine-tampa" class="anno-line"/></svg>
+  <svg id="annoSvg"><line id="annoLine-polonio" class="anno-line"/><line id="annoLine-tampa" class="anno-line"/><line id="annoLine-folha" class="anno-line"/><line id="annoLine-chapa" class="anno-line"/></svg>
   <div class="anno" id="anno-chumbo">Chumbo</div>
   <div class="anno anno-lead" id="anno-polonio">Polônio</div>
   <div class="anno anno-lead" id="anno-tampa">Tampa</div>
+  <div class="anno anno-lead" id="anno-folha">Folha de ouro finíssima</div>
+  <div class="anno anno-lead" id="anno-chapa">Chapa fotográfica sensível a radiação</div>
 </div>
 <div id="label">EXPERIMENTO DE RUTHERFORD · 1909 · v22</div>
 <div id="hint">🖱 ARRASTAR: GIRAR · 🤏 PINÇA: ZOOM · ✌️ 2 DEDOS: MOVER · TOQUE NA FOLHA: VISÃO ATÔMICA</div>
@@ -1109,14 +1111,20 @@ boxGroup.updateMatrixWorld(true);
 // ── Anotações roteirizadas (dialogo4.5): Chumbo / Polônio / Tampa ──
 // Âncoras em coords LOCAIS da boxGroup → mundo (boxGroup é estático).
 const ANNOS = {
-  chumbo:  { el:document.getElementById('anno-chumbo'),  line:null,
+  // âncoras relativas à boxGroup (local:true → convertidas p/ mundo abaixo)
+  chumbo:  { el:document.getElementById('anno-chumbo'),  line:null, local:true,
              anchor:new THREE.Vector3(BOX_W/2, 0.15, 0.0),        off:[0, 0]   }, // texto na lateral da caixa
-  polonio: { el:document.getElementById('anno-polonio'), line:document.getElementById('annoLine-polonio'),
+  polonio: { el:document.getElementById('anno-polonio'), line:document.getElementById('annoLine-polonio'), local:true,
              anchor:new THREE.Vector3(0.35, BOX_H/2, 0.45),       off:[70, -74] }, // reta até a caixa
-  tampa:   { el:document.getElementById('anno-tampa'),   line:document.getElementById('annoLine-tampa'),
+  tampa:   { el:document.getElementById('anno-tampa'),   line:document.getElementById('annoLine-tampa'), local:true,
              anchor:new THREE.Vector3(0, 0.05, BARREL_TIP_Z),     off:[96, 34]  }, // reta até o cano/tampa frontal
+  // âncoras já em coords de MUNDO (folha e chapa estão centradas na origem)
+  folha:   { el:document.getElementById('anno-folha'),   line:document.getElementById('annoLine-folha'),
+             anchor:new THREE.Vector3(0, 0.95, 0),                off:[92, -84] }, // reta até a folha de ouro
+  chapa:   { el:document.getElementById('anno-chapa'),   line:document.getElementById('annoLine-chapa'),
+             anchor:new THREE.Vector3(3.47, 1.1, 2.37),           off:[10, -92] }, // reta até a chapa fotográfica (anel)
 };
-Object.keys(ANNOS).forEach(k => boxGroup.localToWorld(ANNOS[k].anchor));
+Object.keys(ANNOS).forEach(k => { if (ANNOS[k].local) boxGroup.localToWorld(ANNOS[k].anchor); });
 let annoShown = {};
 function updateAnnos(){
   const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
