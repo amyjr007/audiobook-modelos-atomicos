@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.108</div>
+<div class="app-version" id="appVersion">v1.3.109</div>
 
 </div>
 <script>
@@ -7926,7 +7926,8 @@ var ch4Segs = [
   { src:'audio/dialogo4.5E.mp3?v=1.3.105', hideFab:true }, /* toca; ao fim SEM play: espera LIGAR a máquina -> (delay 2s) dialogo4.5F */
   { src:'audio/dialogo4.5F.mp3?v=1.3.105' },               /* ligou a máquina (após 2s) -> toca; ao fim: play -> dialogo4.5G */
   { src:'audio/dialogo4.5G.mp3?v=1.3.102' },               /* ▶ -> dialogo4.5H */
-  { src:'audio/dialogo4.5H.mp3?v=1.3.105' }                /* ▶ (último) */
+  { src:'audio/dialogo4.5H.mp3?v=1.3.105' },               /* ▶ -> dialogo4.5I */
+  { src:'audio/dialogo4.5I.mp3?v=1.3.109' }                /* câmera p/ setI; 9s aparece o botão "Resumo"; play ao final */
 ];
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
 function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
@@ -7949,6 +7950,8 @@ function ch4ExpCamGo(preset, dur){
    ch4.rates p/ reaplicar quando o iframe (re)carregar (ruthReady). */
 function ch4ExpRates(straight, deflect, back){ ch4.rates={ straight:straight, deflect:deflect, back:back }; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthRates', straight:straight, deflect:deflect, back:back }, '*'); }catch(_){} } }
 function ch4ExpRatesReset(){ ch4.rates=null; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthRates', reset:true }, '*'); }catch(_){} } }
+/* revela/esconde o botão "Resumo" do experimento (dialogo4.5I) */
+function ch4ExpSummaryBtn(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthSummaryBtn', on:!!on }, '*'); }catch(_){} } }
 /* mãozinha "aperte aqui" apontando pro símbolo (mostra se o usuário demorar a clicar) */
 function ch4ExpHint(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthHint', on:!!on }, '*'); }catch(_){} } }
 function ch4HintClear(){ if(ch4.hintTimer){ clearTimeout(ch4.hintTimer); ch4.hintTimer=null; } ch4ExpHint(false); }
@@ -7984,7 +7987,7 @@ window.addEventListener('message', function(ev){
 });
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.108';
+var CH4V='?v=1.3.109';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
@@ -8326,7 +8329,23 @@ ch4Segs[14].build=function(){
     { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setH'); } }
   ];
 };
-ch4Segs[14].onEnded=function(){ ch4ExpRatesReset(); ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* volta as incidências ao padrão */
+ch4Segs[14].onEnded=function(){ ch4ExpRatesReset(); ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* volta as incidências ao padrão; ▶ -> dialogo4.5I */
+/* dialogo4.5I (seg 15): ao começar, move a câmera p/ setI. Aos 9s aparece o botão "Resumo"
+   (abre a tela com o resumo das observações + Fechar). Ao fim: mostra o play. */
+ch4Segs[15].onStart=function(){
+  ch4.awaitMachine=null; ch4.awaitCamMove=false; ch4HintClear();
+  var e=ch4El('ch4Exp');
+  if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }
+  ch4ExpSet(true); ch4ExpLock(true); ch4ExpObsHide();
+  ch4ExpSummaryBtn(false);        /* botão Resumo escondido; aparece aos 9s */
+  ch4ExpCamGo('setI');            /* move a câmera p/ setI (trava o arrasto na transição, libera ao chegar) */
+};
+ch4Segs[15].build=function(){
+  return [
+    { t:9.0, done:false, fn:function(){ ch4ExpSummaryBtn(true); } }   /* aparece o botão "Resumo" */
+  ];
+};
+ch4Segs[15].onEnded=function(){ ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* play ao final */
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 function ch4ShowFab(show){ var f=ch4El('ch4Fab'); if(f){ f.style.display = show ? '' : 'none'; } }
 function ch4SetFab(playing){ var ic=ch4El('ch4FabIcon'); if(ic){ ic.textContent = playing ? '⏸' : '▶'; } }

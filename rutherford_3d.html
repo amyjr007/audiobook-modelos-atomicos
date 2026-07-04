@@ -151,7 +151,6 @@ body {
 }
 /* ── SUMMARY BUTTON ──────────────────────── */
 #summaryBtn {
-  display: none !important;   /* omitido por enquanto */
   position: fixed;
   top: 48px;
   right: 16px;
@@ -166,13 +165,14 @@ body {
   color: rgba(180, 220, 255, 0.9);
   cursor: pointer;
   z-index: 200;
-  display: flex;
+  display: none;   /* escondido por padrão; revelado sob demanda (dialogo4.5I) via .reveal */
   align-items: center;
   gap: 0.4rem;
   backdrop-filter: blur(6px);
   transition: background 0.2s, border-color 0.2s;
   touch-action: manipulation;
 }
+#summaryBtn.reveal { display: flex; }
 #summaryBtn:hover {
   background: rgba(40, 40, 60, 0.95);
   border-color: rgba(150, 200, 255, 0.8);
@@ -1665,6 +1665,7 @@ const CAM_PRESETS = {
   setF: { target: [-0.238, -1.420, -0.059], theta: -1.6133, phi: 0.8233, dist: 22.680 },  // dialogo4.5F
   setG: { target: [2.166, 1.478, -1.510], theta: -1.5806, phi: 0.6227, dist: 30.488 },  // dialogo4.5G
   setH: { target: [-0.187, -2.031, -0.583], theta: -4.7446, phi: 0.4593, dist: 29.372 }, // dialogo4.5H
+  setI: { target: [1.817, 1.279, -2.581], theta: -1.0719, phi: 1.0333, dist: 34.293 },  // dialogo4.5I
 };
 let camTween = null;
 function tweenCamTo(name, dur) {
@@ -1705,6 +1706,11 @@ window.addEventListener('message', (ev) => {
   if (d.type === 'ruthObs') { showObs(d.text, d.dur); return; }   // dialogo4.5F: "Observação 1..." digitada no topo
   if (d.type === 'ruthObsHide') { hideObs(); return; }
   if (d.type === 'ruthRates') { d.reset ? ruthResetRates() : ruthSetRates(d); return; }   // dialogo4.5F/G/H: incidência de partículas
+  if (d.type === 'ruthSummaryBtn') {   // dialogo4.5I: revela/esconde o botão "Resumo"
+    if (d.on) { summaryBtn.classList.add('reveal'); }
+    else { summaryBtn.classList.remove('reveal'); closeSummary(); }
+    return;
+  }
   if (d.type === 'ruthHint') { d.on ? showHint() : hideHint(); return; }   // mãozinha "aperte aqui"
   if (d.type === 'ruthCamLock') { camLocked = !!d.locked; if (!camLocked) camMoveNotified = false; return; }   // dialogo4.5D: libera arrastar a câmera
   if (d.type === 'ruthAtomic') { atomicUnlocked = !!d.on; return; }   // liga/desliga a interação oculta (visão atômica)
