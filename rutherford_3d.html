@@ -47,6 +47,16 @@ body {
 }
 .anno.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
 .anno-lead { color:#ffe14d; text-shadow:0 2px 10px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.9); }
+.anno-big { font-size:clamp(1.02rem,3.9vw,1.4rem); }   /* +2pt */
+/* mãozinha "aperte aqui" — aparece se demorar a clicar no símbolo */
+#ruthHint { position:fixed; left:0; top:0; transform:translate(-50%,0); z-index:21; pointer-events:none;
+  display:none; flex-direction:column; align-items:center; gap:1px; opacity:0; transition:opacity .4s ease; }
+#ruthHint.show { display:flex; opacity:1; }
+#ruthHint .hand { font-size:2.3rem; line-height:1; animation:ruthHandBob 1s ease-in-out infinite;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.75)); }
+#ruthHint .hint-txt { font-family:'Fredoka',sans-serif; font-weight:700; color:#ffe14d;
+  font-size:1.05rem; text-shadow:0 2px 8px rgba(0,0,0,.95); white-space:nowrap; }
+@keyframes ruthHandBob { 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-9px);} }
 #obsBtn {
   position: fixed; top: 48px; left: 16px;
   background: rgba(20, 20, 35, 0.88);
@@ -445,12 +455,13 @@ body {
 <!-- Anotações roteirizadas (dialogo4.5): Chumbo / Polônio / Tampa, ancoradas em 3D -->
 <div id="annoLayer">
   <svg id="annoSvg"><line id="annoLine-polonio" class="anno-line"/><line id="annoLine-tampa" class="anno-line"/><line id="annoLine-folha" class="anno-line"/><line id="annoLine-chapa" class="anno-line"/></svg>
-  <div class="anno" id="anno-chumbo">Chumbo</div>
-  <div class="anno anno-lead" id="anno-polonio">Polônio</div>
+  <div class="anno anno-big" id="anno-chumbo">Chumbo</div>
+  <div class="anno anno-lead anno-big" id="anno-polonio">Polônio</div>
   <div class="anno anno-lead" id="anno-tampa">Tampa</div>
-  <div class="anno anno-lead" id="anno-folha">Folha de ouro finíssima</div>
-  <div class="anno anno-lead" id="anno-chapa">Chapa fotográfica sensível a radiação</div>
+  <div class="anno anno-lead anno-big" id="anno-folha">Folha de ouro finíssima</div>
+  <div class="anno anno-lead anno-big" id="anno-chapa">Chapa fotográfica sensível a radiação</div>
 </div>
+<div id="ruthHint"><span class="hand">👆</span><span class="hint-txt">aperte aqui</span></div>
 <div id="label">EXPERIMENTO DE RUTHERFORD · 1909 · v22</div>
 <div id="hint">🖱 ARRASTAR: GIRAR · 🤏 PINÇA: ZOOM · ✌️ 2 DEDOS: MOVER · TOQUE NA FOLHA: VISÃO ATÔMICA</div>
 
@@ -1113,18 +1124,22 @@ boxGroup.updateMatrixWorld(true);
 const ANNOS = {
   // âncoras relativas à boxGroup (local:true → convertidas p/ mundo abaixo)
   chumbo:  { el:document.getElementById('anno-chumbo'),  line:null, local:true,
-             anchor:new THREE.Vector3(BOX_W/2, 0.15, 0.0),        off:[0, 0]   }, // texto na lateral da caixa
+             anchor:new THREE.Vector3(BOX_W/2, 0.15, 0.0),        off:[0, 50]  }, // texto na lateral da caixa (2 linhas abaixo)
   polonio: { el:document.getElementById('anno-polonio'), line:document.getElementById('annoLine-polonio'), local:true,
              anchor:new THREE.Vector3(0.35, BOX_H/2, 0.45),       off:[70, -74] }, // reta até a caixa
   tampa:   { el:document.getElementById('anno-tampa'),   line:document.getElementById('annoLine-tampa'), local:true,
-             anchor:new THREE.Vector3(0, 0.05, BARREL_TIP_Z),     off:[96, 34]  }, // reta até o cano/tampa frontal
+             anchor:new THREE.Vector3(0, 0.05, BARREL_TIP_Z),     off:[40, 16]  }, // reta curta até o cano/tampa (mais à esquerda)
   // âncoras já em coords de MUNDO (folha e chapa estão centradas na origem)
   folha:   { el:document.getElementById('anno-folha'),   line:document.getElementById('annoLine-folha'),
-             anchor:new THREE.Vector3(0, 0.95, 0),                off:[92, -84] }, // reta até a folha de ouro
+             anchor:new THREE.Vector3(0, 0.95, 0),                off:[-30, -84] }, // reta até a folha (mais à esquerda p/ caber)
   chapa:   { el:document.getElementById('anno-chapa'),   line:document.getElementById('annoLine-chapa'),
-             anchor:new THREE.Vector3(3.47, 1.1, 2.37),           off:[10, -92] }, // reta até a chapa fotográfica (anel)
+             anchor:new THREE.Vector3(3.47, 1.1, 2.37),           off:[0, -92], centerX:true }, // centralizado na horizontal, mesma altura
 };
 Object.keys(ANNOS).forEach(k => { if (ANNOS[k].local) boxGroup.localToWorld(ANNOS[k].anchor); });
+// âncora da mãozinha = símbolo de radioatividade (topo da caixa)
+const hintEl = document.getElementById('ruthHint');
+const hintAnchor = boxGroup.localToWorld(new THREE.Vector3(0, BOX_H/2 + 0.01, 0));
+let hintShown = false;
 let annoShown = {};
 function updateAnnos(){
   const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
@@ -1133,13 +1148,20 @@ function updateAnnos(){
     const a = ANNOS[id];
     const p = a.anchor.clone().project(camera);
     const sx = (p.x*0.5+0.5)*w, sy = (-p.y*0.5+0.5)*h;
-    const lx = sx + a.off[0], ly = sy + a.off[1];
+    const lx = a.centerX ? w/2 : (sx + a.off[0]), ly = sy + a.off[1];
     a.el.style.left = lx+'px'; a.el.style.top = ly+'px';
     if (a.line){ a.line.setAttribute('x1', sx); a.line.setAttribute('y1', sy); a.line.setAttribute('x2', lx); a.line.setAttribute('y2', ly); }
+  }
+  if (hintShown){
+    const p = hintAnchor.clone().project(camera);
+    hintEl.style.left = ((p.x*0.5+0.5)*w) + 'px';
+    hintEl.style.top  = ((-p.y*0.5+0.5)*h + 26) + 'px';   // logo abaixo do símbolo, dedo apontando pra cima
   }
 }
 function showAnno(id){ const a = ANNOS[id]; if(!a) return; annoShown[id]=true; updateAnnos(); a.el.classList.add('show'); if(a.line) a.line.classList.add('show'); }
 function hideAnnos(){ for (const id in ANNOS){ const a=ANNOS[id]; a.el.classList.remove('show'); if(a.line) a.line.classList.remove('show'); } annoShown = {}; }
+function showHint(){ hintShown = true; updateAnnos(); hintEl.classList.add('show'); }
+function hideHint(){ hintShown = false; hintEl.classList.remove('show'); }
 
 // ═══════════════════════════════════════════════
 //  SLIT PLATE (collimator) — enhanced
@@ -1497,7 +1519,7 @@ function playClick() { try { clickSound.currentTime = 0; const p = clickSound.pl
 
 function setOpen(val, silent) {
   open = val;
-  if (val) hideAnnos();   // ao LIGAR a máquina, as anotações (Chumbo/Polônio/Tampa) saem em fade
+  if (val) { hideAnnos(); hideHint(); }   // ao LIGAR a máquina, as anotações e a mãozinha somem
   capOpenTarget = val ? 1 : 0;
   // Knob: red (stop) when closed, green (running) when open
   capKnobMat.color.setHex(open ? 0x44cc44 : 0xcc3311);
@@ -1623,6 +1645,7 @@ window.addEventListener('message', (ev) => {
   if (d.type === 'ruthSet')  { setOpen(!!d.on, true); return; }
   if (d.type === 'ruthAnno' && d.id) { showAnno(d.id); return; }   // dialogo4.5: mostra Chumbo/Polônio/Tampa
   if (d.type === 'ruthAnnoHide') { hideAnnos(); return; }
+  if (d.type === 'ruthHint') { d.on ? showHint() : hideHint(); return; }   // mãozinha "aperte aqui"
   if (d.type === 'ruthAtomic') { atomicUnlocked = !!d.on; return; }   // liga/desliga a interação oculta (visão atômica)
 });
 

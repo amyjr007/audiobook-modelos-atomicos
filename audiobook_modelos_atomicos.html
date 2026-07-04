@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.99</div>
+<div class="app-version" id="appVersion">v1.3.100</div>
 
 </div>
 <script>
@@ -7919,7 +7919,7 @@ var ch4Segs = [
   { src:'audio/dialogo4.4.mp3?v=1.3.72' },   /* ▶ -> dialogo4.5 */
   { src:'audio/dialogo4.5.mp3?v=1.3.79' },   /* dialogo4.5: 5s -> zoom set2; ao fim SEM play, espera LIGAR a máquina */
   { src:'audio/dialogo4.5A.mp3?v=1.3.79', hideFab:true },  /* ligou a máquina -> toca; botão da máquina travado; ao fim libera */
-  { src:'audio/dialogo4.5B.mp3?v=1.3.99', hideFab:true },  /* desligou a máquina -> toca + câmera vai p/ set3; ao fim aparece o play (áudio atualizado) */
+  { src:'audio/dialogo4.5B.mp3?v=1.3.100', hideFab:true },  /* desligou a máquina -> toca + câmera vai p/ set3; ao fim aparece o play (áudio atualizado) */
   { src:'audio/dialogo4.5C.mp3?v=1.3.85' }                 /* play -> toca; 6s câmera p/ set4, 18s volta p/ set1; ao fim tira o play e libera a máquina */
 ];
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
@@ -7927,6 +7927,9 @@ function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.conten
 /* anotações roteirizadas do experimento (Chumbo/Polônio/Tampa) durante o dialogo4.5 */
 function ch4ExpAnno(id){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthAnno', id:id }, '*'); }catch(_){} } }
 function ch4ExpAnnoHide(){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthAnnoHide' }, '*'); }catch(_){} } }
+/* mãozinha "aperte aqui" apontando pro símbolo (mostra se o usuário demorar a clicar) */
+function ch4ExpHint(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthHint', on:!!on }, '*'); }catch(_){} } }
+function ch4HintClear(){ if(ch4.hintTimer){ clearTimeout(ch4.hintTimer); ch4.hintTimer=null; } ch4ExpHint(false); }
 /* trava/destrava o botão (sinal de radioatividade) que liga/desliga a máquina.
    Guarda o estado em ch4.expLocked p/ reaplicar quando o iframe (re)carregar (ruthReady). */
 function ch4ExpLock(locked){ ch4.expLocked=!!locked; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthLock', locked:!!locked }, '*'); }catch(_){} } }
@@ -7935,7 +7938,7 @@ function ch4ExpSet(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){
 /* eventos vindos do experimento: usuário ligou/desligou a máquina */
 function ch4OnMachine(on){
   if(on && ch4.awaitMachine==='machineOn'){        /* LIGOU -> dialogo4.5A (trava o botão durante o áudio) */
-    ch4.awaitMachine=null; ch4ExpLock(true); ch4StartSegment(7);
+    ch4.awaitMachine=null; ch4HintClear(); ch4ExpLock(true); ch4StartSegment(7);
   } else if(!on && ch4.awaitMachine==='machineOff'){ /* DESLIGOU -> trava o botão, câmera p/ set3 + dialogo4.5B */
     ch4.awaitMachine=null; ch4ExpLock(true); ch4ExpCam('set3', 2500); ch4StartSegment(8);
   }
@@ -7947,7 +7950,7 @@ window.addEventListener('message', function(ev){
 });
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.99';
+var CH4V='?v=1.3.100';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
@@ -7965,7 +7968,7 @@ function ch4PlayIntro(){
   abVibe(AB_VTXT);
 }
 function ch4IntroHide(){ var intro=ch4El('ch4Intro'); if(intro){ intro.classList.add('out'); } }   /* sai (junto com a 1ª imagem) */
-function ch4IntroReset(){ var intro=ch4El('ch4Intro'); if(intro){ intro.classList.remove('up','out'); } ['ch4IntroNum','ch4IntroTitle','ch4IntroSub'].forEach(function(id){ var e=ch4El(id); if(e){ e.classList.remove('in'); } }); var w=ch4El('ch4ImgWrap'); if(w){ w.classList.remove('in','out','drama','drama-out'); } var g=ch4El('ch4Glow'); if(g){ g.classList.remove('on'); } ch4ImgName(''); ch4ImgLabel(''); ch4DateHide(); if(typeof ch4DuoReset==='function'){ ch4DuoReset(); } if(typeof ch4RadReset==='function'){ ch4RadReset(); } if(typeof ch4ExpReset==='function'){ ch4ExpReset(); } }
+function ch4IntroReset(){ var intro=ch4El('ch4Intro'); if(intro){ intro.classList.remove('up','out'); } ['ch4IntroNum','ch4IntroTitle','ch4IntroSub'].forEach(function(id){ var e=ch4El(id); if(e){ e.classList.remove('in'); } }); var w=ch4El('ch4ImgWrap'); if(w){ w.classList.remove('in','out','drama','drama-out'); } var g=ch4El('ch4Glow'); if(g){ g.classList.remove('on'); } ch4ImgName(''); ch4ImgLabel(''); ch4DateHide(); if(typeof ch4DuoReset==='function'){ ch4DuoReset(); } if(typeof ch4RadReset==='function'){ ch4RadReset(); } if(typeof ch4ExpReset==='function'){ ch4ExpReset(); } if(typeof ch4HintClear==='function'){ ch4HintClear(); } }
 function ch4ImgName(txt){ var c=ch4El('ch4Cap'); if(!c) return; if(txt){ c.textContent=txt; void c.offsetWidth; c.classList.add('in'); } else { c.classList.remove('in'); c.textContent=''; } }
 /* rótulo preso à imagem (dentro do quadro): some junto com a imagem */
 function ch4ImgLabel(txt){ var l=ch4El('ch4ImgLabel'); if(!l) return; if(txt){ l.textContent=txt; void l.offsetWidth; l.classList.add('in'); } else { l.classList.remove('in'); l.textContent=''; } }
@@ -8186,16 +8189,20 @@ ch4Segs[6].build=function(){
     { t:5.0,  done:false, fn:function(){ ch4ExpCam('set2', 2500); } },                    /* zoom in suave: set1 -> set2 */
     { t:11.7, done:false, fn:function(){ ch4ExpAnno('chumbo'); } },                        /* "Chumbo" na lateral da caixa */
     { t:13.8, done:false, fn:function(){ ch4ExpAnno('polonio'); } },                       /* "Polônio" com reta até a caixa */
-    { t:18.0, done:false, fn:function(){ ch4ExpAnno('tampa'); } }                          /* "Tampa" com reta saindo do cano frontal */
+    { t:18.0, done:false, fn:function(){ ch4ExpAnno('tampa'); } },                         /* "Tampa" com reta saindo do cano frontal */
+    { t:22.0, done:false, fn:function(){ ch4ExpAnnoHide(); } }                             /* todas as palavras somem aos 22s */
   ];
 };
 ch4Segs[6].onStart=function(){
-  ch4.awaitMachine=null;
+  ch4.awaitMachine=null; ch4HintClear();
   var e=ch4El('ch4Exp');
   if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }   /* jump direto pelo marcador: experimento na tela em set1 */
   ch4ExpSet(false); ch4ExpLock(true); ch4ExpAnnoHide();     /* máquina off + travada + anotações limpas durante o 4.5 */
 };
-ch4Segs[6].onEnded=function(){ ch4ExpLock(false); ch4.awaitMachine='machineOn'; ch4ShowFab(false); ch4SetFab(false); };  /* sem play: espera LIGAR */
+ch4Segs[6].onEnded=function(){   /* sem play: espera o usuário LIGAR a máquina; se demorar >5s, mostra a mãozinha */
+  ch4ExpLock(false); ch4.awaitMachine='machineOn'; ch4ShowFab(false); ch4SetFab(false);
+  ch4HintClear(); ch4.hintTimer=setTimeout(function(){ if(ch4.awaitMachine==='machineOn'){ ch4ExpHint(true); } }, 5000);
+};
 /* dialogo4.5A (seg 7): tocou ao LIGAR a máquina (botão travado). Ao fim, libera o botão
    e passa a esperar o clique pra DESLIGAR. */
 ch4Segs[7].onEnded=function(){ ch4ExpLock(false); ch4.awaitMachine='machineOff'; ch4ShowFab(false); ch4SetFab(false); };
