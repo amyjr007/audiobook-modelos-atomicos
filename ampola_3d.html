@@ -35,7 +35,7 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;touch-actio
 </style>
 </head>
 <body>
-<h2 class="sr-only">Ampola de Crookes interativa em 3D sobre uma mesa de laboratório: botão liga/desliga que faz um raio catódico verde crescer do cátodo ao ânodo, com hélice e placas de deflexão removíveis e ligada a uma bateria.</h2>
+<h2 class="sr-only">Ampola de Crookes interativa em 3D: tubo de vidro horizontal apoiado num pedestal de madeira sobre uma mesa de laboratório, com botão liga/desliga que faz um raio catódico verde crescer do cátodo ao ânodo, hélice e placas de deflexão removíveis e uma bateria ligada por fios.</h2>
 <canvas id="c"></canvas>
 <div class="panel-frame"></div>
 <div class="amp-ctrls">
@@ -88,7 +88,7 @@ scene.add(fillLight);
 
 const spotLight = new THREE.SpotLight(0xffe8c0, 0.9, 24, Math.PI / 4.5, 0.5, 1.4);
 spotLight.position.set(1, 11, 2);
-spotLight.target.position.set(0.8, 0, 0);
+spotLight.target.position.set(0.2, 0, 0);
 scene.add(spotLight); scene.add(spotLight.target);
 
 // ═══════════════════════════════════════════════
@@ -204,45 +204,48 @@ function metalMat(color, extra) {
 }
 
 // ═══════════════════════════════════════════════
-//  GRUPO DA AMPOLA (origem = base do vidro)
+//  GRUPO DA AMPOLA — TUBO HORIZONTAL (eixo X) sobre pedestal de madeira
+//  (origem do grupo = centro do tubo, no eixo do raio)
 // ═══════════════════════════════════════════════
-const TUBE_X = 0.8;
-const BASE_Y = TABLE_TOP_Y + 0.42;   // base do vidro (dentro do soquete)
+const TUBE_CX  = 0.2;                       // centro do tubo no mundo (x)
+const AXIS_Y   = TABLE_TOP_Y + 2.05;        // altura do eixo do tubo (pedestal alto, como na referência)
 const tubeGroup = new THREE.Group();
-tubeGroup.position.set(TUBE_X, BASE_Y, 0);
+tubeGroup.position.set(TUBE_CX, AXIS_Y, 0);
 scene.add(tubeGroup);
 
-// ── Suporte de laboratório (base + soquete + haste + garra) ──
-const standMat = new THREE.MeshPhongMaterial({ color: 0x24262c, specular: 0x555f6a, shininess: 45 });
-const standBase = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.13, 1.35), standMat);
-standBase.position.set(0, TABLE_TOP_Y + 0.065 - BASE_Y, -0.18);
-standBase.castShadow = true; standBase.receiveShadow = true;
-tubeGroup.add(standBase);
+// ── Pedestal de madeira torneado (base redonda + balaústre + argola-berço) ──
+const pedestalMat = new THREE.MeshPhongMaterial({ map: woodSideTex, color: 0xb4732e, specular: 0x40220c, shininess: 32 });
+const PED_Y0 = TABLE_TOP_Y - AXIS_Y;        // topo da mesa em coords locais
+const pedBase = new THREE.Mesh(new THREE.CylinderGeometry(0.72, 0.80, 0.12, 28), pedestalMat);
+pedBase.position.set(0, PED_Y0 + 0.06, 0);
+pedBase.castShadow = true; pedBase.receiveShadow = true;
+tubeGroup.add(pedBase);
+const pedBase2 = new THREE.Mesh(new THREE.CylinderGeometry(0.50, 0.60, 0.10, 24), pedestalMat);
+pedBase2.position.set(0, PED_Y0 + 0.17, 0);
+pedBase2.castShadow = true;
+tubeGroup.add(pedBase2);
 
-const socket = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.52, 0.5, 24), metalMat(0x3a3e46));
-socket.position.set(0, TABLE_TOP_Y + 0.38 - BASE_Y, 0);
-socket.castShadow = true;
-tubeGroup.add(socket);
+const balusterPts = [
+  [0.34, 0.00], [0.30, 0.10], [0.20, 0.20], [0.17, 0.34], [0.26, 0.52],
+  [0.30, 0.66], [0.22, 0.80], [0.17, 0.96], [0.24, 1.14], [0.28, 1.26],
+  [0.18, 1.36], [0.14, 1.48], [0.20, 1.58], [0.24, 1.62],
+].map(p => new THREE.Vector2(p[0], p[1]));
+const baluster = new THREE.Mesh(new THREE.LatheGeometry(balusterPts, 26), pedestalMat);
+baluster.position.set(0, PED_Y0 + 0.22, 0);
+baluster.castShadow = true;
+tubeGroup.add(baluster);
 
-const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 4.55, 14), metalMat(0x494e58));
-rod.position.set(0, TABLE_TOP_Y + 0.13 + 2.275 - BASE_Y, -0.85);
-rod.castShadow = true;
-tubeGroup.add(rod);
+// argola-berço metálica em volta do centro do tubo
+const cradle = new THREE.Mesh(new THREE.TorusGeometry(0.66, 0.045, 12, 30), metalMat(0x8a6a3a, { specular: 0xd8b878 }));
+cradle.rotation.y = Math.PI / 2;   // eixo da argola ao longo de X (abraça o tubo)
+tubeGroup.add(cradle);
 
-const clampArm = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.55), metalMat(0x494e58));
-clampArm.position.set(0, 3.72, -0.58);
-tubeGroup.add(clampArm);
-const clampRing = new THREE.Mesh(new THREE.TorusGeometry(0.37, 0.045, 10, 28), metalMat(0x565c66));
-clampRing.rotation.x = Math.PI / 2;
-clampRing.position.set(0, 3.72, 0);
-tubeGroup.add(clampRing);
-
-// ── Vidro da ampola (perfil = silhueta do 2D: gargalos + bojo) ──
+// ── Vidro do tubo (horizontal; leve bojo no centro, gargalos nas pontas) ──
+const HALF_LEN = 2.10;
 const glassPts = [
-  [0.00, 0.00], [0.14, 0.01], [0.30, 0.05], [0.34, 0.16], [0.34, 0.62],
-  [0.46, 0.95], [0.78, 1.40], [1.05, 1.83], [1.12, 2.05], [1.05, 2.27],
-  [0.78, 2.70], [0.46, 3.15], [0.34, 3.48], [0.34, 3.94], [0.30, 4.05],
-  [0.14, 4.09], [0.00, 4.10],
+  [0.00, 0.00], [0.16, 0.01], [0.30, 0.05], [0.40, 0.14], [0.44, 0.30],
+  [0.50, 0.75], [0.58, 1.55], [0.62, 2.10], [0.58, 2.65], [0.50, 3.45],
+  [0.44, 3.90], [0.40, 4.06], [0.30, 4.15], [0.16, 4.19], [0.00, 4.20],
 ].map(p => new THREE.Vector2(p[0], p[1]));
 const glassGeo = new THREE.LatheGeometry(glassPts, 48);
 const glassMat = new THREE.MeshPhongMaterial({
@@ -250,41 +253,62 @@ const glassMat = new THREE.MeshPhongMaterial({
   transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false,
 });
 const glassMesh = new THREE.Mesh(glassGeo, glassMat);
+glassMesh.rotation.z = -Math.PI / 2;        // deita o tubo: eixo do lathe (+Y) vira +X
+glassMesh.position.x = -HALF_LEN;
 glassMesh.renderOrder = 6;
 glassMesh.castShadow = true;
 tubeGroup.add(glassMesh);
+
+// virolas metálicas nas duas pontas + terminais
+[-1, 1].forEach(sx => {
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.31, 0.31, 0.20, 22), metalMat(0x9aa2ab));
+  cap.rotation.z = Math.PI / 2;
+  cap.position.set(sx * 2.06, 0, 0);
+  cap.castShadow = true;
+  tubeGroup.add(cap);
+  const nip = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.16, 10), metalMat(0x7c828b));
+  nip.rotation.z = Math.PI / 2;
+  nip.position.set(sx * 2.20, 0, 0);
+  tubeGroup.add(nip);
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(0.085, 12, 10), metalMat(0xc4ccd4));
+  ball.position.set(sx * 2.30, 0, 0);
+  tubeGroup.add(ball);
+});
 
 // brilho interno verde (tubeglow do 2D): aparece quando ligada
 const tubeGlow = new THREE.Mesh(
   new THREE.SphereGeometry(1, 24, 18),
   new THREE.MeshBasicMaterial({ color: 0x39ff14, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })
 );
-tubeGlow.scale.set(0.92, 1.55, 0.92);
-tubeGlow.position.y = 2.05;
+tubeGlow.scale.set(1.85, 0.52, 0.52);
 tubeGlow.renderOrder = 2;
 tubeGroup.add(tubeGlow);
 
-// ── Cátodo (embaixo) e ânodo (em cima) ──
+// ── Cátodo (esquerda) e ânodo (direita), dentro do tubo ──
 const electrodeMat = metalMat(0xaab2bb, { specular: 0xffffff, shininess: 95 });
-const cathodeDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.34, 0.07, 24), electrodeMat);
-cathodeDisc.position.y = 0.80;
+const cathodeDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.30, 0.06, 22), electrodeMat);
+cathodeDisc.rotation.z = Math.PI / 2;
+cathodeDisc.position.set(-1.70, 0, 0);
 tubeGroup.add(cathodeDisc);
-const cathodeStem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.72, 10), electrodeMat);
-cathodeStem.position.y = 0.42;
+const cathodeStem = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.38, 10), electrodeMat);
+cathodeStem.rotation.z = Math.PI / 2;
+cathodeStem.position.set(-1.90, 0, 0);
 tubeGroup.add(cathodeStem);
 
-const anodeDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.30, 0.07, 24), electrodeMat);
-anodeDisc.position.y = 3.10;
+const anodeDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.30, 0.28, 0.06, 22), electrodeMat);
+anodeDisc.rotation.z = Math.PI / 2;
+anodeDisc.position.set(1.70, 0, 0);
 tubeGroup.add(anodeDisc);
-const anodeStem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.95, 10), electrodeMat);
-anodeStem.position.y = 3.60;
+const anodeStem = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.38, 10), electrodeMat);
+anodeStem.rotation.z = Math.PI / 2;
+anodeStem.position.set(1.90, 0, 0);
 tubeGroup.add(anodeStem);
 
 // ═══════════════════════════════════════════════
-//  BATERIA + FIOS
+//  BATERIA + FIOS (bateria atrás, à esquerda — como na referência)
 // ═══════════════════════════════════════════════
 const battGroup = new THREE.Group();
-battGroup.position.set(-2.35, TABLE_TOP_Y, 0.35);
+battGroup.position.set(-2.45, TABLE_TOP_Y, -0.95);
 scene.add(battGroup);
 
 const battGeo = new THREE.BoxGeometry(0.62, 1.38, 0.52);
@@ -344,7 +368,7 @@ const battMinus = labelPlane('−', { color: '#7fb0e0', px: 60, w: 96, h: 96, wo
 battMinus.position.set(-0.16, 1.28, 0.27);
 battGroup.add(battMinus);
 
-// fios: vermelho (+ -> ânodo, topo) e azul (− -> cátodo, base)
+// fios: vermelho (+ -> ânodo, ponta DIREITA) e azul (− -> cátodo, ponta ESQUERDA)
 function wire(points, color) {
   const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(p[0], p[1], p[2])));
   const geo = new THREE.TubeGeometry(curve, 64, 0.035, 8, false);
@@ -355,28 +379,29 @@ function wire(points, color) {
   scene.add(mesh);
   return mesh;
 }
-const tubeTopWorld = new THREE.Vector3(TUBE_X, BASE_Y + 4.12, 0);
-const tubeBotWorld = new THREE.Vector3(TUBE_X + 0.30, TABLE_TOP_Y + 0.52, 0.30);
+const TERM_R_X = TUBE_CX + 2.30, TERM_L_X = TUBE_CX - 2.30;
 wire([
-  [-2.19, TABLE_TOP_Y + 1.50, 0.35],
-  [-2.05, TABLE_TOP_Y + 2.6, 0.10],
-  [-1.30, BASE_Y + 4.6, -0.55],
-  [-0.10, BASE_Y + 4.75, -0.35],
-  [tubeTopWorld.x, tubeTopWorld.y + 0.10, tubeTopWorld.z],
+  [-2.29, TABLE_TOP_Y + 1.50, -0.95],
+  [-1.50, TABLE_TOP_Y + 0.70, -1.40],
+  [ 0.80, TABLE_TOP_Y + 0.55, -1.45],
+  [ 2.85, TABLE_TOP_Y + 1.40, -0.80],
+  [TERM_R_X + 0.06, AXIS_Y - 0.06, -0.14],
+  [TERM_R_X, AXIS_Y, 0],
 ], 0xbb4f29);
 wire([
-  [-2.51, TABLE_TOP_Y + 1.50, 0.35],
-  [-2.75, TABLE_TOP_Y + 0.75, 0.55],
-  [-1.60, TABLE_TOP_Y + 0.18, 0.68],
-  [-0.30, TABLE_TOP_Y + 0.16, 0.60],
-  [tubeBotWorld.x, tubeBotWorld.y, tubeBotWorld.z],
+  [-2.61, TABLE_TOP_Y + 1.50, -0.95],
+  [-2.95, TABLE_TOP_Y + 0.70, -0.65],
+  [-2.62, TABLE_TOP_Y + 0.45, 0.15],
+  [TERM_L_X - 0.10, AXIS_Y - 0.35, 0.22],
+  [TERM_L_X, AXIS_Y, 0],
 ], 0x4d7fad);
 
 // ═══════════════════════════════════════════════
-//  RAIO CATÓDICO (camadas de tubo + brilhos)
+//  RAIO CATÓDICO — horizontal (cátodo esq. -> ânodo dir.)
+//  Com placas: entorta PARA CIMA, rumo à placa + (em cima)
 // ═══════════════════════════════════════════════
-const BEAM_Y0 = 0.88, BEAM_Y1 = 3.02, BEAM_MID = (BEAM_Y0 + BEAM_Y1) / 2;
-const BEND_X  = 0.92;   // controle da curva rumo à placa + (mesmo exagero do 2D)
+const BEAM_X0 = -1.62, BEAM_X1 = 1.62, BEAM_MIDX = 0;
+const BEND_Y  = 0.55;
 const beamGroup = new THREE.Group();
 beamGroup.renderOrder = 3;
 tubeGroup.add(beamGroup);
@@ -390,9 +415,9 @@ const BEAM_LAYERS = [
 const TUBULAR = 40, RADIAL = 10;
 let beamMeshes = [];
 function beamCurve(bent) {
-  const ctrl = new THREE.Vector3(bent ? BEND_X : 0, BEAM_MID, 0);
+  const ctrl = new THREE.Vector3(BEAM_MIDX, bent ? BEND_Y : 0, 0);
   return new THREE.QuadraticBezierCurve3(
-    new THREE.Vector3(0, BEAM_Y0, 0), ctrl, new THREE.Vector3(0, BEAM_Y1, 0)
+    new THREE.Vector3(BEAM_X0, 0, 0), ctrl, new THREE.Vector3(BEAM_X1, 0, 0)
   );
 }
 function rebuildBeam(bent) {
@@ -413,7 +438,7 @@ function rebuildBeam(bent) {
 }
 rebuildBeam(false);
 
-// brilho do cátodo (3 sprites aditivos)
+// brilho do cátodo (3 sprites aditivos, na ponta esquerda)
 function glowTexture(inner, outer) {
   const cv = document.createElement('canvas'); cv.width = cv.height = 64;
   const ctx = cv.getContext('2d');
@@ -429,7 +454,7 @@ const cathodeGlow = [];
     map: glowTexGreen, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending,
   }));
   s.scale.set(size, size, 1);
-  s.position.set(0, BEAM_Y0 + 0.02, 0);
+  s.position.set(BEAM_X0 + 0.02, 0, 0);
   s.renderOrder = 4;
   s.userData.baseOp = op;
   tubeGroup.add(s);
@@ -438,27 +463,29 @@ const cathodeGlow = [];
 
 // luzes verdes reais (iluminam a mesa quando ligada)
 const beamLight = new THREE.PointLight(0x39ff14, 0, 10);
-beamLight.position.set(TUBE_X, BASE_Y + BEAM_MID, 0);
+beamLight.position.set(TUBE_CX, AXIS_Y, 0);
 scene.add(beamLight);
 const cathodeLight = new THREE.PointLight(0x66ff33, 0, 4.5);
-cathodeLight.position.set(TUBE_X, BASE_Y + BEAM_Y0, 0);
+cathodeLight.position.set(TUBE_CX + BEAM_X0, AXIS_Y, 0);
 scene.add(cathodeLight);
 
 // ═══════════════════════════════════════════════
-//  HÉLICE (dentro da ampola, gira com o raio reto)
+//  HÉLICE (dentro do tubo, à direita do centro; roda vertical)
 // ═══════════════════════════════════════════════
 const propGroup = new THREE.Group();
-propGroup.position.set(-0.32, 2.25, 0);
+const PROP_X = 0.55, PROP_HUB_Y = -0.30;
+propGroup.position.set(PROP_X, PROP_HUB_Y, 0);
 tubeGroup.add(propGroup);
 const propMats = [];
 function propMat(color, extra) { const m = metalMat(color, Object.assign({ transparent: true }, extra || {})); propMats.push(m); return m; }
 
-const propArm = new THREE.Mesh(new THREE.BoxGeometry(0.66, 0.065, 0.065), propMat(0x9aa2ab));
-propArm.position.set(-0.33, 0, 0);
-propGroup.add(propArm);
-const propBracket = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.24, 0.10), propMat(0x7c848d));
-propBracket.position.set(-0.68, 0, 0);
-propGroup.add(propBracket);
+// poste de apoio no "chão" do vidro
+const propPost = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.26, 0.065), propMat(0x9aa2ab));
+propPost.position.set(0, -0.16, 0);
+propGroup.add(propPost);
+const propFoot = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.05, 0.12), propMat(0x7c848d));
+propFoot.position.set(0, -0.28, 0);
+propGroup.add(propFoot);
 
 const wheel = new THREE.Group();
 propGroup.add(wheel);
@@ -477,22 +504,22 @@ for (let i = 0; i < 6; i++) {
 }
 
 // ═══════════════════════════════════════════════
-//  PLACAS DE DEFLEXÃO (− azul à esquerda, + laranja à direita)
+//  PLACAS DE DEFLEXÃO (− azul EMBAIXO, + laranja EM CIMA)
+//  o raio entorta pra cima, atraído pela placa +
 // ═══════════════════════════════════════════════
 function plateTexture(sign, color) {
-  const cv = document.createElement('canvas'); cv.width = 64; cv.height = 128;
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 64;
   const ctx = cv.getContext('2d');
-  ctx.fillStyle = 'rgba(0,0,0,0)'; ctx.fillRect(0, 0, 64, 128);
   ctx.font = '700 30px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillStyle = color;
-  [26, 64, 102].forEach(y => ctx.fillText(sign, 32, y));
+  [26, 64, 102].forEach(x => ctx.fillText(sign, x, 32));
   return new THREE.CanvasTexture(cv);
 }
-function makePlate(side) {   // side: -1 (esq, −) | +1 (dir, +)
+function makePlate(side) {   // side: -1 (embaixo, −) | +1 (em cima, +)
   const g = new THREE.Group();
   const body = new THREE.Mesh(
-    new THREE.BoxGeometry(0.055, 0.78, 0.42),
+    new THREE.BoxGeometry(0.78, 0.055, 0.42),
     new THREE.MeshPhongMaterial({
       color: side < 0 ? 0x2c3b4e : 0x3f3030,
       specular: side < 0 ? 0x5e80ac : 0x9a5a5a,
@@ -501,46 +528,45 @@ function makePlate(side) {   // side: -1 (esq, −) | +1 (dir, +)
   );
   g.add(body);
   const signs = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.34, 0.68),
+    new THREE.PlaneGeometry(0.68, 0.34),
     new THREE.MeshBasicMaterial({
       map: plateTexture(side < 0 ? '−' : '+', side < 0 ? '#74b6ff' : '#ff8a72'),
       transparent: true, depthWrite: false, side: THREE.DoubleSide,
     })
   );
-  signs.rotation.y = side < 0 ? Math.PI / 2 : -Math.PI / 2;
-  signs.position.x = side * -0.033;
+  signs.rotation.x = side < 0 ? -Math.PI / 2 : Math.PI / 2;
+  signs.position.y = side * -0.033;
   signs.renderOrder = 5;
   g.add(signs);
-  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.6, 8),
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.45, 8),
     new THREE.MeshPhongMaterial({ color: 0x7c828b, specular: 0xcfd6dd, shininess: 60, transparent: true }));
-  stem.rotation.z = Math.PI / 2;
-  stem.position.x = side * 0.55;
+  stem.position.y = side * 0.36;
   g.add(stem);
-  const cap = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.15, 0.15),
+  const cap = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.12, 0.15),
     new THREE.MeshPhongMaterial({ color: 0x3a4048, specular: 0x99a2ac, shininess: 55, transparent: true }));
-  cap.position.x = side * 0.9;
+  cap.position.y = side * 0.62;
   g.add(cap);
-  g.position.set(side * 0.58, 1.72, 0);
+  g.position.set(-0.45, side * 0.34, 0);
   g.userData.side = side;
   g.userData.mats = [body.material, signs.material, stem.material, cap.material];
   tubeGroup.add(g);
   return g;
 }
-const plateLGroup = makePlate(-1);
-const plateRGroup = makePlate(+1);
+const plateLGroup = makePlate(-1);   // − embaixo
+const plateRGroup = makePlate(+1);   // + em cima
 
 // ═══════════════════════════════════════════════
-//  RÓTULOS 3D (ânodo, cátodo, raios catódicos)
+//  RÓTULOS 3D (cátodo à esquerda, ânodo à direita)
 // ═══════════════════════════════════════════════
 const anodeLabel = labelPlane('ânodo (+)', { color: '#cdd3da', px: 34, worldW: 0.86 });
-anodeLabel.position.set(0.92, 3.22, 0.30);
+anodeLabel.position.set(1.80, 0.88, 0.30);
 tubeGroup.add(anodeLabel);
 
 const catTexNormal = textTexture('cátodo (−)', { color: '#cdd3da', px: 34 });
 const catTexPulse  = textTexture('cátodo (−)', { color: '#ffd24a', px: 34 });
 const catLabel = labelPlane('cátodo (−)', { color: '#cdd3da', px: 34, worldW: 0.86 });
 catLabel.material.map = catTexNormal;
-catLabel.position.set(0.95, 0.70, 0.30);
+catLabel.position.set(-1.80, 0.88, 0.30);
 tubeGroup.add(catLabel);
 
 // "Raios catódicos" com linha-guia tracejada (só aparece a pedido da pág. pai)
@@ -549,18 +575,18 @@ rayLabelCv.width = 320; rayLabelCv.height = 72;
 (() => {
   const ctx = rayLabelCv.getContext('2d');
   ctx.strokeStyle = '#5fae53'; ctx.lineWidth = 3; ctx.setLineDash([9, 9]);
-  ctx.beginPath(); ctx.moveTo(4, 46); ctx.lineTo(62, 42); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(14, 66); ctx.lineTo(40, 44); ctx.stroke();
   ctx.font = '700 30px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   ctx.fillStyle = '#8dff77';
-  ctx.fillText('Raios catódicos', 70, 36);
+  ctx.fillText('Raios catódicos', 48, 28);
 })();
 const rayLabel = new THREE.Mesh(
   new THREE.PlaneGeometry(1.5, 0.34),
   new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(rayLabelCv), transparent: true, opacity: 0, depthWrite: false })
 );
 rayLabel.renderOrder = 8;
-rayLabel.position.set(1.05, 2.62, 0.35);
+rayLabel.position.set(0.05, 1.02, 0.35);
 tubeGroup.add(rayLabel);
 
 const billboards = [anodeLabel, catLabel, rayLabel, battLabel, battPlus, battMinus];
@@ -588,11 +614,11 @@ const eTexSign  = electronTexture(true);
 const e9St = { active: false, acc: 0, parts: [] };
 const E9_SPAWN = 0.30, E9_SPEED = 0.42;
 function beamLocalPos(t, bent) {
-  if (!bent) { return new THREE.Vector3(0, BEAM_Y0 + (BEAM_Y1 - BEAM_Y0) * t, 0); }
+  if (!bent) { return new THREE.Vector3(BEAM_X0 + (BEAM_X1 - BEAM_X0) * t, 0, 0); }
   const u = 1 - t;
   return new THREE.Vector3(
-    2 * u * t * BEND_X,
-    u * u * BEAM_Y0 + 2 * u * t * BEAM_MID + t * t * BEAM_Y1,
+    u * u * BEAM_X0 + 2 * u * t * BEAM_MIDX + t * t * BEAM_X1,
+    2 * u * t * BEND_Y,
     0
   );
 }
@@ -631,7 +657,7 @@ tubeGroup.add(e9Feat);
 billboards.push(featLabel);
 
 const E9_FEAT_START = beamLocalPos(0, false);
-const E9_FEAT_END   = new THREE.Vector3(1.30, 2.50, 0.95);
+const E9_FEAT_END   = new THREE.Vector3(0.55, 1.55, 0.95);
 const e9FeatAnim = { active: false, t: 0 };
 
 // ═══════════════════════════════════════════════
@@ -747,7 +773,7 @@ function e9(act) {
   if (act === 'reset') {
     e9St.active = false; e9Clear(); e9MulTarget = 1; e9Mul = 1;
     e9Feat.visible = false; e9FeatAnim.active = false; e9FeatAnim.t = 0;
-    featLabel.material.opacity = 0;
+    featLabel.material.opacity = 0; featLabel.userData.fadeIn = false;
     return;
   }
   if (act === 'hideRays') { e9MulTarget = 0; return; }
@@ -765,14 +791,14 @@ let rayLabelTarget = 0;
 //  CÂMERA — travada; presets nomeados + captura (C/L)
 // ═══════════════════════════════════════════════
 const CAM_MIN = 3, CAM_MAX = 40;
-const camTarget = new THREE.Vector3(-0.30, 0.95, 0);
-let camTheta = -0.25;
-let camPhi   = 1.18;
-let camDist  = 11.5;
+const camTarget = new THREE.Vector3(0.10, 0.75, 0);
+let camTheta = -0.15;
+let camPhi   = 1.25;
+let camDist  = 12.5;
 let camLocked = true;
 
 const CAM_PRESETS = {
-  set1: { target: [-0.30, 0.95, 0], theta: -0.25, phi: 1.18, dist: 11.5 },
+  set1: { target: [0.10, 0.75, 0], theta: -0.15, phi: 1.25, dist: 12.5 },
 };
 let camTween = null;
 function applyCam() {
@@ -867,7 +893,7 @@ function update() {
   // hélice: presença (desce + some) e giro (ease-in, sentido invertido)
   const pTgt = hasProp ? 1 : 0;
   propT += Math.sign(pTgt - propT) * Math.min(Math.abs(pTgt - propT), dt / 0.42);
-  propGroup.position.y = 2.25 - (1 - propT) * 0.55;
+  propGroup.position.y = PROP_HUB_Y - (1 - propT) * 0.5;
   propMats.forEach(m => { m.opacity = propT; });
   propGroup.visible = propT > 0.01;
   const spinning = (on && hasProp && !hasPlates);
@@ -877,12 +903,12 @@ function update() {
   wAngle = (wAngle - wVel * dt) % 360;
   wheel.rotation.z = wAngle * Math.PI / 180;
 
-  // placas: deslizam das laterais + fade
+  // placas: deslizam de cima/baixo + fade
   const plTgt = hasPlates ? 1 : 0;
   plateT += Math.sign(plTgt - plateT) * Math.min(Math.abs(plTgt - plateT), dt / 0.42);
   [plateLGroup, plateRGroup].forEach(g => {
     const side = g.userData.side;
-    g.position.x = side * (0.58 + (1 - plateT) * 0.5);
+    g.position.y = side * (0.34 + (1 - plateT) * 0.5);
     g.userData.mats.forEach(m => { m.opacity = plateT; });
     g.visible = plateT > 0.01;
   });
