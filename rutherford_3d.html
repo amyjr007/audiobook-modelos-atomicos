@@ -33,6 +33,20 @@ body {
   text-shadow:0 0 18px rgba(255,200,0,0.35);
   pointer-events:none; white-space:nowrap;
 }
+/* ── Anotações roteirizadas (dialogo4.5) ───────── */
+#annoLayer { position:fixed; inset:0; pointer-events:none; z-index:20; overflow:hidden; }
+#annoSvg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.anno-line { stroke:#fff; stroke-width:2; opacity:0; transition:opacity .45s ease; filter:drop-shadow(0 1px 3px rgba(0,0,0,.7)); }
+.anno-line.show { opacity:.92; }
+.anno {
+  position:absolute; left:0; top:0; transform:translate(-50%,-50%) scale(.6);
+  font-family:'Fredoka',sans-serif; font-weight:700; white-space:nowrap;
+  color:#fff; font-size:clamp(.9rem,3.4vw,1.25rem); letter-spacing:.02em;
+  text-shadow:0 2px 10px rgba(0,0,0,.85), 0 0 4px rgba(0,0,0,.9);
+  opacity:0; transition:opacity .5s ease, transform .5s cubic-bezier(.34,1.56,.64,1);
+}
+.anno.show { opacity:1; transform:translate(-50%,-50%) scale(1); }
+.anno-lead { color:#ffe14d; text-shadow:0 2px 10px rgba(0,0,0,.9), 0 0 6px rgba(0,0,0,.9); }
 #obsBtn {
   position: fixed; top: 48px; left: 16px;
   background: rgba(20, 20, 35, 0.88);
@@ -428,6 +442,13 @@ body {
 </head>
 <body>
 <canvas id="c"></canvas>
+<!-- Anotações roteirizadas (dialogo4.5): Chumbo / Polônio / Tampa, ancoradas em 3D -->
+<div id="annoLayer">
+  <svg id="annoSvg"><line id="annoLine-polonio" class="anno-line"/><line id="annoLine-tampa" class="anno-line"/></svg>
+  <div class="anno" id="anno-chumbo">Chumbo</div>
+  <div class="anno anno-lead" id="anno-polonio">Polônio</div>
+  <div class="anno anno-lead" id="anno-tampa">Tampa</div>
+</div>
 <div id="label">EXPERIMENTO DE RUTHERFORD · 1909 · v22</div>
 <div id="hint">🖱 ARRASTAR: GIRAR · 🤏 PINÇA: ZOOM · ✌️ 2 DEDOS: MOVER · TOQUE NA FOLHA: VISÃO ATÔMICA</div>
 
@@ -1083,6 +1104,34 @@ if (boxPedH > 0.005) {
 
 boxGroup.position.set(-6.5, BOX_Y, 0);
 boxGroup.rotation.y = Math.PI / 2;  // barrel points +X
+boxGroup.updateMatrixWorld(true);
+
+// ── Anotações roteirizadas (dialogo4.5): Chumbo / Polônio / Tampa ──
+// Âncoras em coords LOCAIS da boxGroup → mundo (boxGroup é estático).
+const ANNOS = {
+  chumbo:  { el:document.getElementById('anno-chumbo'),  line:null,
+             anchor:new THREE.Vector3(BOX_W/2, 0.15, 0.0),        off:[0, 0]   }, // texto na lateral da caixa
+  polonio: { el:document.getElementById('anno-polonio'), line:document.getElementById('annoLine-polonio'),
+             anchor:new THREE.Vector3(0.35, BOX_H/2, 0.45),       off:[70, -74] }, // reta até a caixa
+  tampa:   { el:document.getElementById('anno-tampa'),   line:document.getElementById('annoLine-tampa'),
+             anchor:new THREE.Vector3(0, 0.05, BARREL_TIP_Z),     off:[96, 34]  }, // reta até o cano/tampa frontal
+};
+Object.keys(ANNOS).forEach(k => boxGroup.localToWorld(ANNOS[k].anchor));
+let annoShown = {};
+function updateAnnos(){
+  const w = renderer.domElement.clientWidth, h = renderer.domElement.clientHeight;
+  for (const id in ANNOS){
+    if (!annoShown[id]) continue;
+    const a = ANNOS[id];
+    const p = a.anchor.clone().project(camera);
+    const sx = (p.x*0.5+0.5)*w, sy = (-p.y*0.5+0.5)*h;
+    const lx = sx + a.off[0], ly = sy + a.off[1];
+    a.el.style.left = lx+'px'; a.el.style.top = ly+'px';
+    if (a.line){ a.line.setAttribute('x1', sx); a.line.setAttribute('y1', sy); a.line.setAttribute('x2', lx); a.line.setAttribute('y2', ly); }
+  }
+}
+function showAnno(id){ const a = ANNOS[id]; if(!a) return; annoShown[id]=true; updateAnnos(); a.el.classList.add('show'); if(a.line) a.line.classList.add('show'); }
+function hideAnnos(){ for (const id in ANNOS){ const a=ANNOS[id]; a.el.classList.remove('show'); if(a.line) a.line.classList.remove('show'); } annoShown = {}; }
 
 // ═══════════════════════════════════════════════
 //  SLIT PLATE (collimator) — enhanced
@@ -1440,6 +1489,7 @@ function playClick() { try { clickSound.currentTime = 0; const p = clickSound.pl
 
 function setOpen(val, silent) {
   open = val;
+  if (val) hideAnnos();   // ao LIGAR a máquina, as anotações (Chumbo/Polônio/Tampa) saem em fade
   capOpenTarget = val ? 1 : 0;
   // Knob: red (stop) when closed, green (running) when open
   capKnobMat.color.setHex(open ? 0x44cc44 : 0xcc3311);
@@ -1563,6 +1613,8 @@ window.addEventListener('message', (ev) => {
   if (d.type === 'ruthCam' && d.preset) { tweenCamTo(d.preset, d.dur); return; }
   if (d.type === 'ruthLock') { machineLocked = !!d.locked; return; }
   if (d.type === 'ruthSet')  { setOpen(!!d.on, true); return; }
+  if (d.type === 'ruthAnno' && d.id) { showAnno(d.id); return; }   // dialogo4.5: mostra Chumbo/Polônio/Tampa
+  if (d.type === 'ruthAnnoHide') { hideAnnos(); return; }
   if (d.type === 'ruthAtomic') { atomicUnlocked = !!d.on; return; }   // liga/desliga a interação oculta (visão atômica)
 });
 
@@ -2391,6 +2443,7 @@ document.querySelectorAll('.flip-card[data-flip]').forEach(card => {
 function animate() {
   requestAnimationFrame(animate);
   update();
+  updateAnnos();
   renderer.render(scene, camera);
 }
 animate();
