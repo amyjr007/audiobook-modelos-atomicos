@@ -435,7 +435,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch4-wall{position:absolute;inset:0;z-index:11;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;
   background:radial-gradient(120% 90% at 50% 45%, #12100a 0%, #08070c 60%, #050409 100%);transition:opacity .5s ease}
 .ch4-wall.on{opacity:1;visibility:visible}
-.ch4-wall.fade{opacity:0;transition:opacity .8s ease}   /* some tudo em fade (dialogo4.8, 21.6s) */
+.ch4-wall.on .ch4-wall-atoms.fade{opacity:0;transition:opacity .8s ease}   /* some SÓ a parede de átomos (dialogo4.8, 21.6s); o ambiente/backdrop fica */
 .ch4-wall-atoms{position:absolute;top:50%;left:52%;transform:translate(-50%,-50%) scale(.18);opacity:0;
   display:flex;flex-direction:column;align-items:center;transition:transform 1.25s cubic-bezier(.52,.02,.35,1),opacity .8s ease}
 .ch4-wall.on .ch4-wall-atoms{transform:translate(-50%,-50%) scale(1);opacity:1}
@@ -463,15 +463,14 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch4-wall-label.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 /* dialogo4.8: modelo nuclear — 3 núcleos (só prótons, 3D) muito distantes + feixe alfa */
 .ch4-nuc{position:absolute;inset:0;z-index:12;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;
-  background:radial-gradient(120% 90% at 50% 45%, #0b0f16 0%, #06070c 60%, #04040a 100%);transition:opacity .8s ease}
+  background:transparent;transition:opacity .8s ease}   /* fundo transparente: reusa o ambiente/backdrop do ch4Wall */
 .ch4-nuc.on{opacity:1;visibility:visible}
-.ch4-nuc-atom{position:absolute;left:52%;transform:translate(-50%,-50%);perspective:220px}
-.ch4-nuc-cluster{position:relative;width:12vmin;height:12vmin;transform-style:preserve-3d;animation:ch4NucSpin 8s linear infinite}
-@keyframes ch4NucSpin{to{transform:rotateY(360deg)}}
-.ch4-nuc-p{position:absolute;left:50%;top:50%;width:4.6vmin;height:4.6vmin;margin:-2.3vmin;border-radius:50%;
+.ch4-nuc-atom{position:absolute;left:52%;transform:translate(-50%,-50%);perspective:260px}
+.ch4-nuc-cluster{position:relative;width:7.2vmin;height:7.2vmin;transform-style:preserve-3d;transform:rotateX(-16deg) rotateY(26deg)}   /* estático, mas em 3D (inclinado) */
+.ch4-nuc-p{position:absolute;left:50%;top:50%;width:2.76vmin;height:2.76vmin;margin:-1.38vmin;border-radius:50%;
   background:radial-gradient(circle at 33% 27%,#fff 0%,#fff1b0 12%,#ffcc33 46%,#e59400 78%,#a86500 100%);
-  box-shadow:inset -1px -2px 3px rgba(0,0,0,.4),inset 1px 1px 2px rgba(255,255,255,.5),0 2px 6px rgba(0,0,0,.5)}
-.ch4-nuc-p::after{content:'+';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;font-size:2.3vmin;color:#000}
+  box-shadow:inset -1px -1px 2px rgba(0,0,0,.4),inset 1px 1px 1px rgba(255,255,255,.5),0 1px 4px rgba(0,0,0,.5)}
+.ch4-nuc-p::after{content:'+';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:900;font-size:1.4vmin;color:#000}
 .ch4-nuc-beam{position:absolute;inset:0;z-index:1}
 .ch4-nuc-fly{position:absolute;left:-6%;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);
   background:radial-gradient(circle at 34% 30%,#fff,#ff74c0 55%,#c01e6e 100%);box-shadow:0 0 12px 3px rgba(255,100,190,.85);
@@ -2730,7 +2729,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.118</div>
+<div class="app-version" id="appVersion">v1.3.119</div>
 
 </div>
 <script>
@@ -8056,8 +8055,8 @@ function ch4WallStep(ts){
     if(inzone!==p.jelly){ p.jelly=inzone; p.el.classList.toggle('jelly', inzone); }   /* geleia ao entrar/sair */
     if(!p.acted && p.vx>0 && p.x>=z.cx){        /* interação no meio da parede (num átomo) */
       p.acted=true;
-      if(p.type==='deflect'){ p.vy=(Math.random()<0.5?-1:1)*(110+Math.random()*130); }
-      else if(p.type==='back'){ p.vx=-Math.abs(p.vx)*0.9; p.vy=(Math.random()<0.5?-1:1)*(40+Math.random()*70); }
+      if(p.type==='deflect'){ p.vy=(Math.random()<0.5?-1:1)*(110+Math.random()*130); abVibe(30); }               /* vibra ao desviar */
+      else if(p.type==='back'){ p.vx=-Math.abs(p.vx)*0.9; p.vy=(Math.random()<0.5?-1:1)*(40+Math.random()*70); abVibe([45,25,60]); }  /* vibração forte ao bater e voltar */
     }
     var speed = inzone ? 0.5 : 1;               /* bem mais lenta dentro da "geleia" (efeito visível) */
     p.x += p.vx*speed*dt; p.y += p.vy*dt;
@@ -8091,18 +8090,17 @@ function ch4WallLabelShow(){
   void lbl.offsetWidth; lbl.classList.add('show'); abVibe(AB_VTXT);
 }
 function ch4WallLabelHide(){ var lbl=ch4El('ch4WallLabel'); if(lbl){ lbl.classList.remove('show'); } var line=ch4El('ch4WallLine'); if(line){ line.classList.remove('show'); } }
-function ch4WallFadeOut(){ ch4WallBeamStop(); var w=ch4El('ch4Wall'); if(w){ w.classList.add('fade'); } ch4WallLabelHide(); }   /* some tudo em fade (dialogo4.8) */
+function ch4WallFadeOut(){ ch4WallBeamStop(); ch4WallPartsClear(); var a=ch4El('ch4WallAtoms'); if(a){ a.classList.add('fade'); } ch4WallLabelHide(); }   /* some SÓ a parede de átomos; o ambiente (backdrop do ch4Wall) fica */
 /* ----- dialogo4.8: modelo nuclear — 3 núcleos (só prótons, 3D) muito distantes + feixe alfa ----- */
 var ch4NucBeamId=null;
-var CH4_PROTONS=[[0,0,0],[2.3,1.4,1.2],[-1.9,1.6,-1.4],[1.7,-1.8,-1.2],[-1.7,-1.4,1.8],[0.4,2.3,-1.5],[-0.6,-2.3,0.7]];
+var CH4_PROTONS=[[0,0,0],[1.38,0.84,0.72],[-1.14,0.96,-0.84],[1.02,-1.08,-0.72],[-1.02,-0.84,1.08],[0.24,1.38,-0.9],[-0.36,-1.38,0.42]];  /* offsets já 40% menores */
 function ch4NucBuild(){
   var nuc=ch4El('ch4Nuc'); if(!nuc) return;
   nuc.querySelectorAll('.ch4-nuc-atom').forEach(function(a){ a.remove(); });   /* limpa núcleos antigos */
   var tops=[15, 50, 85];                                                       /* 3 núcleos: cima / meio / baixo (distância imensa) */
   tops.forEach(function(t){
     var atom=document.createElement('div'); atom.className='ch4-nuc-atom'; atom.style.top=t+'%';
-    var cl=document.createElement('div'); cl.className='ch4-nuc-cluster';
-    cl.style.animationDelay=(-Math.random()*8)+'s';
+    var cl=document.createElement('div'); cl.className='ch4-nuc-cluster';   /* estático (sem giro), mas em 3D */
     CH4_PROTONS.forEach(function(o){
       var p=document.createElement('span'); p.className='ch4-nuc-p';
       p.style.transform='translate3d('+o[0]+'vmin,'+o[1]+'vmin,'+o[2]+'vmin)';
@@ -8120,7 +8118,9 @@ function ch4NucBeamStart(){
   var box=ch4El('ch4NucBeam'); if(!box || ch4NucBeamId) return;
   ch4NucBeamId=setInterval(function(){
     var p=document.createElement('div'); p.className='ch4-nuc-fly';
-    p.style.top=(8+Math.random()*84)+'%';                                     /* passam direto, quase sempre no vazio entre os núcleos */
+    /* núcleos em 15% / 50% / 85%: as partículas passam SÓ nos vãos entre eles (nunca alinhadas) */
+    var gap=(Math.random()<0.5) ? (26+Math.random()*13) : (61+Math.random()*13);   /* vão de cima (26-39%) ou de baixo (61-74%) */
+    p.style.top=gap+'%';
     p.style.animationDuration=(2.6+Math.random()*0.9).toFixed(2)+'s';
     box.appendChild(p);
     p.addEventListener('animationend', function(){ p.remove(); });
@@ -8142,6 +8142,7 @@ function ch4WallReset(){
   ch4WallBeamStop(); ch4WallPartsClear(); ch4WallLabelHide();
   if(ch4.wallStartTimer){ clearTimeout(ch4.wallStartTimer); ch4.wallStartTimer=null; }
   var w=ch4El('ch4Wall'); if(w){ w.classList.remove('on','fade'); }
+  var a=ch4El('ch4WallAtoms'); if(a){ a.classList.remove('fade'); }
   var box=ch4El('ch4WallBeam'); if(box){ box.innerHTML=''; }
 }
 /* mãozinha "aperte aqui" apontando pro símbolo (mostra se o usuário demorar a clicar) */
@@ -8571,7 +8572,7 @@ ch4Segs[17].build=function(){
   return [
     { t:7.6,  done:false, fn:function(){ ch4WallLabelShow(); } },                                              /* reta + "massa difusa positiva" */
     { t:15.0, done:false, fn:function(){ ch4WallLabelHide(); ch4WallBeamStart({ straight:1, deflect:0, back:0, interval:1300 }); } }, /* some o rótulo; começam poucas partículas (com geleia) */
-    { t:27.0, done:false, fn:function(){ ch4WallSpawnBack(); ch4WallBeamStart({ straight:0.82, deflect:0.16, back:0.03, interval:1050 }); } }  /* uma volta agora + mix (maioria direto) */
+    { t:27.0, done:false, fn:function(){ ch4WallSpawnBack(); ch4WallBeamStart({ straight:0.55, deflect:0.32, back:0.13, interval:1000 }); } }  /* uma volta agora + mais desviadas/voltas (com vibração) */
   ];
 };
 ch4Segs[17].onEnded=function(){ ch4ShowFab(true); ch4SetFab(false); };   /* play ao final (a parede + feixe seguem na tela) */
@@ -8586,8 +8587,8 @@ ch4Segs[18].onStart=function(){
 };
 ch4Segs[18].build=function(){
   return [
-    { t:21.6, done:false, fn:function(){ ch4WallFadeOut(); } },   /* some tudo (a parede + feixe) em fade */
-    { t:28.0, done:false, fn:function(){ ch4WallReset(); ch4NucShow(); } },   /* 3 núcleos (só prótons, 3D, distantes) */
+    { t:21.6, done:false, fn:function(){ ch4WallFadeOut(); } },   /* some SÓ a parede de átomos; o ambiente (backdrop) fica */
+    { t:28.0, done:false, fn:function(){ var a=ch4El('ch4WallAtoms'); if(a){ a.innerHTML=''; a.classList.remove('fade'); } ch4WallLabelHide(); ch4NucShow(); } },   /* 3 núcleos (só prótons, 3D, distantes) no MESMO ambiente */
     { t:31.0, done:false, fn:function(){ ch4NucBeamStart(); } }               /* feixe alfa passa direto entre os núcleos */
   ];
 };
