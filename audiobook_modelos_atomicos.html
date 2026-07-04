@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.110</div>
+<div class="app-version" id="appVersion">v1.3.111</div>
 
 </div>
 <script>
@@ -7936,6 +7936,8 @@ function ch4ExpAnno(id){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow)
 function ch4ExpAnnoHide(){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthAnnoHide' }, '*'); }catch(_){} } }
 /* "Observação 1..." digitada no topo da tela (dialogo4.5F) */
 var CH4_OBS1='"Observação 1 – A grande maioria das partículas alfa atravessam a folha de ouro como se não tivesse nada no caminho, mantendo a folha intacta"';
+var CH4_OBS2='"Observação 2. De vez em quando, algumas partículas que atravessam a folha são desviadas, um evento que demora bastante pra ser observado"';
+var CH4_OBS3='"Raramente, mas muito raramente, uma partícula alfa batia em alguma coisa e voltava."';
 function ch4ExpObs(text, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthObs', text:text, dur:dur }, '*'); }catch(_){} } }
 function ch4ExpObsHide(){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthObsHide' }, '*'); }catch(_){} } }
 /* move a câmera até um preset TRAVANDO o arrasto do usuário durante a transição;
@@ -8311,7 +8313,9 @@ ch4Segs[13].onStart=function(){
 };
 ch4Segs[13].build=function(){
   return [
-    { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setG'); } }
+    { t:0.2,  done:false, fn:function(){ ch4ExpObs(CH4_OBS2, 8800); } },   /* digita "Observação 2..." (0.2s -> 9s) */
+    { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setG'); } },
+    { t:20.0, done:false, fn:function(){ ch4ExpObsHide(); } }              /* some em fade aos 20s */
   ];
 };
 ch4Segs[13].onEnded=function(){ ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* play -> dialogo4.5H */
@@ -8326,7 +8330,9 @@ ch4Segs[14].onStart=function(){
 };
 ch4Segs[14].build=function(){
   return [
-    { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setH'); } }
+    { t:0.2,  done:false, fn:function(){ ch4ExpObs(CH4_OBS3, 7800); } },   /* digita "Raramente..." (0.2s -> 8s) */
+    { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setH'); } },
+    { t:29.0, done:false, fn:function(){ ch4ExpObsHide(); } }              /* some em fade aos 29s */
   ];
 };
 ch4Segs[14].onEnded=function(){ ch4ExpRatesReset(); ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* volta as incidências ao padrão; ▶ -> dialogo4.5I */
