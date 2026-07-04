@@ -1582,6 +1582,7 @@ let camDist  = 35.267;
 // Câmera travada p/ o usuário: sem girar, zoom (in/out) ou pan. Só os movimentos
 // roteirizados (presets set1/2/3 via tweenCamTo) mexem a câmera.
 let camLocked = true;
+let camMoveNotified = false;   // dialogo4.5D: avisa o pai UMA vez quando o usuário mexe a câmera
 
 function applyCam() {
   camDist = Math.max(CAM_MIN, Math.min(CAM_MAX, camDist));
@@ -1646,6 +1647,7 @@ window.addEventListener('message', (ev) => {
   if (d.type === 'ruthAnno' && d.id) { showAnno(d.id); return; }   // dialogo4.5: mostra Chumbo/Polônio/Tampa
   if (d.type === 'ruthAnnoHide') { hideAnnos(); return; }
   if (d.type === 'ruthHint') { d.on ? showHint() : hideHint(); return; }   // mãozinha "aperte aqui"
+  if (d.type === 'ruthCamLock') { camLocked = !!d.locked; if (!camLocked) camMoveNotified = false; return; }   // dialogo4.5D: libera arrastar a câmera
   if (d.type === 'ruthAtomic') { atomicUnlocked = !!d.on; return; }   // liga/desliga a interação oculta (visão atômica)
 });
 
@@ -1693,6 +1695,10 @@ function onRotateMove(x, y) {
   camTheta -= dx * 0.007;
   camPhi   += dy * 0.007;
   applyCam();
+  if (!camMoveNotified) {              // avisa o pai na 1ª mexida (dialogo4.5D -> 4.5E)
+    camMoveNotified = true;
+    try { window.parent.postMessage({ type: 'ruthCamMoved' }, '*'); } catch (_) {}
+  }
 }
 function onRotateEnd() { isDragging = false; }
 
