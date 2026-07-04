@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.102</div>
+<div class="app-version" id="appVersion">v1.3.103</div>
 
 </div>
 <script>
@@ -2793,7 +2793,8 @@ var timestampsCh3 = [
 var timestampsCh4 = [
   { title:'O início',     sub:'', time:null, seg:1 },   /* dialogo4 (após o título) */
   { title:'As radiações', sub:'', time:null, seg:4 },   /* dialogo4.3 */
-  { title:'O experimento de Rutherford', sub:'', time:null, seg:6 }   /* fim do dialogo4.4: o experimento já na tela (dialogo4.5) */
+  { title:'O experimento de Rutherford', sub:'', time:null, seg:6 },  /* fim do dialogo4.4: o experimento já na tela (dialogo4.5) */
+  { title:'As observações experimentais', sub:'', time:null, seg:12 }  /* início do dialogo4.5F */
 ];
 
 /* Capítulos: cada um tem a SUA barra lateral de marcadores. Capítulo 1 = audiobook
@@ -7932,14 +7933,19 @@ function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.conten
 /* anotações roteirizadas do experimento (Chumbo/Polônio/Tampa) durante o dialogo4.5 */
 function ch4ExpAnno(id){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthAnno', id:id }, '*'); }catch(_){} } }
 function ch4ExpAnnoHide(){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthAnnoHide' }, '*'); }catch(_){} } }
+/* "Observação 1..." digitada no topo da tela (dialogo4.5F) */
+var CH4_OBS1='"Observação 1 – A grande maioria das partículas alfa atravessam a folha de ouro como se não tivesse nada no caminho, mantendo a folha intacta"';
+function ch4ExpObs(text, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthObs', text:text, dur:dur }, '*'); }catch(_){} } }
+function ch4ExpObsHide(){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthObsHide' }, '*'); }catch(_){} } }
 /* mãozinha "aperte aqui" apontando pro símbolo (mostra se o usuário demorar a clicar) */
 function ch4ExpHint(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthHint', on:!!on }, '*'); }catch(_){} } }
 function ch4HintClear(){ if(ch4.hintTimer){ clearTimeout(ch4.hintTimer); ch4.hintTimer=null; } ch4ExpHint(false); }
 /* trava/destrava o botão (sinal de radioatividade) que liga/desliga a máquina.
    Guarda o estado em ch4.expLocked p/ reaplicar quando o iframe (re)carregar (ruthReady). */
 function ch4ExpLock(locked){ ch4.expLocked=!!locked; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthLock', locked:!!locked }, '*'); }catch(_){} } }
-/* liga/desliga a máquina programaticamente (silencioso: não dispara evento de volta) */
-function ch4ExpSet(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthSet', on:!!on }, '*'); }catch(_){} } }
+/* liga/desliga a máquina programaticamente (silencioso: não dispara evento de volta).
+   Guarda o estado em ch4.expOn p/ reaplicar quando o iframe (re)carregar (ruthReady). */
+function ch4ExpSet(on){ ch4.expOn=!!on; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthSet', on:!!on }, '*'); }catch(_){} } }
 /* trava/destrava o arrastar da câmera (dialogo4.5D libera; padrão é travada) */
 function ch4ExpCamLock(locked){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCamLock', locked:!!locked }, '*'); }catch(_){} } }
 /* eventos vindos do experimento: usuário ligou/desligou a máquina */
@@ -7956,7 +7962,7 @@ function ch4OnMachine(on){
 window.addEventListener('message', function(ev){
   var d=ev&&ev.data; if(!d || typeof d!=='object'){ return; }
   if(d.type==='ruthMachine'){ ch4OnMachine(!!d.on); return; }
-  if(d.type==='ruthReady'){ ch4ExpLock(ch4.expLocked); return; }   /* iframe (re)carregou: reaplica a trava atual */
+  if(d.type==='ruthReady'){ ch4ExpLock(ch4.expLocked); if(ch4.expOn!=null){ ch4ExpSet(ch4.expOn); } return; }   /* iframe (re)carregou: reaplica trava + estado da máquina */
   if(d.type==='ruthCamMoved'){                                     /* dialogo4.5D: usuário mexeu a câmera -> corta e vai p/ 4.5E (câmera segue livre) */
     if(ch4.awaitCamMove){ ch4.awaitCamMove=false; ch4StartSegment(11); }
     return;
@@ -7964,7 +7970,7 @@ window.addEventListener('message', function(ev){
 });
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.102';
+var CH4V='?v=1.3.103';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
@@ -8257,6 +8263,23 @@ ch4Segs[10].onEnded=function(){ ch4.awaitCamMove=true; ch4ExpCamLock(false); ch4
    evento é LIGAR a máquina -> (delay 2s) dialogo4.5F. */
 ch4Segs[11].onStart=function(){ ch4.awaitCamMove=false; ch4ExpLock(true); };   /* trava só o botão durante a narração; câmera livre */
 ch4Segs[11].onEnded=function(){ ch4ShowFab(false); ch4SetFab(false); ch4ExpLock(false); ch4.awaitMachine='machineOnE'; };   /* espera LIGAR a máquina */
+/* dialogo4.5F (seg 12): tocou ao LIGAR a máquina (após 2s do 4.5E). Aos 2s escreve
+   "Observação 1..." no topo (digitando; termina aos 8s); aos 18s some em fade.
+   Ao fim: mostra o play -> dialogo4.5G. */
+ch4Segs[12].onStart=function(){
+  ch4.awaitMachine=null; ch4.awaitCamMove=false; ch4HintClear();
+  var e=ch4El('ch4Exp');
+  if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }   /* salto pelo marcador: experimento na tela */
+  ch4ExpSet(true); ch4ExpLock(true);          /* máquina LIGADA (partículas atravessando a folha) + botão travado */
+  ch4ExpAnnoHide(); ch4ExpObsHide();
+};
+ch4Segs[12].build=function(){
+  return [
+    { t:2.0,  done:false, fn:function(){ ch4ExpObs(CH4_OBS1, 6000); } },   /* digita; termina aos 8s */
+    { t:18.0, done:false, fn:function(){ ch4ExpObsHide(); } }              /* some tudo em fade */
+  ];
+};
+ch4Segs[12].onEnded=function(){ ch4ExpObsHide(); ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* play -> dialogo4.5G */
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 function ch4ShowFab(show){ var f=ch4El('ch4Fab'); if(f){ f.style.display = show ? '' : 'none'; } }
 function ch4SetFab(playing){ var ic=ch4El('ch4FabIcon'); if(ic){ ic.textContent = playing ? '⏸' : '▶'; } }
