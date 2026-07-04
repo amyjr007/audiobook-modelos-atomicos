@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.103</div>
+<div class="app-version" id="appVersion">v1.3.104</div>
 
 </div>
 <script>
@@ -7946,8 +7946,10 @@ function ch4ExpLock(locked){ ch4.expLocked=!!locked; var fr=ch4El('ch4ExpFrame')
 /* liga/desliga a máquina programaticamente (silencioso: não dispara evento de volta).
    Guarda o estado em ch4.expOn p/ reaplicar quando o iframe (re)carregar (ruthReady). */
 function ch4ExpSet(on){ ch4.expOn=!!on; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthSet', on:!!on }, '*'); }catch(_){} } }
-/* trava/destrava o arrastar da câmera (dialogo4.5D libera; padrão é travada) */
-function ch4ExpCamLock(locked){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCamLock', locked:!!locked }, '*'); }catch(_){} } }
+/* trava/destrava o arrastar da câmera (dialogo4.5D libera; padrão é travada).
+   Guarda o estado em ch4.camLocked p/ reaplicar quando o iframe (re)carregar (ruthReady) —
+   assim, uma vez liberada, a câmera segue livre mesmo em salto por marcador. */
+function ch4ExpCamLock(locked){ ch4.camLocked=!!locked; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCamLock', locked:!!locked }, '*'); }catch(_){} } }
 /* eventos vindos do experimento: usuário ligou/desligou a máquina */
 function ch4OnMachine(on){
   if(on && ch4.awaitMachine==='machineOn'){        /* LIGOU -> dialogo4.5A (trava o botão durante o áudio) */
@@ -7962,7 +7964,7 @@ function ch4OnMachine(on){
 window.addEventListener('message', function(ev){
   var d=ev&&ev.data; if(!d || typeof d!=='object'){ return; }
   if(d.type==='ruthMachine'){ ch4OnMachine(!!d.on); return; }
-  if(d.type==='ruthReady'){ ch4ExpLock(ch4.expLocked); if(ch4.expOn!=null){ ch4ExpSet(ch4.expOn); } return; }   /* iframe (re)carregou: reaplica trava + estado da máquina */
+  if(d.type==='ruthReady'){ ch4ExpLock(ch4.expLocked); if(ch4.expOn!=null){ ch4ExpSet(ch4.expOn); } if(ch4.camLocked!=null){ ch4ExpCamLock(ch4.camLocked); } return; }   /* iframe (re)carregou: reaplica trava + estado da máquina + trava da câmera */
   if(d.type==='ruthCamMoved'){                                     /* dialogo4.5D: usuário mexeu a câmera -> corta e vai p/ 4.5E (câmera segue livre) */
     if(ch4.awaitCamMove){ ch4.awaitCamMove=false; ch4StartSegment(11); }
     return;
@@ -7970,7 +7972,7 @@ window.addEventListener('message', function(ev){
 });
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.103';
+var CH4V='?v=1.3.104';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
@@ -8271,6 +8273,7 @@ ch4Segs[12].onStart=function(){
   var e=ch4El('ch4Exp');
   if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }   /* salto pelo marcador: experimento na tela */
   ch4ExpSet(true); ch4ExpLock(true);          /* máquina LIGADA (partículas atravessando a folha) + botão travado */
+  ch4ExpCamLock(false);                        /* câmera LIVRE (a função já foi ativada no 4.5D; segue livre daqui) */
   ch4ExpAnnoHide(); ch4ExpObsHide();
 };
 ch4Segs[12].build=function(){
