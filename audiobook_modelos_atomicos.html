@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.105</div>
+<div class="app-version" id="appVersion">v1.3.106</div>
 
 </div>
 <script>
@@ -7937,6 +7937,18 @@ function ch4ExpAnnoHide(){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindo
 var CH4_OBS1='"Observação 1 – A grande maioria das partículas alfa atravessam a folha de ouro como se não tivesse nada no caminho, mantendo a folha intacta"';
 function ch4ExpObs(text, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthObs', text:text, dur:dur }, '*'); }catch(_){} } }
 function ch4ExpObsHide(){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthObsHide' }, '*'); }catch(_){} } }
+/* move a câmera até um preset TRAVANDO o arrasto do usuário durante a transição;
+   ao chegar (dur), libera de novo (dialogo4.5F/G/H). */
+function ch4ExpCamGo(preset, dur){
+  var d = dur || 3500;
+  ch4ExpCamLock(true); ch4ExpCam(preset, d);
+  if(ch4.camGoTimer){ clearTimeout(ch4.camGoTimer); }
+  ch4.camGoTimer=setTimeout(function(){ ch4.camGoTimer=null; ch4ExpCamLock(false); }, d + 150);
+}
+/* incidência de partículas (frames entre spawns; null = tipo desligado). Guarda em
+   ch4.rates p/ reaplicar quando o iframe (re)carregar (ruthReady). */
+function ch4ExpRates(straight, deflect, back){ ch4.rates={ straight:straight, deflect:deflect, back:back }; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthRates', straight:straight, deflect:deflect, back:back }, '*'); }catch(_){} } }
+function ch4ExpRatesReset(){ ch4.rates=null; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthRates', reset:true }, '*'); }catch(_){} } }
 /* mãozinha "aperte aqui" apontando pro símbolo (mostra se o usuário demorar a clicar) */
 function ch4ExpHint(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthHint', on:!!on }, '*'); }catch(_){} } }
 function ch4HintClear(){ if(ch4.hintTimer){ clearTimeout(ch4.hintTimer); ch4.hintTimer=null; } ch4ExpHint(false); }
@@ -7964,7 +7976,7 @@ function ch4OnMachine(on){
 window.addEventListener('message', function(ev){
   var d=ev&&ev.data; if(!d || typeof d!=='object'){ return; }
   if(d.type==='ruthMachine'){ ch4OnMachine(!!d.on); return; }
-  if(d.type==='ruthReady'){ ch4ExpLock(ch4.expLocked); if(ch4.expOn!=null){ ch4ExpSet(ch4.expOn); } if(ch4.camLocked!=null){ ch4ExpCamLock(ch4.camLocked); } return; }   /* iframe (re)carregou: reaplica trava + estado da máquina + trava da câmera */
+  if(d.type==='ruthReady'){ ch4ExpLock(ch4.expLocked); if(ch4.expOn!=null){ ch4ExpSet(ch4.expOn); } if(ch4.camLocked!=null){ ch4ExpCamLock(ch4.camLocked); } if(ch4.rates){ ch4ExpRates(ch4.rates.straight, ch4.rates.deflect, ch4.rates.back); } return; }   /* iframe (re)carregou: reaplica trava + máquina + câmera + incidência de partículas */
   if(d.type==='ruthCamMoved'){                                     /* dialogo4.5D: usuário mexeu a câmera -> corta e vai p/ 4.5E (câmera segue livre) */
     if(ch4.awaitCamMove){ ch4.awaitCamMove=false; ch4StartSegment(11); }
     return;
@@ -7972,7 +7984,7 @@ window.addEventListener('message', function(ev){
 });
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.104';
+var CH4V='?v=1.3.106';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
@@ -8274,15 +8286,47 @@ ch4Segs[12].onStart=function(){
   if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }   /* salto pelo marcador: experimento na tela */
   ch4ExpSet(true); ch4ExpLock(true);          /* máquina LIGADA (partículas atravessando a folha) + botão travado */
   ch4ExpCamLock(false);                        /* câmera LIVRE (a função já foi ativada no 4.5D; segue livre daqui) */
+  ch4ExpRates(55, null, null);                 /* SÓ as partículas que passam direto (sem desvio, sem volta) */
   ch4ExpAnnoHide(); ch4ExpObsHide();
 };
 ch4Segs[12].build=function(){
   return [
     { t:2.0,  done:false, fn:function(){ ch4ExpObs(CH4_OBS1, 6000); } },   /* digita; termina aos 8s */
+    { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setF'); } },         /* trava o arrasto, leva a câmera p/ setF e libera ao chegar */
     { t:18.0, done:false, fn:function(){ ch4ExpObsHide(); } }              /* some tudo em fade */
   ];
 };
 ch4Segs[12].onEnded=function(){ ch4ExpObsHide(); ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* play -> dialogo4.5G */
+/* dialogo4.5G (seg 13): mantém as diretas + AUMENTA as desviadas. Aos 3s leva a câmera p/ setG
+   (trava o arrasto na transição, libera ao chegar). ▶ -> dialogo4.5H. */
+ch4Segs[13].onStart=function(){
+  ch4.awaitMachine=null; ch4.awaitCamMove=false; ch4HintClear();
+  var e=ch4El('ch4Exp');
+  if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }
+  ch4ExpSet(true); ch4ExpLock(true); ch4ExpCamLock(false); ch4ExpObsHide();
+  ch4ExpRates(55, 200, null);                  /* diretas normais + desviadas mais frequentes (padrão 600 -> 200) */
+};
+ch4Segs[13].build=function(){
+  return [
+    { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setG'); } }
+  ];
+};
+ch4Segs[13].onEnded=function(){ ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* play -> dialogo4.5H */
+/* dialogo4.5H (seg 14, último): mantém diretas + desviadas e AUMENTA as que voltam. Aos 3s
+   leva a câmera p/ setH. Ao fim: volta as incidências ao padrão. */
+ch4Segs[14].onStart=function(){
+  ch4.awaitMachine=null; ch4.awaitCamMove=false; ch4HintClear();
+  var e=ch4El('ch4Exp');
+  if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }
+  ch4ExpSet(true); ch4ExpLock(true); ch4ExpCamLock(false); ch4ExpObsHide();
+  ch4ExpRates(55, 200, 550);                   /* diretas + desviadas + retroespalhadas mais frequentes (padrão 1800 -> 550) */
+};
+ch4Segs[14].build=function(){
+  return [
+    { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setH'); } }
+  ];
+};
+ch4Segs[14].onEnded=function(){ ch4ExpRatesReset(); ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* volta as incidências ao padrão */
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 function ch4ShowFab(show){ var f=ch4El('ch4Fab'); if(f){ f.style.display = show ? '' : 'none'; } }
 function ch4SetFab(playing){ var ic=ch4El('ch4FabIcon'); if(ic){ ic.textContent = playing ? '⏸' : '▶'; } }

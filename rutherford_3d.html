@@ -1456,6 +1456,15 @@ let atomicUnlocked = false;  // hidden atomic/electron view (gold-foil tap) — 
 let frameCount = 0;
 let lastStraight = -9999, lastDeflect = -9999, lastBack = -9999;
 const T_STRAIGHT = 55, T_DEFLECT = 600, T_BACK = 1800;
+// Taxas ATUAIS de spawn (frames entre partículas). null = tipo desligado.
+// Padrão = os valores acima; o dialogo4.5F/G/H ajusta via {type:'ruthRates'}.
+let rateStraight = T_STRAIGHT, rateDeflect = T_DEFLECT, rateBack = T_BACK;
+function ruthSetRates(r){
+  rateStraight = ('straight' in r) ? r.straight : rateStraight;
+  rateDeflect  = ('deflect'  in r) ? r.deflect  : rateDeflect;
+  rateBack     = ('back'     in r) ? r.back     : rateBack;
+}
+function ruthResetRates(){ rateStraight = T_STRAIGHT; rateDeflect = T_DEFLECT; rateBack = T_BACK; }
 
 function ringPos(theta, yOff) {
   return new THREE.Vector3(
@@ -1653,6 +1662,9 @@ const CAM_PRESETS = {
   set2: { target: [-5.610, -1.292, -0.629], theta: 0.0994, phi: 1.0007, dist: 12.557 },
   set3: { target: [-0.115, -1.285, -0.692], theta: -0.7826, phi: 0.8373, dist: 11.382 },  // destaque na folha de ouro
   set4: { target: [1.081, -1.429, -0.456], theta: 3.1654, phi: 0.9400, dist: 27.046 },   // destaque no aparato
+  setF: { target: [-0.238, -1.420, -0.059], theta: -1.6133, phi: 0.8233, dist: 22.680 },  // dialogo4.5F
+  setG: { target: [-1.027, -1.653, -0.514], theta: -7.8573, phi: 0.2867, dist: 23.131 },  // dialogo4.5G
+  setH: { target: [-2.011, -0.982, -0.473], theta: -11.1099, phi: 0.6040, dist: 23.444 }, // dialogo4.5H
 };
 let camTween = null;
 function tweenCamTo(name, dur) {
@@ -1692,6 +1704,7 @@ window.addEventListener('message', (ev) => {
   if (d.type === 'ruthAnnoHide') { hideAnnos(); return; }
   if (d.type === 'ruthObs') { showObs(d.text, d.dur); return; }   // dialogo4.5F: "Observação 1..." digitada no topo
   if (d.type === 'ruthObsHide') { hideObs(); return; }
+  if (d.type === 'ruthRates') { d.reset ? ruthResetRates() : ruthSetRates(d); return; }   // dialogo4.5F/G/H: incidência de partículas
   if (d.type === 'ruthHint') { d.on ? showHint() : hideHint(); return; }   // mãozinha "aperte aqui"
   if (d.type === 'ruthCamLock') { camLocked = !!d.locked; if (!camLocked) camMoveNotified = false; return; }   // dialogo4.5D: libera arrastar a câmera
   if (d.type === 'ruthAtomic') { atomicUnlocked = !!d.on; return; }   // liga/desliga a interação oculta (visão atômica)
@@ -1854,9 +1867,9 @@ function update() {
   updateCamTween();
   if (open) {
     frameCount++;
-    if (frameCount - lastStraight > T_STRAIGHT) { spawnStraight(); lastStraight = frameCount; }
-    if (frameCount - lastDeflect  > T_DEFLECT)  { spawnDeflected(); lastDeflect  = frameCount; }
-    if (frameCount - lastBack     > T_BACK)     { spawnBack();      lastBack     = frameCount; }
+    if (rateStraight != null && frameCount - lastStraight > rateStraight) { spawnStraight(); lastStraight = frameCount; }
+    if (rateDeflect  != null && frameCount - lastDeflect  > rateDeflect)  { spawnDeflected(); lastDeflect  = frameCount; }
+    if (rateBack     != null && frameCount - lastBack     > rateBack)     { spawnBack();      lastBack     = frameCount; }
   }
   for (let i = flashes.length - 1; i >= 0; i--) {
     const f = flashes[i];
