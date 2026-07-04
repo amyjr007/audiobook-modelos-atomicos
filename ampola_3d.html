@@ -7,10 +7,7 @@
 <style>
 html,body{margin:0;background:transparent;overflow:hidden;height:100%}
 body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;touch-action:none;-webkit-tap-highlight-color:transparent}
-#c{position:fixed;inset:0;width:100%;height:100%;display:block;border-radius:22px}
-/* moldura do painel (mesmo visual do experimento 2D) */
-.panel-frame{position:fixed;inset:0;border-radius:22px;border:1.2px solid #2a3543;pointer-events:none;z-index:5;
- background:radial-gradient(120% 90% at 50% 40%, rgba(22,29,38,0) 55%, rgba(5,7,11,.5) 100%)}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block}
 /* controles na lateral DIREITA, de baixo p/ cima: On/off, hélice, placas (idênticos ao 2D) */
 .amp-ctrls{position:absolute;right:3.5%;bottom:9%;display:flex;flex-direction:column-reverse;align-items:center;gap:clamp(9px,2.6vw,15px);z-index:10}
 .amp-sw{position:relative;width:52px;height:27px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);cursor:pointer;padding:0;flex-shrink:0;transition:background .25s,border-color .25s;-webkit-tap-highlight-color:transparent}
@@ -37,7 +34,6 @@ body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:#fff;touch-actio
 <body>
 <h2 class="sr-only">Ampola de Crookes interativa em 3D: tubo de vidro horizontal apoiado num pedestal de madeira sobre uma mesa de laboratório, com botão liga/desliga que faz um raio catódico verde crescer do cátodo ao ânodo, hélice e placas de deflexão removíveis e uma bateria ligada por fios.</h2>
 <canvas id="c"></canvas>
-<div class="panel-frame"></div>
 <div class="amp-ctrls">
 <button id="powerBtn" class="amp-sw" aria-label="Ligar/Desligar" aria-pressed="false"></button>
 <button id="propBtn" class="amp-ib helice" aria-label="Hélice" aria-pressed="false"><span class="led"></span><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="2.1"/><g><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g><g transform="rotate(120 12 12)"><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g><g transform="rotate(240 12 12)"><ellipse cx="12" cy="6.2" rx="2" ry="4.3"/></g></svg></button>
@@ -794,11 +790,11 @@ const CAM_MIN = 3, CAM_MAX = 40;
 const camTarget = new THREE.Vector3(0.10, 0.75, 0);
 let camTheta = -0.15;
 let camPhi   = 1.25;
-let camDist  = 12.5;
+let camDist  = 14;      /* tela cheia no celular (quadro ~9:19.5): o tubo inteiro cabe na largura */
 let camLocked = true;
 
 const CAM_PRESETS = {
-  set1: { target: [0.10, 0.75, 0], theta: -0.15, phi: 1.25, dist: 12.5 },
+  set1: { target: [0.10, 0.75, 0], theta: -0.15, phi: 1.25, dist: 14 },
 };
 let camTween = null;
 function applyCam() {
