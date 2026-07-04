@@ -445,10 +445,15 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   box-shadow:0 0 22px 6px rgba(240,170,60,.28)}
 .ch4-wall-elec{position:absolute;width:1.7vmin;height:1.7vmin;border-radius:50%;background:radial-gradient(circle at 38% 34%,#5a4a36,#241a10);box-shadow:0 0 3px rgba(0,0,0,.6);transform:translate(-50%,-50%)}
 .ch4-wall-beam{position:absolute;inset:0;z-index:1}
-.ch4-wall-p{position:absolute;left:0;top:0;width:11px;height:11px;border-radius:50%;
+.ch4-wall-p{position:absolute;left:0;top:0;width:12px;height:12px;border-radius:50%;
   background:radial-gradient(circle at 34% 30%,#fff,#ff74c0 55%,#c01e6e 100%);
-  box-shadow:0 0 12px 3px rgba(255,100,190,.85);transform:translate(-50%,-50%);transition:transform .16s ease;will-change:left,top}
-.ch4-wall-p.jelly{transform:translate(-50%,-50%) scale(1.28,.78)}   /* efeito "geleia" ao atravessar o átomo */
+  box-shadow:0 0 12px 3px rgba(255,100,190,.85);transform:translate(-50%,-50%);
+  transition:transform .26s cubic-bezier(.34,1.7,.5,1), background .18s ease, box-shadow .18s ease;will-change:left,top}
+/* "bala na geleia": ao entrar na massa do átomo estica/comprime com mola, muda de cor
+   (fica turquesa) e ganha brilho; ao sair volta ao rosa com repique */
+.ch4-wall-p.jelly{transform:translate(-50%,-50%) scale(1.75,.58);
+  background:radial-gradient(circle at 34% 30%,#eafffb,#3ce0d0 50%,#0d8f88 100%);
+  box-shadow:0 0 18px 6px rgba(70,235,215,.92)}
 /* rótulo "massa difusa positiva" + reta saindo de um átomo (dialogo4.7) */
 .ch4-wall-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2}
 .ch4-wall-line{stroke:#fff;stroke-width:2;opacity:0;transition:opacity .5s ease;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
@@ -2706,7 +2711,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.116</div>
+<div class="app-version" id="appVersion">v1.3.117</div>
 
 </div>
 <script>
@@ -8034,7 +8039,7 @@ function ch4WallStep(ts){
       if(p.type==='deflect'){ p.vy=(Math.random()<0.5?-1:1)*(110+Math.random()*130); }
       else if(p.type==='back'){ p.vx=-Math.abs(p.vx)*0.9; p.vy=(Math.random()<0.5?-1:1)*(40+Math.random()*70); }
     }
-    var speed = inzone ? 0.7 : 1;               /* mais lenta dentro da "geleia" */
+    var speed = inzone ? 0.5 : 1;               /* bem mais lenta dentro da "geleia" (efeito visível) */
     p.x += p.vx*speed*dt; p.y += p.vy*dt;
     ch4WallPos(p);
     if(p.x<-70 || p.x>window.innerWidth+70 || p.y<-70 || p.y>window.innerHeight+70){ p.el.remove(); ch4WallSys.parts.splice(i,1); }
@@ -8504,7 +8509,7 @@ ch4Segs[17].onStart=function(){
 ch4Segs[17].build=function(){
   return [
     { t:7.6,  done:false, fn:function(){ ch4WallLabelShow(); } },                                              /* reta + "massa difusa positiva" */
-    { t:15.0, done:false, fn:function(){ ch4WallBeamStart({ straight:1, deflect:0, back:0, interval:1300 }); } }, /* poucas, retas, com geleia */
+    { t:15.0, done:false, fn:function(){ ch4WallLabelHide(); ch4WallBeamStart({ straight:1, deflect:0, back:0, interval:1300 }); } }, /* some o rótulo; começam poucas partículas (com geleia) */
     { t:27.0, done:false, fn:function(){ ch4WallSpawnBack(); ch4WallBeamStart({ straight:0.82, deflect:0.16, back:0.03, interval:1050 }); } }  /* uma volta agora + mix (maioria direto) */
   ];
 };
