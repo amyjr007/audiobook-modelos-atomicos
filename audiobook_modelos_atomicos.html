@@ -431,6 +431,24 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch4-exp{position:absolute;inset:0;z-index:9;background:#000;transform:translateY(101%);transition:transform 1s cubic-bezier(.5,0,.2,1);pointer-events:none}
 .ch4-exp.up{transform:translateY(0);pointer-events:auto}
 .ch4-exp-frame{width:100%;height:100%;border:0;display:block;background:#000}
+/* dialogo4.6: parede de átomos (modelo de Thomson) + feixe de partículas alfa */
+.ch4-wall{position:absolute;inset:0;z-index:11;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;
+  background:radial-gradient(120% 90% at 50% 45%, #12100a 0%, #08070c 60%, #050409 100%);transition:opacity .5s ease}
+.ch4-wall.on{opacity:1;visibility:visible}
+.ch4-wall-atoms{position:absolute;top:50%;left:52%;transform:translate(-50%,-50%) scale(.18);opacity:0;
+  display:flex;flex-direction:column;align-items:center;transition:transform 1.25s cubic-bezier(.52,.02,.35,1),opacity .8s ease}
+.ch4-wall.on .ch4-wall-atoms{transform:translate(-50%,-50%) scale(1);opacity:1}
+.ch4-wall-row{display:flex;margin-top:-4.2vmin}
+.ch4-wall-row:first-child{margin-top:0}
+.ch4-wall-atom{position:relative;width:19vmin;height:19vmin;margin:-2.2vmin;border-radius:50%;
+  background:radial-gradient(circle at 40% 34%, #fff2cf 0%, #ffdd8c 22%, #f0ab3e 55%, #b9741d 82%, rgba(150,90,20,0) 100%);
+  box-shadow:0 0 22px 6px rgba(240,170,60,.28)}
+.ch4-wall-elec{position:absolute;width:1.7vmin;height:1.7vmin;border-radius:50%;background:radial-gradient(circle at 38% 34%,#5a4a36,#241a10);box-shadow:0 0 3px rgba(0,0,0,.6);transform:translate(-50%,-50%)}
+.ch4-wall-beam{position:absolute;inset:0}
+.ch4-wall-p{position:absolute;left:-6%;width:11px;height:11px;border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#fff,#ff74c0 55%,#c01e6e 100%);
+  box-shadow:0 0 12px 3px rgba(255,100,190,.85);animation:ch4WallFly 2.6s linear both}
+@keyframes ch4WallFly{from{transform:translateX(0)}to{transform:translateX(114vw)}}
 /* Quando o carrossel aparece, sobe o conteúdo p/ dar espaço à imagem inteira */
 .ab-stage.with-carousel{justify-content:flex-start;padding-top:40px}
 .ab-stage.with-carousel .ab-relative{gap:18px}
@@ -2604,6 +2622,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         </div>
         <!-- dialogo4.4: experimento rutherford_3d (HTML interativo) sobe de baixo, tela cheia vertical -->
         <div class="ch4-exp" id="ch4Exp"><iframe class="ch4-exp-frame" id="ch4ExpFrame" title="Experimento de Rutherford (3D)" loading="lazy" scrolling="no"></iframe></div>
+        <!-- dialogo4.6: zoom até o âmago da matéria -> parede de átomos (Thomson) + partículas alfa L->R -->
+        <div class="ch4-wall" id="ch4Wall"><div class="ch4-wall-atoms" id="ch4WallAtoms"></div><div class="ch4-wall-beam" id="ch4WallBeam"></div></div>
       </div>
       <!-- Controle Play/Pause (canto inferior) -->
       <button class="ab-fab" id="ch4Fab" onclick="ch4Toggle()" aria-label="Tocar ou pausar narração">
@@ -2680,7 +2700,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.112</div>
+<div class="app-version" id="appVersion">v1.3.113</div>
 
 </div>
 <script>
@@ -7927,7 +7947,8 @@ var ch4Segs = [
   { src:'audio/dialogo4.5F.mp3?v=1.3.105' },               /* ligou a máquina (após 2s) -> toca; ao fim: play -> dialogo4.5G */
   { src:'audio/dialogo4.5G.mp3?v=1.3.102' },               /* ▶ -> dialogo4.5H */
   { src:'audio/dialogo4.5H.mp3?v=1.3.105' },               /* ▶ -> dialogo4.5I */
-  { src:'audio/dialogo4.5I.mp3?v=1.3.109' }                /* câmera p/ setI; 9s aparece o botão "Resumo"; play ao final */
+  { src:'audio/dialogo4.5I.mp3?v=1.3.109' },               /* câmera p/ setI; 9s aparece o botão "Resumo"; play ao final */
+  { src:'audio/dialogo4.6.mp3?v=1.3.113' }                 /* 3s->câmera setJ (fim 5s); 11s zoom até o âmago -> parede de átomos + feixe alfa */
 ];
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
 function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
@@ -7954,6 +7975,44 @@ function ch4ExpRates(straight, deflect, back){ ch4.rates={ straight:straight, de
 function ch4ExpRatesReset(){ ch4.rates=null; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthRates', reset:true }, '*'); }catch(_){} } }
 /* revela/esconde o botão "Resumo" do experimento (dialogo4.5I) */
 function ch4ExpSummaryBtn(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthSummaryBtn', on:!!on }, '*'); }catch(_){} } }
+/* ----- dialogo4.6: zoom até o âmago da matéria -> parede de átomos (Thomson) + feixe alfa L->R ----- */
+var ch4WallBeamId=null;
+function ch4WallBuild(){
+  var atoms=ch4El('ch4WallAtoms'); if(!atoms) return; atoms.innerHTML='';
+  var rows=6, cols=4;
+  for(var r=0;r<rows;r++){
+    var row=document.createElement('div'); row.className='ch4-wall-row';
+    if(r%2){ row.style.marginLeft='9vmin'; }                               /* fileiras alternadas deslocadas */
+    for(var c=0;c<cols;c++){
+      var a=document.createElement('div'); a.className='ch4-wall-atom';
+      for(var k=0;k<3;k++){ var e=document.createElement('span'); e.className='ch4-wall-elec'; e.style.left=(24+Math.random()*52)+'%'; e.style.top=(24+Math.random()*52)+'%'; a.appendChild(e); }  /* elétrons embutidos */
+      row.appendChild(a);
+    }
+    atoms.appendChild(row);
+  }
+}
+function ch4WallBeamStart(){
+  var box=ch4El('ch4WallBeam'); if(!box || ch4WallBeamId) return;
+  ch4WallBeamId=setInterval(function(){
+    var p=document.createElement('div'); p.className='ch4-wall-p';
+    p.style.top=(16+Math.random()*66)+'%';                                 /* entra em alturas variadas */
+    p.style.animationDuration=(2.2+Math.random()*0.8).toFixed(2)+'s';
+    box.appendChild(p);
+    p.addEventListener('animationend', function(){ p.remove(); });
+  }, 260);
+}
+function ch4WallShow(){
+  ch4WallReset(); ch4WallBuild();
+  var w=ch4El('ch4Wall'); if(w){ void w.offsetWidth; w.classList.add('on'); }   /* backdrop + zoom-in dos átomos */
+  ch4.wallStartTimer=setTimeout(function(){ ch4.wallStartTimer=null; ch4WallBeamStart(); }, 1150);  /* feixe começa após o zoom */
+  abVibe(AB_VTXT);
+}
+function ch4WallReset(){
+  if(ch4WallBeamId){ clearInterval(ch4WallBeamId); ch4WallBeamId=null; }
+  if(ch4.wallStartTimer){ clearTimeout(ch4.wallStartTimer); ch4.wallStartTimer=null; }
+  var w=ch4El('ch4Wall'); if(w){ w.classList.remove('on'); }
+  var box=ch4El('ch4WallBeam'); if(box){ box.innerHTML=''; }
+}
 /* mãozinha "aperte aqui" apontando pro símbolo (mostra se o usuário demorar a clicar) */
 function ch4ExpHint(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthHint', on:!!on }, '*'); }catch(_){} } }
 function ch4HintClear(){ if(ch4.hintTimer){ clearTimeout(ch4.hintTimer); ch4.hintTimer=null; } ch4ExpHint(false); }
@@ -7989,7 +8048,7 @@ window.addEventListener('message', function(ev){
 });
 function ch4El(id){ return document.getElementById(id); }
 /* ----- cena de imagens do dialogo4 ----- */
-var CH4V='?v=1.3.112';
+var CH4V='?v=1.3.113';
 /* enquadramento por imagem: scale (zoom out) e object-position (recorte) */
 var CH4_FRAME={ 'sal_uranio.jpg':{ scale:0.72 }, 'marie_curie.png':{ scale:0.99, pos:'50% 12%' } };
 function ch4ApplyFrame(file){ var img=ch4El('ch4Img'); if(!img) return; var f=CH4_FRAME[file]||{}; img.style.transform = f.scale ? ('scale('+f.scale+')') : ''; img.style.objectPosition = f.pos || 'center'; }
@@ -8152,7 +8211,7 @@ function ch4ExpRise(){
   var e=ch4El('ch4Exp'); if(e){ void e.offsetWidth; e.classList.add('up'); }
   abVibe(AB_VTXT);
 }
-function ch4ExpReset(){ var e=ch4El('ch4Exp'); if(e){ e.classList.remove('up'); } var w=ch4El('ch4ImgWrap'); if(w){ w.classList.remove('up-exit'); } }
+function ch4ExpReset(){ var e=ch4El('ch4Exp'); if(e){ e.classList.remove('up'); } var w=ch4El('ch4ImgWrap'); if(w){ w.classList.remove('up-exit'); } if(typeof ch4WallReset==='function'){ ch4WallReset(); } }
 /* dialogo4.0 (seg 0): título do capítulo no topo (mesma animação dos outros) */
 ch4Segs[0].onStart=function(){ ch4PlayIntro(); };
 /* dialogo4 (seg 1): ao dar play o título sai junto com a 1ª imagem + ken burns + eventos */
@@ -8352,6 +8411,21 @@ ch4Segs[15].build=function(){
   ];
 };
 ch4Segs[15].onEnded=function(){ ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* play ao final */
+/* dialogo4.6 (seg 16): 3s move a câmera p/ setJ (fim aos 5s); 11s dá um zoom intenso até o
+   âmago da matéria e mostra uma parede de átomos (Thomson) com o feixe alfa passando L->R. */
+ch4Segs[16].onStart=function(){
+  ch4.awaitMachine=null; ch4.awaitCamMove=false; ch4HintClear();
+  var e=ch4El('ch4Exp');
+  if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }
+  ch4ExpSet(true); ch4ExpLock(true); ch4ExpObsHide(); ch4ExpSummaryBtn(false); ch4WallReset();   /* experimento na tela; parede escondida */
+};
+ch4Segs[16].build=function(){
+  return [
+    { t:3.0,  done:false, fn:function(){ ch4ExpCamGo('setJ', 2000); } },   /* move a câmera p/ setJ (termina aos 5s) */
+    { t:11.0, done:false, fn:function(){ ch4WallShow(); } }                /* zoom até o âmago -> parede de átomos + feixe alfa */
+  ];
+};
+ch4Segs[16].onEnded=function(){ ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* play ao final (a parede fica na tela) */
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 function ch4ShowFab(show){ var f=ch4El('ch4Fab'); if(f){ f.style.display = show ? '' : 'none'; } }
 function ch4SetFab(playing){ var ic=ch4El('ch4FabIcon'); if(ic){ ic.textContent = playing ? '⏸' : '▶'; } }
