@@ -444,11 +444,17 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   background:radial-gradient(circle at 40% 34%, #fff2cf 0%, #ffdd8c 22%, #f0ab3e 55%, #b9741d 82%, rgba(150,90,20,0) 100%);
   box-shadow:0 0 22px 6px rgba(240,170,60,.28)}
 .ch4-wall-elec{position:absolute;width:1.7vmin;height:1.7vmin;border-radius:50%;background:radial-gradient(circle at 38% 34%,#5a4a36,#241a10);box-shadow:0 0 3px rgba(0,0,0,.6);transform:translate(-50%,-50%)}
-.ch4-wall-beam{position:absolute;inset:0}
-.ch4-wall-p{position:absolute;left:-6%;width:11px;height:11px;border-radius:50%;
+.ch4-wall-beam{position:absolute;inset:0;z-index:1}
+.ch4-wall-p{position:absolute;left:0;top:0;width:11px;height:11px;border-radius:50%;
   background:radial-gradient(circle at 34% 30%,#fff,#ff74c0 55%,#c01e6e 100%);
-  box-shadow:0 0 12px 3px rgba(255,100,190,.85);animation:ch4WallFly 2.6s linear both}
-@keyframes ch4WallFly{from{transform:translateX(0)}to{transform:translateX(114vw)}}
+  box-shadow:0 0 12px 3px rgba(255,100,190,.85);transform:translate(-50%,-50%);transition:transform .16s ease;will-change:left,top}
+.ch4-wall-p.jelly{transform:translate(-50%,-50%) scale(1.28,.78)}   /* efeito "geleia" ao atravessar o átomo */
+/* rótulo "massa difusa positiva" + reta saindo de um átomo (dialogo4.7) */
+.ch4-wall-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2}
+.ch4-wall-line{stroke:#fff;stroke-width:2;opacity:0;transition:opacity .5s ease;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
+.ch4-wall-line.show{opacity:.9}
+.ch4-wall-label{position:absolute;z-index:3;transform:translate(-50%,-50%) scale(.7);font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(15px,4vw,21px);color:#ffe14d;text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 6px rgba(0,0,0,.9);white-space:nowrap;opacity:0;transition:opacity .5s ease,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.ch4-wall-label.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 /* Quando o carrossel aparece, sobe o conteúdo p/ dar espaço à imagem inteira */
 .ab-stage.with-carousel{justify-content:flex-start;padding-top:40px}
 .ab-stage.with-carousel .ab-relative{gap:18px}
@@ -2623,7 +2629,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <!-- dialogo4.4: experimento rutherford_3d (HTML interativo) sobe de baixo, tela cheia vertical -->
         <div class="ch4-exp" id="ch4Exp"><iframe class="ch4-exp-frame" id="ch4ExpFrame" title="Experimento de Rutherford (3D)" loading="lazy" scrolling="no"></iframe></div>
         <!-- dialogo4.6: zoom até o âmago da matéria -> parede de átomos (Thomson) + partículas alfa L->R -->
-        <div class="ch4-wall" id="ch4Wall"><div class="ch4-wall-atoms" id="ch4WallAtoms"></div><div class="ch4-wall-beam" id="ch4WallBeam"></div></div>
+        <div class="ch4-wall" id="ch4Wall"><div class="ch4-wall-atoms" id="ch4WallAtoms"></div><div class="ch4-wall-beam" id="ch4WallBeam"></div><svg class="ch4-wall-svg" id="ch4WallSvg"><line id="ch4WallLine" class="ch4-wall-line"/></svg><div class="ch4-wall-label" id="ch4WallLabel">massa difusa positiva</div></div>
       </div>
       <!-- Controle Play/Pause (canto inferior) -->
       <button class="ab-fab" id="ch4Fab" onclick="ch4Toggle()" aria-label="Tocar ou pausar narração">
@@ -2700,7 +2706,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.115</div>
+<div class="app-version" id="appVersion">v1.3.116</div>
 
 </div>
 <script>
@@ -7949,7 +7955,8 @@ var ch4Segs = [
   { src:'audio/dialogo4.5G.mp3?v=1.3.102' },               /* ▶ -> dialogo4.5H */
   { src:'audio/dialogo4.5H.mp3?v=1.3.105' },               /* ▶ -> dialogo4.5I */
   { src:'audio/dialogo4.5I.mp3?v=1.3.109' },               /* câmera p/ setI; 9s aparece o botão "Resumo"; play ao final */
-  { src:'audio/dialogo4.6.mp3?v=1.3.113' }                 /* 3s->câmera setJ (fim 5s); 11s zoom até o âmago -> parede de átomos + feixe alfa */
+  { src:'audio/dialogo4.6.mp3?v=1.3.113' },                /* 3s->câmera setJ (fim 5s); 11s zoom até o âmago -> parede de átomos */
+  { src:'audio/dialogo4.7.mp3?v=1.3.116' }                 /* parede segue; 7.6s rótulo; 15s partículas (geleia); 27s uma volta + desviadas + maioria direto */
 ];
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
 function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
@@ -7976,8 +7983,7 @@ function ch4ExpRates(straight, deflect, back){ ch4.rates={ straight:straight, de
 function ch4ExpRatesReset(){ ch4.rates=null; var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthRates', reset:true }, '*'); }catch(_){} } }
 /* revela/esconde o botão "Resumo" do experimento (dialogo4.5I) */
 function ch4ExpSummaryBtn(on){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthSummaryBtn', on:!!on }, '*'); }catch(_){} } }
-/* ----- dialogo4.6: zoom até o âmago da matéria -> parede de átomos (Thomson) + feixe alfa L->R ----- */
-var ch4WallBeamId=null;
+/* ----- dialogo4.6/4.7: zoom até o âmago da matéria -> parede de átomos (Thomson) + partículas alfa ----- */
 function ch4WallBuild(){
   var atoms=ch4El('ch4WallAtoms'); if(!atoms) return; atoms.innerHTML='';
   var cols=2;                                                             /* só 2 camadas (espessura da folha) */
@@ -7995,16 +8001,71 @@ function ch4WallBuild(){
     atoms.appendChild(row);
   }
 }
-function ch4WallBeamStart(){
-  var box=ch4El('ch4WallBeam'); if(!box || ch4WallBeamId) return;
-  ch4WallBeamId=setInterval(function(){
-    var p=document.createElement('div'); p.className='ch4-wall-p';
-    p.style.top=(16+Math.random()*66)+'%';                                 /* entra em alturas variadas */
-    p.style.animationDuration=(2.2+Math.random()*0.8).toFixed(2)+'s';
-    box.appendChild(p);
-    p.addEventListener('animationend', function(){ p.remove(); });
-  }, 260);
+/* sistema de partículas (rAF): atravessam a parede com efeito "geleia"; a maioria
+   passa direto, algumas são desviadas, raras batem e voltam. */
+var ch4WallSys={ raf:null, parts:[], spawnTimer:null, last:0, mode:null, zone:null };
+function ch4WallZone(){
+  var a=ch4El('ch4WallAtoms'); if(a){ var r=a.getBoundingClientRect(); if(r.width>2){ return { x0:r.left, x1:r.right, cx:(r.left+r.right)/2 }; } }
+  var w=window.innerWidth; return { x0:w*0.42, x1:w*0.62, cx:w*0.52 };
 }
+function ch4WallPos(p){ p.el.style.left=p.x+'px'; p.el.style.top=p.y+'px'; }
+function ch4WallAdd(type){
+  var box=ch4El('ch4WallBeam'); if(!box) return;
+  var el=document.createElement('div'); el.className='ch4-wall-p'; box.appendChild(el);
+  var p={ el:el, x:-24, y:(0.12+Math.random()*0.76)*window.innerHeight, vx:225+Math.random()*70, vy:0, type:type, acted:false, jelly:false };
+  ch4WallSys.parts.push(p); ch4WallPos(p);
+}
+function ch4WallSpawn(){
+  var m=ch4WallSys.mode||{straight:1,deflect:0,back:0}, rnd=Math.random(), type='straight';
+  if(rnd < (m.back||0)) type='back';
+  else if(rnd < (m.back||0)+(m.deflect||0)) type='deflect';
+  ch4WallAdd(type);
+}
+function ch4WallSpawnBack(){ ch4WallAdd('back'); }   /* garante uma que bate e volta (t=27s) */
+function ch4WallStep(ts){
+  if(!ch4WallSys.last){ ch4WallSys.last=ts; }
+  var dt=Math.min(0.05,(ts-ch4WallSys.last)/1000); ch4WallSys.last=ts;
+  var z=ch4WallSys.zone||(ch4WallSys.zone=ch4WallZone());
+  for(var i=ch4WallSys.parts.length-1;i>=0;i--){
+    var p=ch4WallSys.parts[i], inzone=(p.x>z.x0 && p.x<z.x1);
+    if(inzone!==p.jelly){ p.jelly=inzone; p.el.classList.toggle('jelly', inzone); }   /* geleia ao entrar/sair */
+    if(!p.acted && p.vx>0 && p.x>=z.cx){        /* interação no meio da parede (num átomo) */
+      p.acted=true;
+      if(p.type==='deflect'){ p.vy=(Math.random()<0.5?-1:1)*(110+Math.random()*130); }
+      else if(p.type==='back'){ p.vx=-Math.abs(p.vx)*0.9; p.vy=(Math.random()<0.5?-1:1)*(40+Math.random()*70); }
+    }
+    var speed = inzone ? 0.7 : 1;               /* mais lenta dentro da "geleia" */
+    p.x += p.vx*speed*dt; p.y += p.vy*dt;
+    ch4WallPos(p);
+    if(p.x<-70 || p.x>window.innerWidth+70 || p.y<-70 || p.y>window.innerHeight+70){ p.el.remove(); ch4WallSys.parts.splice(i,1); }
+  }
+  if(ch4WallSys.parts.length || ch4WallSys.spawnTimer){ ch4WallSys.raf=requestAnimationFrame(ch4WallStep); }
+  else { ch4WallSys.raf=null; ch4WallSys.last=0; }
+}
+function ch4WallBeamStart(mode){
+  ch4WallSys.mode = mode || {straight:1,deflect:0,back:0};
+  ch4WallSys.zone = ch4WallZone();
+  var interval = (mode && mode.interval) || 1300;         /* poucas ao mesmo tempo */
+  if(ch4WallSys.spawnTimer){ clearInterval(ch4WallSys.spawnTimer); }
+  ch4WallSys.spawnTimer=setInterval(ch4WallSpawn, interval);
+  if(!ch4WallSys.raf){ ch4WallSys.last=0; ch4WallSys.raf=requestAnimationFrame(ch4WallStep); }
+}
+function ch4WallBeamStop(){ if(ch4WallSys.spawnTimer){ clearInterval(ch4WallSys.spawnTimer); ch4WallSys.spawnTimer=null; } }
+function ch4WallPartsClear(){ for(var i=0;i<ch4WallSys.parts.length;i++){ if(ch4WallSys.parts[i].el){ ch4WallSys.parts[i].el.remove(); } } ch4WallSys.parts=[]; if(ch4WallSys.raf){ cancelAnimationFrame(ch4WallSys.raf); ch4WallSys.raf=null; } ch4WallSys.last=0; }
+/* rótulo "massa difusa positiva" + reta saindo de um átomo (t=7.6s) */
+function ch4WallLabelShow(){
+  var atoms=ch4El('ch4WallAtoms'), lbl=ch4El('ch4WallLabel'), line=ch4El('ch4WallLine'); if(!atoms||!lbl) return;
+  var list=atoms.querySelectorAll('.ch4-wall-atom'); if(!list.length) return;
+  var cy=window.innerHeight*0.5, cx=window.innerWidth*0.52, best=null, bd=1e9;
+  for(var i=0;i<list.length;i++){ var r=list[i].getBoundingClientRect(); var ax=r.left+r.width/2, ay=r.top+r.height/2; if(ay<24||ay>window.innerHeight-24) continue; var d=Math.abs(ay-cy)+Math.abs(ax-cx); if(d<bd){ bd=d; best={x:ax,y:ay}; } }
+  if(!best) return;
+  var lx=Math.max(window.innerWidth*0.03, best.x - window.innerWidth*0.28);   /* rótulo à esquerda (espaço vazio) */
+  var ly=Math.max(30, best.y - window.innerHeight*0.12);
+  lbl.style.left=lx+'px'; lbl.style.top=ly+'px';
+  if(line){ line.setAttribute('x1',best.x); line.setAttribute('y1',best.y); line.setAttribute('x2',lx); line.setAttribute('y2',ly); line.classList.add('show'); }
+  void lbl.offsetWidth; lbl.classList.add('show'); abVibe(AB_VTXT);
+}
+function ch4WallLabelHide(){ var lbl=ch4El('ch4WallLabel'); if(lbl){ lbl.classList.remove('show'); } var line=ch4El('ch4WallLine'); if(line){ line.classList.remove('show'); } }
 function ch4WallShow(){
   ch4WallReset(); ch4WallBuild();
   var w=ch4El('ch4Wall'); if(w){ void w.offsetWidth; w.classList.add('on'); }   /* backdrop + zoom-in dos átomos */
@@ -8012,7 +8073,7 @@ function ch4WallShow(){
   abVibe(AB_VTXT);
 }
 function ch4WallReset(){
-  if(ch4WallBeamId){ clearInterval(ch4WallBeamId); ch4WallBeamId=null; }
+  ch4WallBeamStop(); ch4WallPartsClear(); ch4WallLabelHide();
   if(ch4.wallStartTimer){ clearTimeout(ch4.wallStartTimer); ch4.wallStartTimer=null; }
   var w=ch4El('ch4Wall'); if(w){ w.classList.remove('on'); }
   var box=ch4El('ch4WallBeam'); if(box){ box.innerHTML=''; }
@@ -8430,6 +8491,24 @@ ch4Segs[16].build=function(){
   ];
 };
 ch4Segs[16].onEnded=function(){ ch4ExpLock(false); ch4ShowFab(true); ch4SetFab(false); };   /* play ao final (a parede fica na tela) */
+/* dialogo4.7 (seg 17): a parede segue na tela. 7.6s -> rótulo "massa difusa positiva" num átomo.
+   15s -> começam a passar poucas partículas alfa (efeito geleia). 27s -> uma bate e volta, outras
+   são desviadas, mas a maioria passa direto. */
+ch4Segs[17].onStart=function(){
+  ch4.awaitMachine=null; ch4.awaitCamMove=false; ch4HintClear();
+  var e=ch4El('ch4Exp'); if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }
+  ch4ExpLock(true); ch4ExpObsHide(); ch4ExpSummaryBtn(false);
+  var w=ch4El('ch4Wall'); if(!w || !w.classList.contains('on')){ ch4WallShow(); }   /* garante a parede (continuidade do 4.6 ou salto direto) */
+  ch4WallBeamStop(); ch4WallPartsClear(); ch4WallLabelHide();                        /* limpa partículas/rótulo de execuções anteriores */
+};
+ch4Segs[17].build=function(){
+  return [
+    { t:7.6,  done:false, fn:function(){ ch4WallLabelShow(); } },                                              /* reta + "massa difusa positiva" */
+    { t:15.0, done:false, fn:function(){ ch4WallBeamStart({ straight:1, deflect:0, back:0, interval:1300 }); } }, /* poucas, retas, com geleia */
+    { t:27.0, done:false, fn:function(){ ch4WallSpawnBack(); ch4WallBeamStart({ straight:0.82, deflect:0.16, back:0.03, interval:1050 }); } }  /* uma volta agora + mix (maioria direto) */
+  ];
+};
+ch4Segs[17].onEnded=function(){ ch4ShowFab(true); ch4SetFab(false); };   /* play ao final (a parede + feixe seguem na tela) */
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 function ch4ShowFab(show){ var f=ch4El('ch4Fab'); if(f){ f.style.display = show ? '' : 'none'; } }
 function ch4SetFab(playing){ var ic=ch4El('ch4FabIcon'); if(ic){ ic.textContent = playing ? '⏸' : '▶'; } }
