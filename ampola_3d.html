@@ -554,13 +554,13 @@ const plateRGroup = makePlate(+1);   // + em cima
 // ═══════════════════════════════════════════════
 //  RÓTULOS 3D (cátodo à esquerda, ânodo à direita)
 // ═══════════════════════════════════════════════
-const anodeLabel = labelPlane('ânodo (+)', { color: '#cdd3da', px: 34, worldW: 0.86 });
+const anodeLabel = labelPlane('ânodo (+)', { color: '#cdd3da', px: 37, worldW: 0.86 });
 anodeLabel.position.set(1.80, 0.88, 0.30);
 tubeGroup.add(anodeLabel);
 
-const catTexNormal = textTexture('cátodo (−)', { color: '#cdd3da', px: 34 });
-const catTexPulse  = textTexture('cátodo (−)', { color: '#ffd24a', px: 34 });
-const catLabel = labelPlane('cátodo (−)', { color: '#cdd3da', px: 34, worldW: 0.86 });
+const catTexNormal = textTexture('cátodo (−)', { color: '#cdd3da', px: 37 });
+const catTexPulse  = textTexture('cátodo (−)', { color: '#ffd24a', px: 37 });
+const catLabel = labelPlane('cátodo (−)', { color: '#cdd3da', px: 37, worldW: 0.86 });
 catLabel.material.map = catTexNormal;
 catLabel.position.set(-1.80, 0.88, 0.30);
 tubeGroup.add(catLabel);
@@ -572,10 +572,10 @@ rayLabelCv.width = 320; rayLabelCv.height = 72;
   const ctx = rayLabelCv.getContext('2d');
   ctx.strokeStyle = '#5fae53'; ctx.lineWidth = 3; ctx.setLineDash([9, 9]);
   ctx.beginPath(); ctx.moveTo(14, 66); ctx.lineTo(40, 44); ctx.stroke();
-  ctx.font = '700 30px "Plus Jakarta Sans", system-ui, sans-serif';
+  ctx.font = '700 33px "Plus Jakarta Sans", system-ui, sans-serif';
   ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
   ctx.fillStyle = '#8dff77';
-  ctx.fillText('Raios catódicos', 48, 28);
+  ctx.fillText('Raios catódicos', 48, 27);
 })();
 const rayLabel = new THREE.Mesh(
   new THREE.PlaneGeometry(1.5, 0.34),
