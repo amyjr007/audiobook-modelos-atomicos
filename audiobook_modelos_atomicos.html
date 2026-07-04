@@ -466,7 +466,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   background:transparent;transition:opacity .8s ease}   /* fundo transparente: reusa o ambiente/backdrop do ch4Wall */
 .ch4-nuc.on{opacity:1;visibility:visible}
 .ch4-nuc-atom{position:absolute;left:52%;transform:translate(-50%,-50%);perspective:260px}
-.ch4-nuc-cluster{position:relative;width:7.2vmin;height:7.2vmin;transform-style:preserve-3d;transform:rotateX(-16deg) rotateY(26deg)}   /* estático, mas em 3D (inclinado) */
+.ch4-nuc-cluster{position:relative;width:7.2vmin;height:7.2vmin;transform-style:preserve-3d;transform:rotateX(-16deg) rotateY(26deg) scale(.2)}   /* estático, em 3D; 80% menor */
 .ch4-nuc-p{position:absolute;left:50%;top:50%;width:2.76vmin;height:2.76vmin;margin:-1.38vmin;border-radius:50%;
   background:radial-gradient(circle at 33% 27%,#fff 0%,#fff1b0 12%,#ffcc33 46%,#e59400 78%,#a86500 100%);
   box-shadow:inset -1px -1px 2px rgba(0,0,0,.4),inset 1px 1px 1px rgba(255,255,255,.5),0 1px 4px rgba(0,0,0,.5)}
@@ -2729,7 +2729,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.119</div>
+<div class="app-version" id="appVersion">v1.3.120</div>
 
 </div>
 <script>
@@ -7980,7 +7980,8 @@ var ch4Segs = [
   { src:'audio/dialogo4.5I.mp3?v=1.3.109' },               /* câmera p/ setI; 9s aparece o botão "Resumo"; play ao final */
   { src:'audio/dialogo4.6.mp3?v=1.3.113' },                /* 3s->câmera setJ (fim 5s); 11s zoom até o âmago -> parede de átomos */
   { src:'audio/dialogo4.7.mp3?v=1.3.116' },                /* parede segue; 7.6s rótulo; 15s partículas (geleia); 27s uma volta + desviadas + maioria direto */
-  { src:'audio/dialogo4.8.mp3?v=1.3.118' }                 /* 21.6s some tudo (fade); 28s 3 núcleos (só prótons 3D, distantes); 31s feixe alfa passa direto entre eles */
+  { src:'audio/dialogo4.8.mp3?v=1.3.118' },                /* 21.6s some a parede (fade); 28s 3 núcleos (só prótons 3D, distantes); 31s feixe alfa passa entre eles */
+  { src:'audio/dialogo4.9.mp3?v=1.3.120' }                 /* ▶ ao fim do 4.8 */
 ];
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
 function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
