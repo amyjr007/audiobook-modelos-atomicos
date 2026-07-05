@@ -549,7 +549,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 #ch4AtomEletro2{left:77%;top:66%}
 /* Quando o carrossel aparece, sobe o conteúdo p/ dar espaço à imagem inteira */
 .ab-stage.with-carousel{justify-content:flex-start;padding-top:40px}
-.ab-stage.with-carousel .ab-journey{margin-top:.4em}   /* 0.3 linha (line-height 1.32) abaixo do topo */
+.ab-stage.with-carousel .ab-journey{margin-top:.66em}   /* 0.5 linha (line-height 1.32) abaixo do topo */
 .ab-stage.with-carousel .ab-relative{gap:18px}
 .ab-stage::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 80%,rgba(22,12,5,0.42),rgba(22,12,5,0.84) 72%),linear-gradient(180deg,rgba(22,12,5,0.6),transparent 28%,transparent 60%,rgba(22,12,5,0.78))}
 .ab-relative{position:relative;z-index:2;width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;gap:26px}
@@ -1431,7 +1431,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-seq.vanish{animation:abVanish .9s cubic-bezier(.5,0,.75,0) forwards}
 @keyframes abVanish{to{opacity:0;transform:scale(1.28) translateY(-22px);filter:blur(9px)}}
 
-.ab-credit{--credit-size:clamp(30px,8.5vw,50px);font-family:'Fraunces',serif;font-size:calc(var(--credit-size) - 4px);font-weight:600;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s;letter-spacing:.2px}
+.ab-credit{--credit-size:clamp(30px,8.5vw,50px);font-family:'Fraunces',serif;font-size:15px;font-weight:600;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s;letter-spacing:.2px}
 .ab-credit.show{opacity:1;transform:none}
 .ab-credit-name{font-size:calc(var(--credit-size) - 2px);color:var(--orange);font-weight:700}
 
@@ -1465,8 +1465,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-viewport{position:relative;width:100%;height:min(56vh,420px);border-radius:18px;overflow:hidden;background:#1a0e06;box-shadow:0 16px 44px rgba(0,0,0,.5);border:1px solid rgba(255,122,24,.28);touch-action:pan-y;cursor:grab;user-select:none}
 .ab-viewport:active{cursor:grabbing}
 .ab-track{display:flex;height:100%;will-change:transform}
-.ab-slide{flex:0 0 100%;height:100%}
+.ab-slide{position:relative;flex:0 0 100%;height:100%}
 .ab-slide img{width:100%;height:100%;object-fit:contain;object-position:center;display:block;-webkit-user-drag:none;user-select:none}
+.ab-slide-cap{position:absolute;left:0;right:0;bottom:0;padding:10px 14px;background:rgba(10,6,3,.72);backdrop-filter:blur(3px);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(12px,3.2vw,15px);font-weight:700;letter-spacing:.3px;text-align:center}
 
 /* Mão / gesto de swipe */
 .ab-hand{position:absolute;top:50%;left:50%;margin-top:-20px;font-size:44px;pointer-events:none;opacity:0;z-index:4;filter:drop-shadow(0 5px 9px rgba(0,0,0,.55))}
@@ -1867,12 +1868,12 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ab-carousel" id="abCarousel">
           <div class="ab-viewport" id="abViewport">
             <div class="ab-track" id="abTrack">
-              <div class="ab-slide"><img src="images/img1.png" alt="Imagem 1" draggable="false"></div>
-              <div class="ab-slide"><img src="images/img2.png" alt="Imagem 2" draggable="false"></div>
-              <div class="ab-slide"><img src="images/img3.png" alt="Imagem 3" draggable="false"></div>
-              <div class="ab-slide"><img src="images/img4.png" alt="Imagem 4" draggable="false"></div>
-              <div class="ab-slide"><img src="images/img5.png" alt="Imagem 5" draggable="false"></div>
-              <div class="ab-slide"><img src="images/img6.png" alt="Imagem 6" draggable="false"></div>
+              <div class="ab-slide"><img src="images/img1.png" alt="Imagem 1" draggable="false"><div class="ab-slide-cap">Demócrito e Leucipo · 450 a.C.</div></div>
+              <div class="ab-slide"><img src="images/img2.png" alt="Imagem 2" draggable="false"><div class="ab-slide-cap">John Dalton · 1808</div></div>
+              <div class="ab-slide"><img src="images/img3.png" alt="Imagem 3" draggable="false"><div class="ab-slide-cap">J. J. Thomson · 1904</div></div>
+              <div class="ab-slide"><img src="images/img4.png" alt="Imagem 4" draggable="false"><div class="ab-slide-cap">E. Rutherford · 1911</div></div>
+              <div class="ab-slide"><img src="images/img5.png" alt="Imagem 5" draggable="false"><div class="ab-slide-cap">N. Bohr · 1913</div></div>
+              <div class="ab-slide"><img src="images/img6.png" alt="Imagem 6" draggable="false"><div class="ab-slide-cap">E. Schrödinger · 1926</div></div>
             </div>
             <div class="ab-hand" id="abHand">👆</div>
           </div>
@@ -2820,7 +2821,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.134</div>
+<div class="app-version" id="appVersion">v1.3.135</div>
 
 </div>
 <script>
