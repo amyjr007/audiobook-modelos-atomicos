@@ -33,6 +33,9 @@
   --coral:#ff5436;       /* coral / vermelho-laranja */
   --text:#fbeee2;
   --text2:#cbb29c;
+  /* Distância padrão do topo (abaixo da barra fixa #chapterTop) para o texto de
+     título de TODOS os capítulos. "head text" = barra (~safe-area+46px) + 20px. */
+  --head-text:calc(env(safe-area-inset-top,0px) + 66px);
 }
 /* App em tela cheia (full), sem scroll: a página é sempre uma só. */
 html,body{height:100%}
@@ -575,7 +578,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch-intro.play{display:block}
 .ch-intro.out{opacity:0;pointer-events:none}
 .ch-intro-stage{position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;padding:0 28px;transform:translateY(82vh);will-change:transform;transition:transform 5s cubic-bezier(.33,0,.2,1)}
-.ch-intro.rise .ch-intro-stage{transform:translateY(calc(env(safe-area-inset-top,0px) + 60px))}
+.ch-intro.rise .ch-intro-stage{transform:translateY(var(--head-text))}
 .ch-intro-num{font-family:'Fraunces',serif;font-weight:600;font-style:italic;font-size:clamp(14px,3.6vw,18px);letter-spacing:.42em;text-transform:uppercase;color:var(--orange2);opacity:0;padding-left:.42em}
 .ch-intro.play .ch-intro-num{animation:abChapterIn 1.15s cubic-bezier(.22,1,.36,1) both}
 .ch-intro-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(32px,8.8vw,54px);line-height:1.06;letter-spacing:-.6px;max-width:560px;background:linear-gradient(135deg,var(--amber) 0%,var(--orange) 45%,var(--coral) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transform:translateY(22px) scale(.92);filter:blur(8px)}
@@ -585,7 +588,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
    No dialogo3, o conjunto sobe ao topo (.up). */
 .ch3-intro{position:absolute;inset:0;z-index:5;pointer-events:none}
 .ch3-intro-inner{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:0 28px;transition:top 1.15s cubic-bezier(.5,0,.2,1),transform 1.15s cubic-bezier(.5,0,.2,1),opacity .6s ease}
-.ch3-intro.up .ch3-intro-inner{top:calc(env(safe-area-inset-top,0px) + 66px);transform:translateY(0)}
+.ch3-intro.up .ch3-intro-inner{top:var(--head-text);transform:translateY(0)}
 .ch3-intro.out .ch3-intro-inner{opacity:0}
 .ch3-intro-num{font-family:'Fraunces',serif;font-weight:600;font-style:italic;font-size:clamp(14px,3.6vw,18px);letter-spacing:.42em;text-transform:uppercase;color:var(--orange2);opacity:0;padding-left:.42em}
 .ch3-intro-num.in{animation:abChapterIn 1.15s cubic-bezier(.22,1,.36,1) both}
@@ -2822,7 +2825,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.138</div>
+<div class="app-version" id="appVersion">v1.3.139</div>
 
 </div>
 <script>
@@ -3248,12 +3251,16 @@ function abInitSeg2(){
   abEl('abChapterNum').classList.remove('show');
   abEl('abChapterSub').classList.remove('show','orange');
   abMateriaReset();
+  content.style.transform = ''; /* limpa qualquer transform inline (FLIP do carrossel) p/ o .chapter-rise valer */
   void ch.offsetWidth; /* reflow: fixa o estado base antes de animar */
-  /* dispara a subida + entrada dramática de "Capítulo 1". Deixa um respiro abaixo
-     do cabeçalho fixo do topo (#chapterTop) p/ o texto NÃO subir além do limite. */
+  /* Sobe o "Capítulo 1" até a MESMA distância "head text" dos demais capítulos:
+     20px abaixo da borda inferior da barra fixa (#chapterTop). Medido por rect
+     (robusto) em vez de assumir que o container começa no topo da viewport. */
   var topbar = document.getElementById('chapterTop');
-  var guard = (topbar && topbar.offsetHeight ? topbar.offsetHeight : 56) + 20;
-  content.style.setProperty('--rise', Math.max(0, ch.offsetTop - guard) + 'px');
+  var barBottom = (topbar && topbar.getBoundingClientRect().height) ? topbar.getBoundingClientRect().bottom : 46;
+  var targetY = barBottom + 20;
+  var chTop = ch.getBoundingClientRect().top;
+  content.style.setProperty('--rise', Math.max(0, chTop - targetY) + 'px');
   abEl('abStage').classList.add('chapter-rise');
   abEl('abChapterNum').classList.add('show');
 }
