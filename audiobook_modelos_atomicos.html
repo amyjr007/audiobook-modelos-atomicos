@@ -1501,8 +1501,11 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
 /* Fase "subir": o conteúdo antigo sai por cima e o "Capítulo 1" sobe ao topo */
 .ab-stage.chapter-rise #abContent{transform:translateY(calc(-1 * var(--rise,0px)));transition:transform 1.15s cubic-bezier(.5,0,.18,1)}
-.ab-stage.chapter-rise #abSeq,.ab-stage.chapter-rise #abJourney,.ab-stage.chapter-rise #abCarousel{animation:none;opacity:0;transition:opacity .75s ease,transform 1.15s cubic-bezier(.5,0,.18,1)}
-.ab-stage.chapter-rise #abCarousel{animation:none;transform:translateY(-160px)}   /* animation:none cancela o "both" da entrada (que travava opacity/transform); sobe um pouco mais, junto com o Capítulo 1, p/ sumir de vez (sem ponta visível) */
+.ab-stage.chapter-rise #abSeq,.ab-stage.chapter-rise #abJourney{animation:none;opacity:0;transition:opacity .75s ease,transform 1.15s cubic-bezier(.5,0,.18,1)}
+/* O carrossel NÃO some por fade: sobe pra fora do topo junto com o "Capítulo 1".
+   animation:none cancela o "both" da entrada; --carousel-exit é medido em JS
+   (abInitSeg2) p/ garantir que a base do carrossel saia acima do topo da tela. */
+.ab-stage.chapter-rise #abCarousel{animation:none;opacity:1;transform:translateY(calc(-1 * var(--carousel-exit,160px)));transition:transform 1.15s cubic-bezier(.5,0,.18,1)}
 
 /* ===== Cena do celular (dialogo1.1) ===== */
 /* o bloco "Capítulo 1" some para liberar o palco */
@@ -2825,7 +2828,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.139</div>
+<div class="app-version" id="appVersion">v1.3.140</div>
 
 </div>
 <script>
@@ -3260,7 +3263,15 @@ function abInitSeg2(){
   var barBottom = (topbar && topbar.getBoundingClientRect().height) ? topbar.getBoundingClientRect().bottom : 46;
   var targetY = barBottom + 20;
   var chTop = ch.getBoundingClientRect().top;
-  content.style.setProperty('--rise', Math.max(0, chTop - targetY) + 'px');
+  var rise = Math.max(0, chTop - targetY);
+  content.style.setProperty('--rise', rise + 'px');
+  /* Carrossel sobe pra FORA do topo (não some por fade): move-se, além do rise do
+     conteúdo, o suficiente p/ sua base sair ~60px acima da borda superior. */
+  var carousel = abEl('abCarousel');
+  if(carousel){
+    var cb = carousel.getBoundingClientRect().bottom;
+    carousel.style.setProperty('--carousel-exit', Math.max(160, cb - rise + 60) + 'px');
+  }
   abEl('abStage').classList.add('chapter-rise');
   abEl('abChapterNum').classList.add('show');
 }
