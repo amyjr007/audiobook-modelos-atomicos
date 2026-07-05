@@ -549,6 +549,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 #ch4AtomEletro2{left:77%;top:66%}
 /* Quando o carrossel aparece, sobe o conteúdo p/ dar espaço à imagem inteira */
 .ab-stage.with-carousel{justify-content:flex-start;padding-top:40px}
+.ab-stage.with-carousel .ab-journey{margin-top:.4em}   /* 0.3 linha (line-height 1.32) abaixo do topo */
 .ab-stage.with-carousel .ab-relative{gap:18px}
 .ab-stage::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 80%,rgba(22,12,5,0.42),rgba(22,12,5,0.84) 72%),linear-gradient(180deg,rgba(22,12,5,0.6),transparent 28%,transparent 60%,rgba(22,12,5,0.78))}
 .ab-relative{position:relative;z-index:2;width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;gap:26px}
@@ -1430,9 +1431,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-seq.vanish{animation:abVanish .9s cubic-bezier(.5,0,.75,0) forwards}
 @keyframes abVanish{to{opacity:0;transform:scale(1.28) translateY(-22px);filter:blur(9px)}}
 
-.ab-credit{font-family:'Fraunces',serif;font-size:clamp(30px,8.5vw,50px);font-weight:600;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s;letter-spacing:.2px}
+.ab-credit{--credit-size:clamp(30px,8.5vw,50px);font-family:'Fraunces',serif;font-size:calc(var(--credit-size) - 4px);font-weight:600;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s;letter-spacing:.2px}
 .ab-credit.show{opacity:1;transform:none}
-.ab-credit-name{color:var(--orange);font-weight:700}
+.ab-credit-name{font-size:calc(var(--credit-size) - 2px);color:var(--orange);font-weight:700}
 
 .ab-subject{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;transform:translateY(14px);transition:opacity .7s,transform .7s}
 .ab-subject.show{opacity:1;transform:none}
@@ -2819,7 +2820,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.132</div>
+<div class="app-version" id="appVersion">v1.3.133</div>
 
 </div>
 <script>
