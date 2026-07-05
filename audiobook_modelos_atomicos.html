@@ -480,7 +480,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 /* dialogo4.9: átomo isolado — esfera transparente (limite do átomo) + núcleo no centro */
 .ch4-atom{position:absolute;inset:0;z-index:13;pointer-events:none;opacity:0;visibility:hidden;overflow:hidden;background:transparent;transition:opacity .5s ease}
 .ch4-atom.on{opacity:1;visibility:visible}
-.ch4-atom-shell{position:absolute;left:50%;top:50%;width:min(84vw,74vmin);height:min(84vw,74vmin);
+.ch4-atom-shell{position:absolute;left:50%;top:50%;width:min(96vw,85vmin);height:min(96vw,85vmin);
   transform:translate(-50%,-50%) scale(.16);opacity:0;border-radius:50%;border:2px solid rgba(120,180,255,.5);
   background:radial-gradient(circle at 50% 50%, rgba(90,150,255,.05) 0%, rgba(90,150,255,.02) 68%, rgba(120,180,255,.09) 100%);
   box-shadow:0 0 40px rgba(90,150,255,.22), inset 0 0 60px rgba(90,150,255,.10);
@@ -495,8 +495,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch4-atom.on .ch4-atom-nuc{opacity:1}
 .ch4-atom-nuc .ch4-nuc-cluster{transform:rotateX(-16deg) rotateY(26deg) scale(.34)}   /* núcleo do átomo (visível, mas minúsculo perto da esfera) */
 .ch4-atom-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2}
-.ch4-atom-line{stroke:#fff;stroke-width:2;opacity:0;transition:opacity .5s ease;filter:drop-shadow(0 1px 3px rgba(0,0,0,.7))}
-.ch4-atom-line.show{opacity:.9}
+.ch4-atom-arrow{stroke:#ffe14d;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:0;transition:opacity .5s ease;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+.ch4-atom-arrow.show{opacity:1}
 .ch4-atom-label{position:absolute;z-index:3;transform:translate(-50%,-50%) scale(.7);font-family:'Fraunces',serif;font-style:italic;font-weight:700;
   font-size:clamp(15px,4vw,21px);color:#ffe14d;text-shadow:0 2px 10px rgba(0,0,0,.9);white-space:nowrap;opacity:0;
   transition:opacity .5s ease,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
@@ -2687,7 +2687,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ch4-atom" id="ch4Atom">
           <div class="ch4-atom-shell" id="ch4AtomShell"><div class="ch4-atom-shell-label">limite do átomo</div></div>
           <div class="ch4-atom-nuc" id="ch4AtomNuc"></div>
-          <svg class="ch4-atom-svg" id="ch4AtomSvg"><line id="ch4AtomLine" class="ch4-atom-line"/></svg>
+          <svg class="ch4-atom-svg" id="ch4AtomSvg"><path id="ch4AtomArrow" class="ch4-atom-arrow" fill="none"/></svg>
           <div class="ch4-atom-label" id="ch4AtomLabel">Núcleo atômico</div>
           <div class="ch4-atom-beam" id="ch4AtomBeam"></div>
         </div>
@@ -2767,7 +2767,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.122</div>
+<div class="app-version" id="appVersion">v1.3.123</div>
 
 </div>
 <script>
@@ -8187,13 +8187,24 @@ function ch4AtomShow(){
   var a=ch4El('ch4Atom'); if(a){ void a.offsetWidth; a.classList.add('on'); }   /* esfera dá zoom-in */
   abVibe(AB_VTXT);
 }
-function ch4AtomLineShow(){
-  var line=ch4El('ch4AtomLine'); if(!line) return;
-  var cx=window.innerWidth*0.5, cy=window.innerHeight*0.5;
-  ch4Atom.ex=window.innerWidth*0.5 + window.innerWidth*0.24;
-  ch4Atom.ey=window.innerHeight*0.5 + window.innerHeight*0.2;
-  line.setAttribute('x1',cx); line.setAttribute('y1',cy); line.setAttribute('x2',ch4Atom.ex); line.setAttribute('y2',ch4Atom.ey);
-  line.classList.add('show'); abVibe(AB_VTXT);
+/* seta curva amarela: rabo no rótulo, ponta apontando pro núcleo (sem encostar) */
+function ch4AtomArrowShow(){
+  var arr=ch4El('ch4AtomArrow'); if(!arr) return;
+  var W=window.innerWidth, Hh=window.innerHeight;
+  var cx=W*0.5, cy=Hh*0.5;                                   /* núcleo */
+  var tx=cx + W*0.24, ty=cy + Hh*0.22;                        /* rabo (onde vai o rótulo) */
+  ch4Atom.ex=tx; ch4Atom.ey=ty;
+  var dx=tx-cx, dy=ty-cy, len=Math.hypot(dx,dy)||1, ux=dx/len, uy=dy/len;
+  var gap=W*0.10, hx=cx+ux*gap, hy=cy+uy*gap;                 /* ponta: a um gap do núcleo (não encosta) */
+  var mx=(tx+hx)/2, my=(ty+hy)/2, px=-uy, py=ux;             /* perpendicular p/ curvar */
+  if(py>0){ px=-px; py=-py; }                                 /* curva pra cima */
+  var ctlx=mx+px*len*0.42, ctly=my+py*len*0.42;
+  function rot(vx,vy,a){ return [vx*Math.cos(a)-vy*Math.sin(a), vx*Math.sin(a)+vy*Math.cos(a)]; }
+  var bl=W*0.05, a=0.5, r1=rot(ux,uy,a), r2=rot(ux,uy,-a);    /* farpas da ponta (apontam p/ o núcleo) */
+  var b1x=hx+r1[0]*bl, b1y=hy+r1[1]*bl, b2x=hx+r2[0]*bl, b2y=hy+r2[1]*bl;
+  var d='M'+tx.toFixed(1)+','+ty.toFixed(1)+' Q'+ctlx.toFixed(1)+','+ctly.toFixed(1)+' '+hx.toFixed(1)+','+hy.toFixed(1)
+      +' M'+b1x.toFixed(1)+','+b1y.toFixed(1)+' L'+hx.toFixed(1)+','+hy.toFixed(1)+' L'+b2x.toFixed(1)+','+b2y.toFixed(1);
+  arr.setAttribute('d', d); arr.classList.add('show'); abVibe(AB_VTXT);
 }
 function ch4AtomLabelShow(){
   var lbl=ch4El('ch4AtomLabel'); if(!lbl) return;
@@ -8217,7 +8228,7 @@ function ch4AtomReset(){
   if(ch4.atomPulseTimer){ clearTimeout(ch4.atomPulseTimer); ch4.atomPulseTimer=null; }
   var a=ch4El('ch4Atom'); if(a){ a.classList.remove('on'); }
   var s=ch4El('ch4AtomShell'); if(s){ s.classList.remove('pulse'); }
-  var line=ch4El('ch4AtomLine'); if(line){ line.classList.remove('show'); }
+  var arr=ch4El('ch4AtomArrow'); if(arr){ arr.classList.remove('show'); }
   var lbl=ch4El('ch4AtomLabel'); if(lbl){ lbl.classList.remove('show'); }
   var host=ch4El('ch4AtomNuc'); if(host){ host.innerHTML=''; }
   var box=ch4El('ch4AtomBeam'); if(box){ box.innerHTML=''; }
@@ -8696,7 +8707,7 @@ ch4Segs[19].onStart=function(){
 ch4Segs[19].build=function(){
   return [
     { t:2.7,  done:false, fn:function(){ ch4AtomShow(); } },        /* zoom no átomo do meio; feixe para; esfera transparente + núcleo */
-    { t:6.0,  done:false, fn:function(){ ch4AtomLineShow(); } },    /* reta saindo do núcleo */
+    { t:6.0,  done:false, fn:function(){ ch4AtomArrowShow(); } },   /* seta curva apontando pro núcleo */
     { t:12.0, done:false, fn:function(){ ch4AtomLabelShow(); } },   /* "Núcleo atômico" na outra ponta */
     { t:27.0, done:false, fn:function(){ ch4AtomPulse(); } },       /* a esfera pulsa por 2s */
     { t:32.0, done:false, fn:function(){ ch4AtomHit(); } },         /* partícula alfa bate no núcleo e volta */
