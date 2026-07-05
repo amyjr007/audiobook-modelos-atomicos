@@ -1430,7 +1430,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-seq.vanish{animation:abVanish .9s cubic-bezier(.5,0,.75,0) forwards}
 @keyframes abVanish{to{opacity:0;transform:scale(1.28) translateY(-22px);filter:blur(9px)}}
 
-.ab-credit{font-family:'Fraunces',serif;font-size:clamp(17px,4.4vw,23px);font-weight:600;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s;letter-spacing:.2px}
+.ab-credit{font-family:'Fraunces',serif;font-size:clamp(30px,8.5vw,50px);font-weight:600;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s;letter-spacing:.2px}
 .ab-credit.show{opacity:1;transform:none}
 .ab-credit-name{color:var(--orange);font-weight:700}
 
@@ -1459,7 +1459,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
 /* Carrossel */
 .ab-carousel{display:none;width:100%;max-width:460px;flex-direction:column;align-items:center;gap:14px;margin-top:4px}
-.ab-carousel.show{display:flex;animation:abFadeIn .7s ease both}
+.ab-carousel.show{display:flex;animation:abCarouselIn .85s cubic-bezier(.22,1,.36,1) both}
+@keyframes abCarouselIn{from{opacity:0;transform:translateY(46px)}to{opacity:1;transform:translateY(0)}}
 .ab-viewport{position:relative;width:100%;height:min(56vh,420px);border-radius:18px;overflow:hidden;background:#1a0e06;box-shadow:0 16px 44px rgba(0,0,0,.5);border:1px solid rgba(255,122,24,.28);touch-action:pan-y;cursor:grab;user-select:none}
 .ab-viewport:active{cursor:grabbing}
 .ab-track{display:flex;height:100%;will-change:transform}
@@ -2818,7 +2819,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.131</div>
+<div class="app-version" id="appVersion">v1.3.132</div>
 
 </div>
 <script>
@@ -4771,6 +4772,30 @@ function abSetWord(text, cover){
   span.textContent = text;
   v.appendChild(span);
 }
+/* Revela o carrossel: a frase "A jornada através..." sobe suavemente até sua
+   posição final (FLIP) enquanto o carrossel entra deslizando de baixo. */
+function abRevealCarousel(){
+  var journey = abEl('abJourney');
+  var content = abEl('abContent');
+  var before = journey.getBoundingClientRect();
+  abEl('abStage').classList.add('with-carousel');
+  abEl('abCarousel').classList.add('show');
+  abGoTo(0, false);
+  var after = journey.getBoundingClientRect();
+  var dy = before.top - after.top;
+  if(dy){
+    content.style.transition = 'none';
+    content.style.transform = 'translateY(' + dy + 'px)';
+    content.offsetHeight; /* força reflow antes de animar */
+    content.style.transition = 'transform .85s cubic-bezier(.4,0,.2,1)';
+    content.style.transform = 'translateY(0)';
+    content.addEventListener('transitionend', function cleanup(){
+      content.style.transition = '';
+      content.style.transform = '';
+      content.removeEventListener('transitionend', cleanup);
+    });
+  }
+}
 function abExitWord(){
   var span = abEl('abSubjectValue').querySelector('.ab-word');
   if(span){ span.classList.remove('enter'); span.classList.add('exit'); }
@@ -4789,11 +4814,7 @@ function abCuesSeg0(){
         abEl('abSeq').style.display = 'none';
         abEl('abJourney').classList.add('show');
       } },
-    { time:18.0, done:false, fn:function(){
-        abEl('abStage').classList.add('with-carousel');
-        abEl('abCarousel').classList.add('show');
-        abGoTo(0, false);
-      } },
+    { time:18.0, done:false, fn:function(){ abRevealCarousel(); } },
     { time:20.0, done:false, fn:function(){ abDemoSwipe(); } },
     { time:21.0, done:false, fn:function(){
         if(!ab.userInteracted){ abEl('abHand').className = 'ab-hand hint'; }
