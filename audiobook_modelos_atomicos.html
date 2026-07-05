@@ -2817,7 +2817,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.129</div>
+<div class="app-version" id="appVersion">v1.3.130</div>
 
 </div>
 <script>
@@ -8356,27 +8356,30 @@ function ch4OrbInit(){
   var A=[0, Math.PI/4, Math.PI/2, 3*Math.PI/4];         /* 4 órbitas inclinadas (modelo clássico) */
   ch4Orb.orbits=[];
   for(var i=0;i<4;i++){
-    ch4Orb.orbits.push({ a:R*0.9, b:R*0.4, rot:A[i], sp:(1.15+ (i*0.12))*(i%2?-1:1), ph:Math.random()*6.283, hist:[], active:false });
+    ch4Orb.orbits.push({ a:R*0.9, b:R*0.4, rot:A[i], sp:1.6*(1.15+ (i*0.12))*(i%2?-1:1), ph:Math.random()*6.283, hist:[], active:false });   /* +60% de velocidade */
   }
 }
+/* rastro barato (poucos strokes) — evita queda de FPS do shadowBlur por segmento */
 function ch4OrbStep(ts){
   var o=ch4Orb, ctx=o.ctx; if(!ctx){ o.raf=null; return; }
   if(!o.last){ o.last=ts; } var dt=Math.min(0.05,(ts-o.last)/1000); o.last=ts;
   ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
-  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.lineCap='round';
+  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.lineCap='round'; ctx.lineJoin='round';
   for(var i=0;i<o.orbits.length;i++){
     var orb=o.orbits[i]; if(!orb.active) continue;
     orb.ph += orb.sp*dt;
     var ca=Math.cos(orb.ph), sa=Math.sin(orb.ph), cr=Math.cos(orb.rot), sr=Math.sin(orb.rot);
     var x=o.cx + orb.a*ca*cr - orb.b*sa*sr, y=o.cy + orb.a*ca*sr + orb.b*sa*cr;
-    orb.hist.push({x:x,y:y}); if(orb.hist.length>30){ orb.hist.shift(); }
-    for(var j=1;j<orb.hist.length;j++){
-      var f=j/orb.hist.length;                          /* 0 cauda .. 1 cabeça */
-      ctx.beginPath(); ctx.moveTo(orb.hist[j-1].x,orb.hist[j-1].y); ctx.lineTo(orb.hist[j].x,orb.hist[j].y);
-      ctx.strokeStyle='rgba(150,240,255,'+(f*0.85).toFixed(3)+')'; ctx.lineWidth=0.5+f*6;
-      ctx.shadowColor='rgba(120,230,255,0.9)'; ctx.shadowBlur=4+f*10; ctx.stroke();
+    var h=orb.hist; h.push(x); h.push(y); if(h.length>64){ h.splice(0,2); }   /* rastro grande, guardado como flat [x,y,...] */
+    var n=h.length>>1, j, st;
+    if(n>1){
+      ctx.beginPath(); ctx.moveTo(h[0],h[1]); for(j=1;j<n;j++){ ctx.lineTo(h[2*j],h[2*j+1]); }   /* cauda larga e fraca (1 stroke) */
+      ctx.strokeStyle='rgba(120,225,255,0.24)'; ctx.lineWidth=6; ctx.shadowColor='rgba(120,225,255,0.85)'; ctx.shadowBlur=10; ctx.stroke();
+      st=(n*0.5)|0;
+      ctx.beginPath(); ctx.moveTo(h[2*st],h[2*st+1]); for(j=st+1;j<n;j++){ ctx.lineTo(h[2*j],h[2*j+1]); }   /* metade da frente, mais viva (1 stroke) */
+      ctx.strokeStyle='rgba(200,248,255,0.8)'; ctx.lineWidth=3; ctx.shadowBlur=8; ctx.stroke();
     }
-    ctx.beginPath(); ctx.arc(x,y,3.6,0,6.283); ctx.fillStyle='#fff'; ctx.shadowColor='#c8f4ff'; ctx.shadowBlur=18; ctx.fill();
+    ctx.beginPath(); ctx.arc(x,y,3.8,0,6.283); ctx.fillStyle='#fff'; ctx.shadowColor='#d8f7ff'; ctx.shadowBlur=16; ctx.fill();   /* cabeça */
   }
   ctx.restore();
   o.raf=requestAnimationFrame(ch4OrbStep);
