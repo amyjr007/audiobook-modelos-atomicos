@@ -1432,6 +1432,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
 .ab-credit{font-family:'Fraunces',serif;font-size:clamp(17px,4.4vw,23px);font-weight:600;color:var(--text);opacity:0;transform:translateY(14px);transition:opacity .8s,transform .8s;letter-spacing:.2px}
 .ab-credit.show{opacity:1;transform:none}
+.ab-credit-name{color:var(--orange);font-weight:700}
 
 .ab-subject{display:flex;flex-direction:column;align-items:center;gap:10px;opacity:0;transform:translateY(14px);transition:opacity .7s,transform .7s}
 .ab-subject.show{opacity:1;transform:none}
@@ -1439,7 +1440,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-subject-value{min-height:1.1em;font-family:'Fraunces',serif;font-size:clamp(30px,8.5vw,50px);font-weight:900;line-height:1}
 
 /* Palavra do assunto: entrada e saída dramática */
-.ab-word{display:inline-block}
+.ab-word{display:inline-block;color:var(--orange)}
 .ab-word.enter{animation:abWordIn .6s cubic-bezier(.22,1,.36,1) both}
 @keyframes abWordIn{from{opacity:0;transform:translateY(18px) scale(.9)}to{opacity:1;transform:none}}
 .ab-word.exit{animation:abWordOut .95s cubic-bezier(.6,0,.85,0) forwards}
@@ -1851,7 +1852,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <!-- Conteúdo narrado -->
       <div class="ab-relative" id="abContent">
         <div class="ab-seq" id="abSeq">
-          <div class="ab-credit" id="abCredit">Desenvolvido pelo professor Amauri Junior</div>
+          <div class="ab-credit" id="abCredit">Desenvolvido pelo professor<br><span class="ab-credit-name">Amauri Junior</span></div>
           <div class="ab-subject" id="abSubject">
             <span class="ab-subject-label">Assunto:</span>
             <span class="ab-subject-value" id="abSubjectValue"></span>
@@ -2817,7 +2818,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.130</div>
+<div class="app-version" id="appVersion">v1.3.131</div>
 
 </div>
 <script>
