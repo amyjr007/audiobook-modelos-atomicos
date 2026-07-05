@@ -493,10 +493,18 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   font-size:clamp(13px,3.4vw,17px);color:#9ec8ff;text-shadow:0 2px 8px rgba(0,0,0,.8)}
 .ch4-atom-nuc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);perspective:260px;opacity:0;transition:opacity .8s ease}
 .ch4-atom.on .ch4-atom-nuc{opacity:1}
-.ch4-atom-nuc .ch4-nuc-cluster{transform:rotateX(-16deg) rotateY(26deg) scale(.34)}   /* núcleo do átomo (visível, mas minúsculo perto da esfera) */
+.ch4-atom-nuc .ch4-nuc-cluster{transform:rotateX(-16deg) rotateY(26deg) scale(.34);transition:transform 1.2s cubic-bezier(.5,.02,.3,1)}   /* núcleo do átomo (cresce no zoom do 4.10) */
+/* dialogo4.10: zoom no núcleo (a esfera cresce e some) + núcleo maior */
+.ch4-atom.zoom .ch4-atom-shell{opacity:0;transform:translate(-50%,-50%) scale(1.7)}
+.ch4-atom.zoom .ch4-atom-nuc .ch4-nuc-cluster{transform:rotateX(-16deg) rotateY(26deg) scale(.95)}
+.ch4-atom-nuc.pulse{animation:ch4AtomNucPulse .5s ease-in-out 3}
+@keyframes ch4AtomNucPulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.3)}}
+.ch4-atom-charge{left:50%;top:66%}   /* "carga elétrica positiva" abaixo do núcleo */
 .ch4-atom-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2}
-.ch4-atom-arrow{stroke:#ffe14d;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:0;transition:opacity .5s ease;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+.ch4-atom-arrow{stroke:#ffe14d;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:0;transition:opacity .5s ease;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
 .ch4-atom-arrow.show{opacity:1}
+.ch4-atom-arrowhead{fill:#ffe14d;stroke:#fff8;stroke-width:1;opacity:0;transition:opacity .5s ease;filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
+.ch4-atom-arrowhead.show{opacity:1}
 .ch4-atom-label{position:absolute;z-index:3;transform:translate(-50%,-50%) scale(.7);font-family:'Fraunces',serif;font-style:italic;font-weight:700;
   font-size:clamp(15px,4vw,21px);color:#ffe14d;text-shadow:0 2px 10px rgba(0,0,0,.9);white-space:nowrap;opacity:0;
   transition:opacity .5s ease,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
@@ -506,6 +514,11 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   background:radial-gradient(circle at 34% 30%,#fff,#ff74c0 55%,#c01e6e 100%);box-shadow:0 0 12px 3px rgba(255,100,190,.85);
   animation:ch4AtomHit 2.4s cubic-bezier(.3,0,.4,1) both}
 @keyframes ch4AtomHit{0%{left:-6%}42%{left:47.5%}50%{left:48.6%}100%{left:-10%}}
+/* dialogo4.10: partícula alfa desviada pela repulsão (trajetória via Web Animations API) */
+.ch4-atom-fly2{position:absolute;left:0;top:0;width:13px;height:13px;border-radius:50%;transform:translate(-50%,-50%);
+  background:radial-gradient(circle at 34% 30%,#fff,#ff74c0 55%,#c01e6e 100%);box-shadow:0 0 12px 3px rgba(255,100,190,.85);
+  transition:box-shadow .18s ease, filter .18s ease}
+.ch4-atom-fly2.flash{box-shadow:0 0 30px 13px rgba(255,120,210,1);filter:brightness(1.5)}
 /* Quando o carrossel aparece, sobe o conteúdo p/ dar espaço à imagem inteira */
 .ab-stage.with-carousel{justify-content:flex-start;padding-top:40px}
 .ab-stage.with-carousel .ab-relative{gap:18px}
@@ -2687,8 +2700,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ch4-atom" id="ch4Atom">
           <div class="ch4-atom-shell" id="ch4AtomShell"><div class="ch4-atom-shell-label">limite do átomo</div></div>
           <div class="ch4-atom-nuc" id="ch4AtomNuc"></div>
-          <svg class="ch4-atom-svg" id="ch4AtomSvg"><path id="ch4AtomArrow" class="ch4-atom-arrow" fill="none"/></svg>
+          <svg class="ch4-atom-svg" id="ch4AtomSvg"><path id="ch4AtomArrow" class="ch4-atom-arrow" fill="none"/><polygon id="ch4AtomArrowHead" class="ch4-atom-arrowhead"/></svg>
           <div class="ch4-atom-label" id="ch4AtomLabel">Núcleo atômico</div>
+          <div class="ch4-atom-label ch4-atom-charge" id="ch4AtomCharge">carga elétrica positiva</div>
           <div class="ch4-atom-beam" id="ch4AtomBeam"></div>
         </div>
       </div>
@@ -2767,7 +2781,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.123</div>
+<div class="app-version" id="appVersion">v1.3.124</div>
 
 </div>
 <script>
@@ -8020,7 +8034,8 @@ var ch4Segs = [
   { src:'audio/dialogo4.6.mp3?v=1.3.113' },                /* 3s->câmera setJ (fim 5s); 11s zoom até o âmago -> parede de átomos */
   { src:'audio/dialogo4.7.mp3?v=1.3.116' },                /* parede segue; 7.6s rótulo; 15s partículas (geleia); 27s uma volta + desviadas + maioria direto */
   { src:'audio/dialogo4.8.mp3?v=1.3.118' },                /* 21.6s some a parede (fade); 28s 3 núcleos (só prótons 3D, distantes); 31s feixe alfa passa entre eles */
-  { src:'audio/dialogo4.9.mp3?v=1.3.120' }                 /* ▶ ao fim do 4.8 */
+  { src:'audio/dialogo4.9.mp3?v=1.3.120' },                /* ▶ ao fim do 4.8: átomo isolado (limite + núcleo) */
+  { src:'audio/dialogo4.10.mp3?v=1.3.124' }                /* 6s zoom no núcleo (esfera some); 10s "carga elétrica positiva"; 25s 3 pulsos; 30s/40s repulsão (cima/baixo) */
 ];
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
 function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
@@ -8187,24 +8202,26 @@ function ch4AtomShow(){
   var a=ch4El('ch4Atom'); if(a){ void a.offsetWidth; a.classList.add('on'); }   /* esfera dá zoom-in */
   abVibe(AB_VTXT);
 }
-/* seta curva amarela: rabo no rótulo, ponta apontando pro núcleo (sem encostar) */
+/* seta curva amarela (estilo referência, espelhada, 60% menor): rabo no rótulo,
+   cabeça triangular preenchida apontando pro núcleo (sem encostar) */
 function ch4AtomArrowShow(){
-  var arr=ch4El('ch4AtomArrow'); if(!arr) return;
-  var W=window.innerWidth, Hh=window.innerHeight;
+  var arr=ch4El('ch4AtomArrow'), head=ch4El('ch4AtomArrowHead'); if(!arr) return;
+  var W=window.innerWidth, Hh=window.innerHeight, SF=0.4;    /* 60% menor */
   var cx=W*0.5, cy=Hh*0.5;                                   /* núcleo */
-  var tx=cx + W*0.24, ty=cy + Hh*0.22;                        /* rabo (onde vai o rótulo) */
+  var tx=cx + W*0.24*SF, ty=cy + Hh*0.22*SF;                  /* rabo (onde vai o rótulo) */
   ch4Atom.ex=tx; ch4Atom.ey=ty;
   var dx=tx-cx, dy=ty-cy, len=Math.hypot(dx,dy)||1, ux=dx/len, uy=dy/len;
-  var gap=W*0.10, hx=cx+ux*gap, hy=cy+uy*gap;                 /* ponta: a um gap do núcleo (não encosta) */
-  var mx=(tx+hx)/2, my=(ty+hy)/2, px=-uy, py=ux;             /* perpendicular p/ curvar */
-  if(py>0){ px=-px; py=-py; }                                 /* curva pra cima */
-  var ctlx=mx+px*len*0.42, ctly=my+py*len*0.42;
-  function rot(vx,vy,a){ return [vx*Math.cos(a)-vy*Math.sin(a), vx*Math.sin(a)+vy*Math.cos(a)]; }
-  var bl=W*0.05, a=0.5, r1=rot(ux,uy,a), r2=rot(ux,uy,-a);    /* farpas da ponta (apontam p/ o núcleo) */
-  var b1x=hx+r1[0]*bl, b1y=hy+r1[1]*bl, b2x=hx+r2[0]*bl, b2y=hy+r2[1]*bl;
-  var d='M'+tx.toFixed(1)+','+ty.toFixed(1)+' Q'+ctlx.toFixed(1)+','+ctly.toFixed(1)+' '+hx.toFixed(1)+','+hy.toFixed(1)
-      +' M'+b1x.toFixed(1)+','+b1y.toFixed(1)+' L'+hx.toFixed(1)+','+hy.toFixed(1)+' L'+b2x.toFixed(1)+','+b2y.toFixed(1);
-  arr.setAttribute('d', d); arr.classList.add('show'); abVibe(AB_VTXT);
+  var gap=Math.max(W*0.03, len*0.26);                        /* ponta: a um gap do núcleo (não encosta) */
+  var hx=cx+ux*gap, hy=cy+uy*gap;                            /* ponta da seta (aponta pro núcleo) */
+  var hlen=len*0.4, bx=hx+ux*hlen, by=hy+uy*hlen;            /* base da cabeça triangular */
+  var pxn=-uy, pyn=ux, hw=len*0.2;                           /* meia-largura da cabeça */
+  var t1x=bx+pxn*hw, t1y=by+pyn*hw, t2x=bx-pxn*hw, t2y=by-pyn*hw;
+  var mx=(tx+bx)/2, my=(ty+by)/2, cpx=pxn, cpy=pyn;          /* curva do corpo (espelhada: pro lado oposto) */
+  if(cpy<0){ cpx=-cpx; cpy=-cpy; }
+  var ctlx=mx+cpx*len*0.5, ctly=my+cpy*len*0.5;
+  arr.setAttribute('d','M'+tx.toFixed(1)+','+ty.toFixed(1)+' Q'+ctlx.toFixed(1)+','+ctly.toFixed(1)+' '+bx.toFixed(1)+','+by.toFixed(1));
+  if(head){ head.setAttribute('points', hx.toFixed(1)+','+hy.toFixed(1)+' '+t1x.toFixed(1)+','+t1y.toFixed(1)+' '+t2x.toFixed(1)+','+t2y.toFixed(1)); head.classList.add('show'); }
+  arr.classList.add('show'); abVibe(AB_VTXT);
 }
 function ch4AtomLabelShow(){
   var lbl=ch4El('ch4AtomLabel'); if(!lbl) return;
@@ -8224,12 +8241,47 @@ function ch4AtomHit(){
   setTimeout(function(){ abVibe([45,25,60]); }, 1000);   /* vibra no momento da batida (~42% de 2.4s) */
   p.addEventListener('animationend', function(){ p.remove(); });
 }
+/* ----- dialogo4.10: zoom no núcleo, carga positiva, pulsos e repulsão (Rutherford) ----- */
+function ch4AtomZoomNuc(){   /* zoom no núcleo: a esfera cresce e some; o núcleo aumenta */
+  var a=ch4El('ch4Atom'); if(a){ a.classList.add('zoom'); }
+  var arr=ch4El('ch4AtomArrow'); if(arr){ arr.classList.remove('show'); }
+  var head=ch4El('ch4AtomArrowHead'); if(head){ head.classList.remove('show'); }
+  var lbl=ch4El('ch4AtomLabel'); if(lbl){ lbl.classList.remove('show'); }   /* some o "Núcleo atômico" do 4.9 */
+  abVibe(AB_VTXT);
+}
+function ch4AtomCharge(){ var e=ch4El('ch4AtomCharge'); if(e){ void e.offsetWidth; e.classList.add('show'); abVibe(AB_VTXT); } }
+function ch4AtomNucPulse(){   /* dá 3 pulsadas no núcleo */
+  var n=ch4El('ch4AtomNuc'); if(!n) return;
+  n.classList.remove('pulse'); void n.offsetWidth; n.classList.add('pulse');
+  if(ch4.atomNucPulseTimer){ clearTimeout(ch4.atomNucPulseTimer); }
+  ch4.atomNucPulseTimer=setTimeout(function(){ ch4.atomNucPulseTimer=null; n.classList.remove('pulse'); }, 1600);
+}
+function ch4AtomScatter(dir){   /* partícula alfa passa perto do núcleo e é repelida (up/down) */
+  var box=ch4El('ch4AtomBeam'); if(!box) return;
+  var W=window.innerWidth, Hh=window.innerHeight, cx=W*0.5, cy=Hh*0.5, s=(dir==='up')?-1:1;
+  var el=document.createElement('div'); el.className='ch4-atom-fly2'; box.appendChild(el);
+  el.style.left='-30px'; el.style.top=cy+'px';
+  var dur=2800;
+  var anim=el.animate([
+    { left:'-30px',            top:cy+'px' },
+    { left:(cx*0.66)+'px',     top:(cy - s*Hh*0.01)+'px', offset:0.40 },   /* aproxima quase reto */
+    { left:(cx*0.95)+'px',     top:(cy + s*Hh*0.10)+'px', offset:0.58 },   /* perto do núcleo: começa a repelir */
+    { left:(cx*1.16)+'px',     top:(cy + s*Hh*0.27)+'px', offset:0.72 },   /* desvio dramático */
+    { left:(W*1.12)+'px',      top:(cy + s*Hh*0.55)+'px' }                 /* sai */
+  ], { duration:dur, easing:'cubic-bezier(.42,0,.72,1)', fill:'forwards' });
+  setTimeout(function(){ el.classList.add('flash'); abVibe([35,20,45]); setTimeout(function(){ el.classList.remove('flash'); }, 320); }, dur*0.52);
+  anim.onfinish=function(){ el.remove(); };
+}
 function ch4AtomReset(){
   if(ch4.atomPulseTimer){ clearTimeout(ch4.atomPulseTimer); ch4.atomPulseTimer=null; }
-  var a=ch4El('ch4Atom'); if(a){ a.classList.remove('on'); }
+  if(ch4.atomNucPulseTimer){ clearTimeout(ch4.atomNucPulseTimer); ch4.atomNucPulseTimer=null; }
+  var a=ch4El('ch4Atom'); if(a){ a.classList.remove('on','zoom'); }
   var s=ch4El('ch4AtomShell'); if(s){ s.classList.remove('pulse'); }
   var arr=ch4El('ch4AtomArrow'); if(arr){ arr.classList.remove('show'); }
+  var head=ch4El('ch4AtomArrowHead'); if(head){ head.classList.remove('show'); }
   var lbl=ch4El('ch4AtomLabel'); if(lbl){ lbl.classList.remove('show'); }
+  var ch=ch4El('ch4AtomCharge'); if(ch){ ch.classList.remove('show'); }
+  var n=ch4El('ch4AtomNuc'); if(n){ n.classList.remove('pulse'); }
   var host=ch4El('ch4AtomNuc'); if(host){ host.innerHTML=''; }
   var box=ch4El('ch4AtomBeam'); if(box){ box.innerHTML=''; }
 }
@@ -8715,6 +8767,33 @@ ch4Segs[19].build=function(){
   ];
 };
 ch4Segs[19].onEnded=function(){ ch4ShowFab(true); ch4SetFab(false); };   /* play ao final */
+/* dialogo4.10 (seg 20): 6s zoom no núcleo (a esfera cresce e some); 10s "carga elétrica positiva";
+   25s 3 pulsos no núcleo; 30s partícula alfa repelida pra cima; 40s outra repelida pra baixo. */
+ch4Segs[20].onStart=function(){
+  ch4.awaitMachine=null; ch4.awaitCamMove=false; ch4HintClear();
+  var e=ch4El('ch4Exp'); if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }
+  ch4ExpLock(true); ch4ExpObsHide(); ch4ExpSummaryBtn(false);
+  var a=ch4El('ch4Atom');
+  if(a){ a.classList.remove('zoom'); }                                    /* estado pré-zoom (esfera visível) */
+  var ch=ch4El('ch4AtomCharge'); if(ch){ ch.classList.remove('show'); }
+  var n=ch4El('ch4AtomNuc'); if(n){ n.classList.remove('pulse'); }
+  var box=ch4El('ch4AtomBeam'); if(box){ box.innerHTML=''; }
+  if(!a || !a.classList.contains('on')){                                  /* salto direto: recria o átomo (esfera + núcleo) */
+    if(ch4El('ch4Wall')){ ch4El('ch4Wall').classList.add('on'); }
+    if(n){ n.innerHTML=''; n.appendChild(ch4MakeCluster()); }
+    if(a){ void a.offsetWidth; a.classList.add('on'); }
+  }
+};
+ch4Segs[20].build=function(){
+  return [
+    { t:6.0,  done:false, fn:function(){ ch4AtomZoomNuc(); } },     /* zoom no núcleo; a esfera cresce e some */
+    { t:10.0, done:false, fn:function(){ ch4AtomCharge(); } },      /* "carga elétrica positiva" */
+    { t:25.0, done:false, fn:function(){ ch4AtomNucPulse(); } },    /* 3 pulsadas no núcleo */
+    { t:30.0, done:false, fn:function(){ ch4AtomScatter('up'); } }, /* alfa repelida pra cima */
+    { t:40.0, done:false, fn:function(){ ch4AtomScatter('down'); } } /* alfa repelida pra baixo */
+  ];
+};
+ch4Segs[20].onEnded=function(){ ch4ShowFab(true); ch4SetFab(false); };   /* play ao final */
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 function ch4ShowFab(show){ var f=ch4El('ch4Fab'); if(f){ f.style.display = show ? '' : 'none'; } }
 function ch4SetFab(playing){ var ic=ch4El('ch4FabIcon'); if(ic){ ic.textContent = playing ? '⏸' : '▶'; } }
