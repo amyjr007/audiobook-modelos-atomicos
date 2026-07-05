@@ -2781,7 +2781,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.124</div>
+<div class="app-version" id="appVersion">v1.3.125</div>
 
 </div>
 <script>
@@ -8231,6 +8231,7 @@ function ch4AtomLabelShow(){
 function ch4AtomPulse(){
   var s=ch4El('ch4AtomShell'); if(!s) return;
   s.classList.add('pulse');
+  abVibe([55,150,55,150,55]);   /* vibra junto com as pulsadas da esfera */
   if(ch4.atomPulseTimer){ clearTimeout(ch4.atomPulseTimer); }
   ch4.atomPulseTimer=setTimeout(function(){ ch4.atomPulseTimer=null; s.classList.remove('pulse'); }, 2000);   /* pulsa por 2s */
 }
@@ -8238,7 +8239,7 @@ function ch4AtomHit(){
   var box=ch4El('ch4AtomBeam'); if(!box) return;
   var p=document.createElement('div'); p.className='ch4-atom-fly';
   box.appendChild(p);
-  setTimeout(function(){ abVibe([45,25,60]); }, 1000);   /* vibra no momento da batida (~42% de 2.4s) */
+  setTimeout(function(){ abVibe([90,45,150]); }, 1000);   /* vibração FORTE no momento da batida (~42% de 2.4s) */
   p.addEventListener('animationend', function(){ p.remove(); });
 }
 /* ----- dialogo4.10: zoom no núcleo, carga positiva, pulsos e repulsão (Rutherford) ----- */
@@ -8253,6 +8254,7 @@ function ch4AtomCharge(){ var e=ch4El('ch4AtomCharge'); if(e){ void e.offsetWidt
 function ch4AtomNucPulse(){   /* dá 3 pulsadas no núcleo */
   var n=ch4El('ch4AtomNuc'); if(!n) return;
   n.classList.remove('pulse'); void n.offsetWidth; n.classList.add('pulse');
+  abVibe([75,175,75,175,75]);   /* 3 buzzes junto com as 3 pulsadas */
   if(ch4.atomNucPulseTimer){ clearTimeout(ch4.atomNucPulseTimer); }
   ch4.atomNucPulseTimer=setTimeout(function(){ ch4.atomNucPulseTimer=null; n.classList.remove('pulse'); }, 1600);
 }
@@ -8269,7 +8271,7 @@ function ch4AtomScatter(dir){   /* partícula alfa passa perto do núcleo e é r
     { left:(cx*1.16)+'px',     top:(cy + s*Hh*0.27)+'px', offset:0.72 },   /* desvio dramático */
     { left:(W*1.12)+'px',      top:(cy + s*Hh*0.55)+'px' }                 /* sai */
   ], { duration:dur, easing:'cubic-bezier(.42,0,.72,1)', fill:'forwards' });
-  setTimeout(function(){ el.classList.add('flash'); abVibe([35,20,45]); setTimeout(function(){ el.classList.remove('flash'); }, 320); }, dur*0.52);
+  setTimeout(function(){ el.classList.add('flash'); abVibe([70,35,120]); setTimeout(function(){ el.classList.remove('flash'); }, 320); }, dur*0.52);   /* vibração FORTE na repulsão */
   anim.onfinish=function(){ el.remove(); };
 }
 function ch4AtomReset(){
