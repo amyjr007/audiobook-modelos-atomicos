@@ -1498,8 +1498,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
 /* Fase "subir": o conteúdo antigo sai por cima e o "Capítulo 1" sobe ao topo */
 .ab-stage.chapter-rise #abContent{transform:translateY(calc(-1 * var(--rise,0px)));transition:transform 1.15s cubic-bezier(.5,0,.18,1)}
-.ab-stage.chapter-rise #abSeq,.ab-stage.chapter-rise #abJourney,.ab-stage.chapter-rise #abCarousel{opacity:0;transition:opacity .75s ease,transform 1.15s cubic-bezier(.5,0,.18,1)}
-.ab-stage.chapter-rise #abCarousel{transform:translateY(-160px)}   /* sobe um pouco mais, junto com o Capítulo 1, p/ sumir de vez (sem ponta visível) */
+.ab-stage.chapter-rise #abSeq,.ab-stage.chapter-rise #abJourney,.ab-stage.chapter-rise #abCarousel{animation:none;opacity:0;transition:opacity .75s ease,transform 1.15s cubic-bezier(.5,0,.18,1)}
+.ab-stage.chapter-rise #abCarousel{animation:none;transform:translateY(-160px)}   /* animation:none cancela o "both" da entrada (que travava opacity/transform); sobe um pouco mais, junto com o Capítulo 1, p/ sumir de vez (sem ponta visível) */
 
 /* ===== Cena do celular (dialogo1.1) ===== */
 /* o bloco "Capítulo 1" some para liberar o palco */
@@ -2822,7 +2822,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.137</div>
+<div class="app-version" id="appVersion">v1.3.138</div>
 
 </div>
 <script>
