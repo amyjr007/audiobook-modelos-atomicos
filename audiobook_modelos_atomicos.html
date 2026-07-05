@@ -525,6 +525,13 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   background:radial-gradient(circle at 34% 30%,#fff,#ff74c0 55%,#c01e6e 100%);box-shadow:0 0 12px 3px rgba(255,100,190,.85);
   transition:box-shadow .18s ease, filter .18s ease}
 .ch4-atom-fly2.flash{box-shadow:0 0 30px 13px rgba(255,120,210,1);filter:brightness(1.5)}
+/* dialogo4.11: eletrosfera + elétrons orbitando (rastro de cometa) */
+.ch4-atom-orbits{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.ch4-atom-q{position:absolute;left:50%;top:26%;transform:translate(-50%,-50%) scale(.94);z-index:4;white-space:nowrap;text-align:center;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(19px,5.4vw,30px);color:#fff;
+  text-shadow:0 2px 14px rgba(0,0,0,.85);opacity:0;transition:opacity .6s ease,transform .6s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.ch4-atom-q.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.ch4-atom-eletro{color:#8fe0ff}
 /* Quando o carrossel aparece, sobe o conteúdo p/ dar espaço à imagem inteira */
 .ab-stage.with-carousel{justify-content:flex-start;padding-top:40px}
 .ab-stage.with-carousel .ab-relative{gap:18px}
@@ -2706,10 +2713,13 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         <div class="ch4-atom" id="ch4Atom">
           <div class="ch4-atom-shell" id="ch4AtomShell"><div class="ch4-atom-shell-label">limite do átomo</div></div>
           <div class="ch4-atom-field" id="ch4AtomField"></div>
+          <canvas class="ch4-atom-orbits" id="ch4AtomOrbits"></canvas>
           <div class="ch4-atom-nuc" id="ch4AtomNuc"></div>
-          <svg class="ch4-atom-svg" id="ch4AtomSvg"><path id="ch4AtomArrow" class="ch4-atom-arrow" fill="none"/><polygon id="ch4AtomArrowHead" class="ch4-atom-arrowhead"/></svg>
+          <svg class="ch4-atom-svg" id="ch4AtomSvg"><path id="ch4AtomArrow" class="ch4-atom-arrow" fill="none"/><polygon id="ch4AtomArrowHead" class="ch4-atom-arrowhead"/><path id="ch4AtomEletroArrow" class="ch4-atom-arrow" fill="none"/><polygon id="ch4AtomEletroHead" class="ch4-atom-arrowhead"/></svg>
           <div class="ch4-atom-label" id="ch4AtomLabel">Núcleo atômico</div>
           <div class="ch4-atom-label ch4-atom-charge" id="ch4AtomCharge">carga elétrica positiva</div>
+          <div class="ch4-atom-label ch4-atom-eletro" id="ch4AtomEletro">Eletrosfera</div>
+          <div class="ch4-atom-q" id="ch4AtomQ">Onde estão os elétrons?</div>
           <div class="ch4-atom-beam" id="ch4AtomBeam"></div>
         </div>
       </div>
@@ -2788,7 +2798,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.126</div>
+<div class="app-version" id="appVersion">v1.3.127</div>
 
 </div>
 <script>
@@ -8042,7 +8052,8 @@ var ch4Segs = [
   { src:'audio/dialogo4.7.mp3?v=1.3.116' },                /* parede segue; 7.6s rótulo; 15s partículas (geleia); 27s uma volta + desviadas + maioria direto */
   { src:'audio/dialogo4.8.mp3?v=1.3.118' },                /* 21.6s some a parede (fade); 28s 3 núcleos (só prótons 3D, distantes); 31s feixe alfa passa entre eles */
   { src:'audio/dialogo4.9.mp3?v=1.3.120' },                /* ▶ ao fim do 4.8: átomo isolado (limite + núcleo) */
-  { src:'audio/dialogo4.10.mp3?v=1.3.124' }                /* 6s zoom no núcleo (esfera some); 10s "carga elétrica positiva"; 25s 3 pulsos; 30s/40s repulsão (cima/baixo) */
+  { src:'audio/dialogo4.10.mp3?v=1.3.124' },               /* 6s zoom no núcleo (esfera some); 10s "carga elétrica positiva"; 25s 3 pulsos; 30s/40s repulsão (cima/baixo) */
+  { src:'audio/dialogo4.11.mp3?v=1.3.127' }                /* zoom out (átomo inteiro); 4.8s "Onde estão os elétrons?"; 16s Eletrosfera; 21s 4 elétrons orbitando (rastro cometa) */
 ];
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
 function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
@@ -8268,29 +8279,104 @@ function ch4AtomNucPulse(){   /* dá 3 pulsadas no núcleo */
 function ch4AtomScatter(dir){   /* partícula alfa passa perto do núcleo e é repelida (up/down) */
   var box=ch4El('ch4AtomBeam'); if(!box) return;
   var W=window.innerWidth, Hh=window.innerHeight, cx=W*0.5, cy=Hh*0.5, s=(dir==='up')?-1:1;
+  var g=Hh*0.035;                                          /* parâmetro de impacto: passa rente, fora da linha do núcleo */
   var el=document.createElement('div'); el.className='ch4-atom-fly2'; box.appendChild(el);
-  el.style.left='-30px'; el.style.top=cy+'px';
+  el.style.left='-30px'; el.style.top=(cy + s*g)+'px';
   var dur=2800;
   var anim=el.animate([
-    { left:'-30px',            top:cy+'px' },
-    { left:(cx*0.66)+'px',     top:(cy - s*Hh*0.01)+'px', offset:0.40 },   /* aproxima quase reto */
-    { left:(cx*0.95)+'px',     top:(cy + s*Hh*0.10)+'px', offset:0.58 },   /* perto do núcleo: começa a repelir */
-    { left:(cx*1.16)+'px',     top:(cy + s*Hh*0.27)+'px', offset:0.72 },   /* desvio dramático */
+    { left:'-30px',            top:(cy + s*g)+'px' },
+    { left:(cx*0.70)+'px',     top:(cy + s*g)+'px',       offset:0.42 },   /* vem reto, na altura do impacto (por cima/baixo) */
+    { left:(cx*1.00)+'px',     top:(cy + s*g*1.6)+'px',   offset:0.56 },   /* maior aproximação: rente ao núcleo, sem cruzar a linha dele */
+    { left:(cx*1.18)+'px',     top:(cy + s*Hh*0.18)+'px', offset:0.72 },   /* desvio dramático (mesmo lado) */
     { left:(W*1.12)+'px',      top:(cy + s*Hh*0.55)+'px' }                 /* sai */
   ], { duration:dur, easing:'cubic-bezier(.42,0,.72,1)', fill:'forwards' });
   setTimeout(function(){ var f=ch4El('ch4AtomField'); if(f){ f.classList.remove('zap'); void f.offsetWidth; f.classList.add('zap'); } abVibe(30); }, dur*0.42);   /* campo de força ao se aproximar (antes do desvio) */
   setTimeout(function(){ el.classList.add('flash'); abVibe([70,35,120]); setTimeout(function(){ el.classList.remove('flash'); }, 320); }, dur*0.55);   /* vibração FORTE na repulsão */
   anim.onfinish=function(){ el.remove(); };
 }
+/* ----- dialogo4.11: zoom out (mostra o átomo inteiro), eletrosfera + elétrons orbitando ----- */
+function ch4AtomZoomOut(){   /* desfaz o zoom do 4.10: a esfera reaparece e o núcleo volta ao normal */
+  var a=ch4El('ch4Atom'); if(a){ a.classList.remove('zoom'); }
+  var ch=ch4El('ch4AtomCharge'); if(ch){ ch.classList.remove('show'); }
+  var arr=ch4El('ch4AtomArrow'); if(arr){ arr.classList.remove('show'); }
+  var head=ch4El('ch4AtomArrowHead'); if(head){ head.classList.remove('show'); }
+  var lbl=ch4El('ch4AtomLabel'); if(lbl){ lbl.classList.remove('show'); }
+  abVibe(AB_VTXT);
+}
+function ch4AtomQShow(){ var e=ch4El('ch4AtomQ'); if(e){ void e.offsetWidth; e.classList.add('show'); abVibe(AB_VTXT); } }
+function ch4AtomQHide(){ var e=ch4El('ch4AtomQ'); if(e){ e.classList.remove('show'); } }
+/* "Eletrosfera" + setinha amarela apontando pra região em torno do átomo */
+function ch4AtomEletroShow(){
+  var lbl=ch4El('ch4AtomEletro'), arr=ch4El('ch4AtomEletroArrow'), head=ch4El('ch4AtomEletroHead'); if(!lbl) return;
+  var W=window.innerWidth, Hh=window.innerHeight, cx=W*0.5, cy=Hh*0.5, R=ch4OrbRadius();
+  var lx=cx - W*0.30, ly=cy - Hh*0.30;                 /* rótulo no canto superior-esquerdo */
+  lbl.style.left=lx+'px'; lbl.style.top=ly+'px';
+  var tx=cx - R*0.62, ty=cy - R*0.52;                  /* alvo: a região da eletrosfera (dentro da esfera) */
+  var dx=tx-lx, dy=ty-ly, len=Math.hypot(dx,dy)||1, ux=dx/len, uy=dy/len;
+  var bx=tx - ux*W*0.05, by=ty - uy*W*0.05;            /* base da cabeça */
+  var pxn=-uy, pyn=ux, hw=W*0.024;
+  if(arr){ arr.setAttribute('d','M'+lx.toFixed(1)+','+(ly+16).toFixed(1)+' Q'+((lx+tx)/2-W*0.04).toFixed(1)+','+((ly+ty)/2).toFixed(1)+' '+bx.toFixed(1)+','+by.toFixed(1)); arr.classList.add('show'); }
+  if(head){ head.setAttribute('points', tx.toFixed(1)+','+ty.toFixed(1)+' '+(bx+pxn*hw).toFixed(1)+','+(by+pyn*hw).toFixed(1)+' '+(bx-pxn*hw).toFixed(1)+','+(by-pyn*hw).toFixed(1)); head.classList.add('show'); }
+  void lbl.offsetWidth; lbl.classList.add('show'); abVibe(AB_VTXT);
+}
+function ch4AtomEletroHide(){ var lbl=ch4El('ch4AtomEletro'); if(lbl){ lbl.classList.remove('show'); } var arr=ch4El('ch4AtomEletroArrow'); if(arr){ arr.classList.remove('show'); } var head=ch4El('ch4AtomEletroHead'); if(head){ head.classList.remove('show'); } }
+/* raio da esfera-limite em px */
+function ch4OrbRadius(){ var shellPx=Math.min(window.innerWidth*0.96, Math.min(window.innerWidth,window.innerHeight)*0.85); return shellPx*0.5; }
+/* elétrons orbitando com rastro de cometa (canvas) — modelo clássico (órbitas inclinadas) */
+var ch4Orb={ raf:null, cv:null, ctx:null, orbits:[], last:0, cx:0, cy:0, dpr:1 };
+function ch4OrbInit(){
+  var cv=ch4El('ch4AtomOrbits'); if(!cv) return;
+  var dpr=Math.min(window.devicePixelRatio||1, 2); ch4Orb.dpr=dpr;
+  cv.width=Math.round(window.innerWidth*dpr); cv.height=Math.round(window.innerHeight*dpr);
+  var ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ch4Orb.cv=cv; ch4Orb.ctx=ctx; ch4Orb.cx=window.innerWidth*0.5; ch4Orb.cy=window.innerHeight*0.5;
+  var R=ch4OrbRadius();
+  var A=[0, Math.PI/4, Math.PI/2, 3*Math.PI/4];         /* 4 órbitas inclinadas (modelo clássico) */
+  ch4Orb.orbits=[];
+  for(var i=0;i<4;i++){
+    ch4Orb.orbits.push({ a:R*0.9, b:R*0.4, rot:A[i], sp:(1.15+ (i*0.12))*(i%2?-1:1), ph:Math.random()*6.283, hist:[], active:false });
+  }
+}
+function ch4OrbStep(ts){
+  var o=ch4Orb, ctx=o.ctx; if(!ctx){ o.raf=null; return; }
+  if(!o.last){ o.last=ts; } var dt=Math.min(0.05,(ts-o.last)/1000); o.last=ts;
+  ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.lineCap='round';
+  for(var i=0;i<o.orbits.length;i++){
+    var orb=o.orbits[i]; if(!orb.active) continue;
+    orb.ph += orb.sp*dt;
+    var ca=Math.cos(orb.ph), sa=Math.sin(orb.ph), cr=Math.cos(orb.rot), sr=Math.sin(orb.rot);
+    var x=o.cx + orb.a*ca*cr - orb.b*sa*sr, y=o.cy + orb.a*ca*sr + orb.b*sa*cr;
+    orb.hist.push({x:x,y:y}); if(orb.hist.length>30){ orb.hist.shift(); }
+    for(var j=1;j<orb.hist.length;j++){
+      var f=j/orb.hist.length;                          /* 0 cauda .. 1 cabeça */
+      ctx.beginPath(); ctx.moveTo(orb.hist[j-1].x,orb.hist[j-1].y); ctx.lineTo(orb.hist[j].x,orb.hist[j].y);
+      ctx.strokeStyle='rgba(150,240,255,'+(f*0.85).toFixed(3)+')'; ctx.lineWidth=0.5+f*6;
+      ctx.shadowColor='rgba(120,230,255,0.9)'; ctx.shadowBlur=4+f*10; ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(x,y,3.6,0,6.283); ctx.fillStyle='#fff'; ctx.shadowColor='#c8f4ff'; ctx.shadowBlur=18; ctx.fill();
+  }
+  ctx.restore();
+  o.raf=requestAnimationFrame(ch4OrbStep);
+}
+function ch4OrbBegin(){ ch4OrbInit(); if(!ch4Orb.raf){ ch4Orb.last=0; ch4Orb.raf=requestAnimationFrame(ch4OrbStep); } ch4OrbSpawn(0); }
+function ch4OrbSpawn(i){ if(ch4Orb.orbits[i]){ ch4Orb.orbits[i].active=true; ch4Orb.orbits[i].ph=Math.random()*6.283; ch4Orb.orbits[i].hist=[]; abVibe(AB_VTXT); } }
+function ch4OrbReset(){
+  if(ch4Orb.raf){ cancelAnimationFrame(ch4Orb.raf); ch4Orb.raf=null; } ch4Orb.last=0;
+  for(var i=0;i<ch4Orb.orbits.length;i++){ ch4Orb.orbits[i].active=false; ch4Orb.orbits[i].hist=[]; }
+  if(ch4Orb.ctx){ ch4Orb.ctx.clearRect(0,0,window.innerWidth,window.innerHeight); }
+}
 function ch4AtomReset(){
   if(ch4.atomPulseTimer){ clearTimeout(ch4.atomPulseTimer); ch4.atomPulseTimer=null; }
   if(ch4.atomNucPulseTimer){ clearTimeout(ch4.atomNucPulseTimer); ch4.atomNucPulseTimer=null; }
+  ch4OrbReset();
   var a=ch4El('ch4Atom'); if(a){ a.classList.remove('on','zoom'); }
   var s=ch4El('ch4AtomShell'); if(s){ s.classList.remove('pulse'); }
   var arr=ch4El('ch4AtomArrow'); if(arr){ arr.classList.remove('show'); }
   var head=ch4El('ch4AtomArrowHead'); if(head){ head.classList.remove('show'); }
   var lbl=ch4El('ch4AtomLabel'); if(lbl){ lbl.classList.remove('show'); }
   var ch=ch4El('ch4AtomCharge'); if(ch){ ch.classList.remove('show'); }
+  ch4AtomQHide(); ch4AtomEletroHide();
   var n=ch4El('ch4AtomNuc'); if(n){ n.classList.remove('pulse'); }
   var f=ch4El('ch4AtomField'); if(f){ f.classList.remove('zap'); }
   var host=ch4El('ch4AtomNuc'); if(host){ host.innerHTML=''; }
@@ -8805,6 +8891,34 @@ ch4Segs[20].build=function(){
   ];
 };
 ch4Segs[20].onEnded=function(){ ch4ShowFab(true); ch4SetFab(false); };   /* play ao final */
+/* dialogo4.11 (seg 21): zoom out (mostra o átomo inteiro, a esfera reaparece). 4.8s "Onde estão os
+   elétrons?" (some aos 10s). 16s "Eletrosfera" + setinha. 21s aparecem 4 elétrons orbitando
+   (rastro de cometa neon), um a cada 0.8s, formando o modelo clássico. */
+ch4Segs[21].onStart=function(){
+  ch4.awaitMachine=null; ch4.awaitCamMove=false; ch4HintClear();
+  var e=ch4El('ch4Exp'); if(!e || !e.classList.contains('up')){ ch4ExpRise(); ch4ExpCam('set1', 1); }
+  ch4ExpLock(true); ch4ExpObsHide(); ch4ExpSummaryBtn(false);
+  ch4OrbReset(); ch4AtomQHide(); ch4AtomEletroHide();
+  var a=ch4El('ch4Atom');
+  if(!a || !a.classList.contains('on')){                                  /* salto direto: recria o átomo */
+    if(ch4El('ch4Wall')){ ch4El('ch4Wall').classList.add('on'); }
+    var n=ch4El('ch4AtomNuc'); if(n){ n.innerHTML=''; n.appendChild(ch4MakeCluster()); }
+    if(a){ void a.offsetWidth; a.classList.add('on'); }
+  }
+  ch4AtomZoomOut();                                                       /* mostra o átomo inteiro (esfera reaparece) */
+};
+ch4Segs[21].build=function(){
+  return [
+    { t:4.8,  done:false, fn:function(){ ch4AtomQShow(); } },     /* "Onde estão os elétrons?" (fade in) */
+    { t:10.0, done:false, fn:function(){ ch4AtomQHide(); } },     /* some (fade out) */
+    { t:16.0, done:false, fn:function(){ ch4AtomEletroShow(); } },/* "Eletrosfera" + setinha */
+    { t:21.0, done:false, fn:function(){ ch4OrbBegin(); } },      /* 1º elétron orbitando */
+    { t:21.8, done:false, fn:function(){ ch4OrbSpawn(1); } },     /* 2º */
+    { t:22.6, done:false, fn:function(){ ch4OrbSpawn(2); } },     /* 3º */
+    { t:23.4, done:false, fn:function(){ ch4OrbSpawn(3); } }      /* 4º */
+  ];
+};
+ch4Segs[21].onEnded=function(){ ch4ShowFab(true); ch4SetFab(false); };   /* play ao final */
 function ch4SegIndex(part){ for(var i=0;i<ch4Segs.length;i++){ if(ch4Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 function ch4ShowFab(show){ var f=ch4El('ch4Fab'); if(f){ f.style.display = show ? '' : 'none'; } }
 function ch4SetFab(playing){ var ic=ch4El('ch4FabIcon'); if(ic){ ic.textContent = playing ? '⏸' : '▶'; } }
