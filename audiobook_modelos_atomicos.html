@@ -2875,7 +2875,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
     <!-- perguntas -->
     <div id="quizPlay" style="display:none">
       <div class="quiz-kicker">Quiz · Capítulo 1</div>
-      <div class="quiz-progress" id="quizProgress">Pergunta 1 de 5</div>
+      <div class="quiz-progress" id="quizProgress">Pergunta 1 de 6</div>
       <div class="quiz-q" id="quizQuestion"></div>
       <div class="quiz-options" id="quizOptions"></div>
       <div class="quiz-feedback" id="quizFeedback"></div>
@@ -2944,7 +2944,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.154</div>
+<div class="app-version" id="appVersion">v1.3.155</div>
 
 </div>
 <script>
@@ -4586,6 +4586,14 @@ var quizData = [
     q:'Formalmente, o que é a matéria?',
     options:['Tudo que tem cor e forma','Tudo que tem massa e ocupa lugar no espaço','Tudo que é sólido e pesado'],
     correct:1 },
+  { type:'image',
+    q:'Qual das imagens a seguir representa algo que NÃO é formado por matéria, de acordo com a nossa definição?',
+    options:[
+      { img:'images/rock_transparent.jpeg?v=1.3.155', label:'Pedra' },
+      { img:'images/water_cup.jpg?v=1.3.155',          label:'Água' },
+      { img:'images/light_energy.png?v=1.3.155',       label:'Luz' }
+    ],
+    correct:2 },
   { type:'text',
     q:'No dia a dia, a matéria é encontrada principalmente em quais três estados físicos?',
     options:['Sólido, líquido e gasoso','Quente, frio e morno','Duro, mole e derretido'],
@@ -4599,13 +4607,13 @@ var quizData = [
     options:['Sócrates e Platão','Demócrito e Leucipo','Aristóteles e Tales'],
     correct:1 },
   { type:'image',
-    q:'Qual das imagens a seguir expressa melhor o conceito de "indivisível"?',
+    q:'Qual das imagens a seguir representa melhor o conceito de indivisível, proposto por Demócrito e Leucipo?',
     options:[
       { img:'images/apple.svg?v=1.3.72',       label:'Maçã' },
-      { img:'images/quiz-atomo.svg?v=1.3.72',  label:'Esfera maciça' },
-      { img:'images/quiz-blocos.svg?v=1.3.72', label:'Blocos de montar' }
+      { img:'images/celular.svg?v=1.3.155',    label:'Celular' },
+      { img:'images/quiz-blocos.svg?v=1.3.72', label:'Bloco de montar' }
     ],
-    correct:1 }
+    correct:2 }
 ];
 var QUIZ_LETTERS=['a','b','c','d'];
 var QUIZ_ADV_SFX=['maisessa','maisuma','agoraessa','somaisuma']; /* transições 1>2, 2>3, 3>4, 4>5 */
@@ -4684,7 +4692,7 @@ function quizAnswer(i, btn){
   setTimeout(function(){
     if(isLast){ quizFinish(); }
     else {
-      abSfx('audio/'+QUIZ_ADV_SFX[quizIdx]+'.mp3?v=1.3.72'); /* 1>2 maisessa, 2>3 maisuma, 3>4 agoraessa, 4>5 somaisuma */
+      abSfx('audio/'+(QUIZ_ADV_SFX[quizIdx]||'maisessa')+'.mp3?v=1.3.72'); /* 1>2 maisessa, 2>3 maisuma, 3>4 agoraessa, 4>5 somaisuma, 5>6 fallback */
       quizIdx++; quizRender();
     }
   }, 1900);
@@ -4696,20 +4704,21 @@ function quizShake(){
 }
 function quizFinish(){
   abEl('quizPlay').style.display='none';
-  var nota = quizScore*2; /* 0..10 (5 perguntas × 2) */
+  var total=quizData.length, pct=quizScore/total;
+  var nota = Math.round(pct*10); /* 0..10 */
   abEl('quizDoneName').textContent = quizName;
-  abEl('quizDoneScore').textContent = 'Nota: '+nota+' / 10  ·  '+quizScore+' de '+quizData.length+' acertos';
-  abEl('quizDoneMsg').textContent = quizMsg(nota);
+  abEl('quizDoneScore').textContent = 'Nota: '+nota+' / 10  ·  '+quizScore+' de '+total+' acertos';
+  abEl('quizDoneMsg').textContent = quizMsg(pct);
   abEl('quizDone').classList.add('show');
-  abSfx('audio/yes.mp3?v=1.3.72'); abSfx('audio/applause.mp3?v=1.3.72');
-  quizConfetti();
+  /* card: só "statistics"; se < 50%, também "lowscore" (mensagem sugere revisar). */
+  abSfx('audio/statistics.mp3?v=1.3.72');
+  if(pct < 0.5){ setTimeout(function(){ abSfx('audio/lowscore.mp3?v=1.3.72'); }, 700); }
 }
-function quizMsg(nota){
-  if(nota>=10) return 'Perfeito! Você dominou a ideia do átomo. 🏆';
-  if(nota>=8)  return 'Muito bem! Você aprendeu quase tudo por aqui.';
-  if(nota>=6)  return 'Bom trabalho! Vale revisar um ponto ou outro.';
-  if(nota>=4)  return 'Você está no caminho! Que tal revisar o capítulo?';
-  return 'Não desanime! Refaça o capítulo e tente de novo — você consegue!';
+function quizMsg(pct){
+  if(pct>=1)    return 'Perfeito! Você dominou a ideia do átomo. 🏆';
+  if(pct>=0.8)  return 'Muito bem! Você aprendeu quase tudo por aqui.';
+  if(pct>=0.5)  return 'Bom trabalho! Vale revisar um ponto ou outro.';
+  return 'Você acertou menos da metade. Que tal revisar o capítulo e tentar de novo?';
 }
 /* "Próximo capítulo" -> Capítulo II (John Dalton) com o cartão de título que
    sobe em tela cheia e a narração já tocando. */
