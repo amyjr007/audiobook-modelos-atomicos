@@ -1594,7 +1594,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-mat-slide-img.out{transform:translate(-50%,-50%) translateX(185%);opacity:1}
 /* dialogo1.1 (novo): img7 sobe empurrando a cena pra cima; textos digitados */
 .ab-d11{position:fixed;inset:0;z-index:109;display:none;pointer-events:none;overflow:hidden}
-.ab-d11-img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;transform:translateY(100%);transition:transform 1.4s cubic-bezier(.22,1,.36,1)}
+.ab-d11-img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;transform:translateY(100%);transition:transform 2.2s cubic-bezier(.22,1,.36,1)}
 .ab-d11.rise .ab-d11-img{transform:translateY(0)}
 .ab-d11-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 8vw;text-align:center;opacity:0;transition:opacity .5s ease,backdrop-filter .5s ease}
 .ab-d11-center.on{opacity:1;background:rgba(10,8,6,.30);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
@@ -1606,7 +1606,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-d11-indiv{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(18px,5vw,26px);color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.85);opacity:0;transition:opacity .7s ease}
 .ab-d11-indiv.show{opacity:1}
 /* a cena do capítulo é empurrada pra cima e pra fora (dialogo1 -> dialogo1.1) */
-.ab-chapter.pushed{transform:translateY(-130vh);transition:transform 1.4s cubic-bezier(.22,1,.36,1);pointer-events:none}
+.ab-chapter.pushed{transform:translateY(-130vh);transition:transform 2.2s cubic-bezier(.22,1,.36,1);pointer-events:none}
 
 /* ===== Luz / estados físicos (dialogo1.0) ===== */
 /* dois textos centralizados: "A luz não é matéria" / "Luz é energia" */
@@ -1925,6 +1925,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
             <img class="ab-mat-slide-img" id="abMatSlideL" src="images/estado-liquido.svg?v=1.3.141" alt="Líquido" draggable="false">
             <img class="ab-mat-slide-img" id="abMatSlideG" src="images/estado-gas.svg?v=1.3.141" alt="Gasoso" draggable="false">
           </div>
+          <div class="ab-def ab-matquote" id="abMatQuote" style="display:none"></div>
           <div class="ab-chapter-sub ab-atomq" id="abAtomQ" style="display:none">O que é um átomo?</div>
           <div class="ab-chapter-head" id="abChapterHead">
             <span class="ab-chapter-head-line"></span>
@@ -2871,7 +2872,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.143</div>
+<div class="app-version" id="appVersion">v1.3.144</div>
 
 </div>
 <script>
@@ -3402,6 +3403,8 @@ function abMateriaReset(){
   var d=abEl('abDef'); d.classList.remove('show'); d.style.display='none';
   if(abDefTimer){ clearInterval(abDefTimer); abDefTimer=null; }
   var es=abEl('abEstados'); if(es){ es.classList.remove('show'); es.style.display='none'; }
+  var mq=abEl('abMatQuote'); if(mq){ mq.classList.remove('show'); mq.style.display='none'; mq.textContent=''; }
+  if(typeof abMatQuoteTimer!=='undefined' && abMatQuoteTimer){ clearInterval(abMatQuoteTimer); abMatQuoteTimer=null; }
   var aq=abEl('abAtomQ'); if(aq){ aq.classList.remove('show'); aq.style.display='none'; }
   if(typeof abMatSlideReset==='function'){ abMatSlideReset(); }
   abEl('abChapterHead').classList.remove('show');
@@ -3430,9 +3433,22 @@ function abCuesMateria(){
     { time:21.6, done:false, fn:function(){ var c=abEl('abMatSlide'); if(c){ c.style.display=''; } abMatSlideShow('abMatSlideS'); } },   /* mostra a faixa + sólido entra */
     { time:22.0, done:false, fn:function(){ abMatSlideOut('abMatSlideS'); abMatSlideShow('abMatSlideL'); } }, /* sólido sai à direita; líquido entra */
     { time:23.0, done:false, fn:function(){ abMatSlideOut('abMatSlideL'); abMatSlideShow('abMatSlideG'); } }, /* líquido sai; gás entra */
+    { time:33.2, done:false, fn:function(){ abMatQuoteType(); } },                                /* "Toda matéria é formada por átomos" digitado (até ~37s) */
+    { time:40.0, done:false, fn:function(){ abMatQuoteHide(); } },                                /* some em fade out */
     { time:41.0, done:false, fn:function(){ abMatReveal('abAtomQ'); } }                          /* "O que é um átomo?" (branco, como "O que é matéria?") */
   ];
 }
+/* frase digitada "Toda matéria é formada por átomos" (dialogo1) */
+var abMatQuoteTimer=null;
+function abMatQuoteType(){
+  var e=abEl('abMatQuote'); if(!e) return;
+  if(abMatQuoteTimer){ clearInterval(abMatQuoteTimer); abMatQuoteTimer=null; }
+  e.style.display=''; e.textContent=''; void e.offsetWidth; e.classList.add('show');
+  var full='“Toda matéria é formada por átomos”', i=0, n=full.length, step=Math.max(16, 3800/n);   /* 33.2s -> 37s */
+  abMatQuoteTimer=setInterval(function(){ i++; e.textContent=full.slice(0,i)+(i<n?'▌':''); if(i>=n){ clearInterval(abMatQuoteTimer); abMatQuoteTimer=null; } }, step);
+  abVibe(AB_VTXT);
+}
+function abMatQuoteHide(){ if(abMatQuoteTimer){ clearInterval(abMatQuoteTimer); abMatQuoteTimer=null; } var e=abEl('abMatQuote'); if(e){ e.classList.remove('show'); } }
 /* digitação da definição (dialogo1) */
 var abDefTimer=null, AB_DEF_TXT='É tudo que tem massa e ocupa lugar no espaço';
 function abDefType(){
@@ -3471,11 +3487,11 @@ function ab11Atomo(){ var a=abEl('abD11Atomo'); if(a){ a.style.display=''; void 
 function ab11Indiv(){ var iv=abEl('abD11Indiv'); if(iv){ iv.style.display=''; void iv.offsetWidth; iv.classList.add('show'); abVibe(AB_VTXT); } }
 function abInit11(){
   abSpotlight(false); abNavDemoEnd(); abShowFab(true);
-  var d=abEl('abD11'); if(d){ d.style.display=''; }
+  var d=abEl('abD11'); if(d){ d.style.display='block'; }                      /* CSS base é display:none -> precisa 'block' (era o motivo da img7 não aparecer) */
   ab11Reset();
   var ch=abEl('abChapter'); if(ch){ ch.classList.add('pushed'); }            /* empurra a cena da Matéria pra cima */
-  if(d){ void d.offsetWidth; d.classList.add('rise'); }                       /* img7 sobe de baixo */
-  setTimeout(function(){ abMateriaReset(); var c2=abEl('abChapter'); if(c2){ c2.classList.add('gone'); } }, 1500);   /* depois da subida, limpa a Matéria */
+  if(d){ void d.offsetWidth; d.classList.add('rise'); }                       /* img7 sobe de baixo (mais devagar) */
+  setTimeout(function(){ abMateriaReset(); var c2=abEl('abChapter'); if(c2){ c2.classList.add('gone'); } }, 2300);   /* depois da subida, limpa a Matéria */
 }
 function abCues11(){
   return [
