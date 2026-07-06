@@ -99,10 +99,12 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 /* Cabeçalho fixo no topo: número + nome do capítulo */
 .chapter-top{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:720px;z-index:118;display:none;align-items:center;gap:11px;padding:calc(10px + env(safe-area-inset-top,0px)) 18px 10px;background:rgba(22,12,5,0.82);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,122,24,0.14)}
 .chapter-top.show{display:flex}
-.chapter-top{cursor:pointer}
-.chapter-top-back{flex-shrink:0;font-size:22px;line-height:1;color:var(--orange);font-weight:700;margin:-2px 1px 0 -2px}
+.chapter-top-home{margin-left:auto;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:none;border:none;cursor:pointer;color:var(--orange);padding:2px 0;line-height:1}
+.chapter-top-home-ico{font-size:19px;line-height:1}
+.chapter-top-home-txt{font-family:'Plus Jakarta Sans',sans-serif;font-size:8px;font-weight:700;letter-spacing:.4px;color:var(--text2)}
+.chapter-top-home:hover .chapter-top-home-txt{color:var(--orange)}
 .chapter-top-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:12px;color:#160c05;background:linear-gradient(135deg,var(--orange),var(--coral))}
-.chapter-top-name{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chapter-top-name{flex:1;min-width:0;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ts-sheet-handle{flex-shrink:0;display:flex;justify-content:center;padding:12px 0 4px;cursor:pointer}
 .ts-sheet-handle span{width:42px;height:5px;border-radius:3px;background:rgba(255,122,24,0.4)}
 .ts-sheet-header{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:6px 22px 14px}
@@ -2851,10 +2853,13 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 <div class="nav-hand" id="navHand">👆</div>
 
 <!-- Cabeçalho do capítulo (topo): número + nome -->
-<div class="chapter-top" id="chapterTop" onclick="goTo('capitulos')" role="button" tabindex="0" aria-label="Voltar aos capítulos">
-  <span class="chapter-top-back" aria-hidden="true">‹</span>
+<div class="chapter-top" id="chapterTop">
   <span class="chapter-top-num" id="chapterTopNum">1</span>
   <span class="chapter-top-name" id="chapterTopName">A gênese do átomo</span>
+  <button type="button" class="chapter-top-home" onclick="goTo('capitulos')" aria-label="Ir aos capítulos">
+    <span class="chapter-top-home-ico" aria-hidden="true">🏠</span>
+    <span class="chapter-top-home-txt">capítulos</span>
+  </button>
 </div>
 
 <!-- Navegação Rápida (marcadores) — barra embaixo + gaveta que sobe de baixo -->
@@ -2874,7 +2879,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.150</div>
+<div class="app-version" id="appVersion">v1.3.151</div>
 
 </div>
 <script>
