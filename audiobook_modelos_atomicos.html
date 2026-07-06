@@ -1614,8 +1614,11 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-mat-slide-img.out{transform:translate(-50%,-50%) translateX(185%);opacity:1}
 /* dialogo1.1 (novo): img7 sobe empurrando a cena pra cima; textos digitados */
 .ab-d11{position:fixed;inset:0;z-index:109;display:none;pointer-events:none;overflow:hidden}
-.ab-d11-img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;transform:translateY(100%);transition:transform 2.2s cubic-bezier(.22,1,.36,1)}
-.ab-d11.rise .ab-d11-img{transform:translateY(0)}
+/* img7 inteira (object-fit:contain) dentro da área útil: descontando a top bar e a bottom bar */
+.ab-d11-imgwrap{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 52px);bottom:calc(env(safe-area-inset-bottom,0px) + 52px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:6px 4vw 0;transform:translateY(115%);transition:transform 2.2s cubic-bezier(.22,1,.36,1)}
+.ab-d11.rise .ab-d11-imgwrap{transform:translateY(0)}
+.ab-d11-img{max-width:100%;max-height:calc(100% - 50px);width:auto;height:auto;object-fit:contain;border-radius:16px;box-shadow:0 16px 44px rgba(0,0,0,.5)}
+.ab-d11-cap{flex-shrink:0;font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(20px,5.6vw,30px);color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.85);letter-spacing:.6px}
 .ab-d11.fade{opacity:0;transition:opacity .8s ease}   /* some no início do dialogo1.2 (maçã) */
 .ab-d11-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 8vw;text-align:center;opacity:0;transition:opacity .5s ease,backdrop-filter .5s ease}
 .ab-d11-center.on{opacity:1;background:rgba(10,8,6,.30);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
@@ -1979,7 +1982,10 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- dialogo1.1 (novo): img7 sobe empurrando a cena; textos digitados (átomo/indivisível) -->
       <div class="ab-d11" id="abD11" aria-hidden="true">
-        <img class="ab-d11-img" id="abD11Img" src="images/img7.jpg?v=1.3.143" alt="" draggable="false">
+        <div class="ab-d11-imgwrap">
+          <img class="ab-d11-img" id="abD11Img" src="images/img7.jpg?v=1.3.157" alt="" draggable="false">
+          <div class="ab-d11-cap">450 a.C.</div>
+        </div>
         <div class="ab-d11-center" id="abD11Center">
           <div class="ab-d11-text" id="abD11Text"></div>
           <div class="ab-d11-atomo" id="abD11Atomo" style="display:none">Átomo</div>
@@ -2944,7 +2950,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.156</div>
+<div class="app-version" id="appVersion">v1.3.157</div>
 
 </div>
 <script>
