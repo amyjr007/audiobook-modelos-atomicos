@@ -1724,6 +1724,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-at2{position:fixed;inset:0;z-index:109;display:none;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:13vh 7vw 0;text-align:center;pointer-events:none}
 .ab-at2-l1,.ab-at2-l3{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(20px,5.4vw,30px);line-height:1.25;color:var(--text);max-width:480px;opacity:0;transform:translateY(14px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
 .ab-at2-l1.show,.ab-at2-l3.show{opacity:1;transform:none}
+.ab-at2-l2{font-family:'Fraunces',serif;font-style:italic;font-weight:800;font-size:clamp(22px,5.8vw,32px);line-height:1.2;color:#ffe24d;text-shadow:0 3px 16px rgba(0,0,0,.5),0 0 20px rgba(255,210,60,.28);max-width:480px;opacity:0;transform:translateY(14px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
+.ab-at2-l2.show{opacity:1;transform:none}
 .ab-at2-title{font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(42px,13vw,82px);line-height:1;letter-spacing:-.5px;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0;transform:translateY(18px) scale(.92);filter:blur(6px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1),filter .8s ease}
 .ab-at2-title.show{opacity:1;transform:none;filter:blur(0)}
 
@@ -2080,6 +2082,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
       <!-- Átomo / indivisível (dialogo1.5) — textos empilhados do topo p/ baixo -->
       <div class="ab-at2" id="abAt2" style="display:none">
         <div class="ab-at2-l1" id="abAt2L1"></div>
+        <div class="ab-at2-l2" id="abAt2L2"></div>
         <div class="ab-at2-title" id="abAt2Title"></div>
         <div class="ab-at2-l3" id="abAt2L3"></div>
       </div>
@@ -2950,7 +2953,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.162</div>
+<div class="app-version" id="appVersion">v1.3.163</div>
 
 </div>
 <script>
@@ -3972,7 +3975,7 @@ function abInitHold(){
 
 /* ===== Átomo / indivisível (dialogo1.5) ===== */
 function abAt2Reset(){
-  ['abAt2L1','abAt2Title','abAt2L3'].forEach(function(id){ var e=abEl(id); e.classList.remove('show'); e.textContent=''; });
+  ['abAt2L1','abAt2L2','abAt2Title','abAt2L3'].forEach(function(id){ var e=abEl(id); e.classList.remove('show'); e.textContent=''; });
   abEl('abAt2').style.display='none';
 }
 /* onStart do dialogo1.5: MANTÉM a partícula que restou do corte da maçã
@@ -4780,23 +4783,52 @@ function abRedoCelebrate(){
   abAppleCut=false; /* trava o corte durante a remontagem */
 }
 
+/* Som do corte: elemento pré-carregado e REUTILIZADO (no celular, um new Audio()
+   por corte costuma não tocar — latência de decode / desbloqueio). */
+var abCutAudio=null;
+function abCutSound(){
+  try{
+    if(!abCutAudio){ abCutAudio=new Audio('audio/cutting_sound.mp3?v=1.3.163'); abCutAudio.preload='auto'; }
+    abCutAudio.currentTime=0;
+    var p=abCutAudio.play(); if(p&&p.catch){ p.catch(function(){}); }
+  }catch(_){}
+}
+/* Evento final do átomo: toca o dialogo1.3 (sem trocar de cena) e escreve os
+   rótulos sincronizados por cima do pedaço mínimo que restou. */
+function abAtomLabelsPlay(){
+  abAt2Reset();
+  abEl('abAt2').style.display='flex';
+  var au=new Audio('audio/dialogo1.3.mp3?v=1.3.147');
+  var cues=[
+    { t:10.7, done:false, fn:function(){ abAt2Set('abAt2L1','“Construtor básico”'); abEl('abParticleArrow').classList.add('show'); } }, /* seta -> pedaço restante */
+    { t:12.5, done:false, fn:function(){ abAt2Set('abAt2L2','“Tijolo primordial”'); } },                                                /* amarelo */
+    { t:19.5, done:false, fn:function(){ abAt2Set('abAt2Title','“Átomo”'); abEl('abParticleArrow').classList.remove('show'); abParticlePulse(); } }, /* laranja */
+    { t:23.5, done:false, fn:function(){ abAt2Set('abAt2L3','“Indivisível”'); } }
+  ];
+  au.addEventListener('timeupdate', function(){
+    var t=au.currentTime, i;
+    for(i=0;i<cues.length;i++){ if(!cues[i].done && t>=cues[i].t){ cues[i].done=true; cues[i].fn(); } }
+  });
+  var p=au.play(); if(p&&p.catch){ p.catch(function(){}); }
+}
+
 /* Executa um corte (ou sacode, se já chegou no átomo). */
 function abAppleDoCut(){
   abEl('abAppleHint').classList.remove('show');
   if(abAtomReached){
     /* Chegou no "átomo" (pedaço mínimo): ele é INDIVISÍVEL. Tentar cortar dispara
-       o EVENTO FINAL: toca "yes" JUNTO com o dialogo1.3 (sem applause). NÃO troca
+       o EVENTO FINAL: "yes" e, 1s depois, o dialogo1.3 com os rótulos. NÃO troca
        de segmento (isso resetava a maçã inteira = o flash) — o átomo (pedaço
        mínimo) FICA na tela até segunda ordem. Dispara uma única vez. */
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
     abSfx('audio/yes.mp3?v=1.3.72');
-    abSfx('audio/dialogo1.3.mp3?v=1.3.147');   /* dialogo1.3 junto com o "yes" */
+    setTimeout(abAtomLabelsPlay, 1000);   /* 1s depois do "yes" -> dialogo1.3 + rótulos */
     return;
   }
   abVibe(35);                  /* corte: vibração */
-  abSfx('audio/cutting_sound.mp3?v=1.3.158');   /* som do corte ao arrastar o dedo */
+  abCutSound();                /* som do corte ao arrastar o dedo (elemento pré-carregado p/ celular) */
   abAppleSliceHalves();        /* metades voam (com a imagem atual) */
   abAppleJuice();
   abAppleCuts++;
@@ -4881,6 +4913,8 @@ function abBladeFrame(){
   else { abBladeRaf=null; ctx.clearRect(0,0,cv.width,cv.height); }
 }
 function abAppleSetup(){
+  /* pré-carrega o som do corte (decode pronto antes do 1º corte no celular) */
+  try{ if(!abCutAudio){ abCutAudio=new Audio('audio/cutting_sound.mp3?v=1.3.163'); abCutAudio.preload='auto'; abCutAudio.load(); } }catch(_){}
   /* O botão Refazer trata o próprio toque: bloqueia a propagação (p/ o gesto de
      corte não engatar) e dispara no pointerup, sem depender do 'click'
      sintético — que era engolido no 1º toque. */
