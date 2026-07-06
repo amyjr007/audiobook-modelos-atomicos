@@ -1582,6 +1582,14 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 @keyframes abMatPop{0%{opacity:0;transform:translateY(14px) scale(.85);filter:blur(5px)}55%{opacity:1;transform:translateY(0) scale(1.09);filter:blur(0)}100%{opacity:1;transform:none}}
 .ab-def{margin-top:10px;max-width:420px;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(16px,4.4vw,24px);line-height:1.34;color:var(--text);opacity:0;transform:translateY(12px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
 .ab-def.show{opacity:1;transform:none}
+/* dialogo1 (novo): "O que é um átomo?" branco (mesmo estilo de "O que é matéria?") */
+.ab-atomq{color:#fff}
+/* dialogo1 (novo): imagens dos 3 estados deslizando (esq -> centro -> dir) */
+.ab-mat-slide{position:fixed;left:0;right:0;top:58%;height:min(48vw,200px);z-index:106;pointer-events:none;overflow:hidden}
+.ab-mat-slide-img{position:absolute;left:50%;top:50%;width:min(46vw,190px);height:min(46vw,190px);object-fit:contain;
+  transform:translate(-50%,-50%) translateX(-175%);opacity:0;transition:transform .7s cubic-bezier(.5,0,.2,1),opacity .5s ease;-webkit-user-drag:none}
+.ab-mat-slide-img.in{transform:translate(-50%,-50%) translateX(0);opacity:1}
+.ab-mat-slide-img.out{transform:translate(-50%,-50%) translateX(175%);opacity:1}
 
 /* ===== Luz / estados físicos (dialogo1.0) ===== */
 /* dois textos centralizados: "A luz não é matéria" / "Luz é energia" */
@@ -1893,10 +1901,18 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
           <div class="ab-chapter-sub" id="abChapterSub">O que é Matéria?</div>
           <div class="ab-mat" id="abMat" style="display:none">Matéria</div>
           <div class="ab-def" id="abDef" style="display:none">É tudo que tem massa e ocupa lugar no espaço</div>
+          <div class="ab-mat ab-estados" id="abEstados" style="display:none">3 estados físicos</div>
+          <div class="ab-chapter-sub ab-atomq" id="abAtomQ" style="display:none">O que é um átomo?</div>
           <div class="ab-chapter-head" id="abChapterHead">
             <span class="ab-chapter-head-line"></span>
             <span class="ab-chapter-head-text">O que é a Química?</span>
           </div>
+        </div>
+        <!-- dialogo1: 3 imagens de estados físicos deslizando (sólido -> líquido -> gás) -->
+        <div class="ab-mat-slide" id="abMatSlide" aria-hidden="true">
+          <img class="ab-mat-slide-img" id="abMatSlideS" src="images/estado-solido.svg?v=1.3.141" alt="Sólido" draggable="false">
+          <img class="ab-mat-slide-img" id="abMatSlideL" src="images/estado-liquido.svg?v=1.3.141" alt="Líquido" draggable="false">
+          <img class="ab-mat-slide-img" id="abMatSlideG" src="images/estado-gas.svg?v=1.3.141" alt="Gasoso" draggable="false">
         </div>
       </div>
 
@@ -2828,7 +2844,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.140</div>
+<div class="app-version" id="appVersion">v1.3.141</div>
 
 </div>
 <script>
@@ -3091,7 +3107,7 @@ var ab = {
     { src:'audio/dialogo0.mp3?v=1.3.72',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
     { src:'audio/dialogo0.1.mp3?v=1.3.72', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
     { src:'audio/dialogo1A.mp3?v=1.3.72',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
-    { src:'audio/dialogo1.mp3?v=1.3.72',   build:abCuesMateria, onStart:abInitMateria, next:false }, /* Matéria + quiz */
+    { src:'audio/dialogo1.mp3?v=1.3.141',  build:abCuesMateria, onStart:abInitMateria, next:true }, /* Matéria + estados; fim -> ▶ -> dialogo1.0 */
     { src:'audio/dialogo1.0.mp3?v=1.3.72', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
     { src:'audio/dialogo1.1.mp3?v=1.3.72', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
     { src:'audio/dialogo1.2.mp3?v=1.3.72', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
@@ -3356,6 +3372,10 @@ function abConfettiStop(){
 function abMateriaReset(){
   var m=abEl('abMat'); m.classList.remove('show'); m.style.display='none';
   var d=abEl('abDef'); d.classList.remove('show'); d.style.display='none';
+  if(abDefTimer){ clearInterval(abDefTimer); abDefTimer=null; }
+  var es=abEl('abEstados'); if(es){ es.classList.remove('show'); es.style.display='none'; }
+  var aq=abEl('abAtomQ'); if(aq){ aq.classList.remove('show'); aq.style.display='none'; }
+  if(typeof abMatSlideReset==='function'){ abMatSlideReset(); }
   abEl('abChapterHead').classList.remove('show');
   abQuizReset();
   abConfettiStop();
@@ -3370,14 +3390,33 @@ function abInitMateria(){
   abMateriaReset();
 }
 
-/* Cues do dialogo1: Matéria (3.9s), definição (7s, permanece até avançar), cards (12s). */
+/* Cues do dialogo1 (novo): 3.9s "Matéria"; 6.5s digita a definição (até 9s); 20s "3 estados
+   físicos"; 21.6/22/23s imagens sólido->líquido->gás; 41s "O que é um átomo?". Fim -> play. */
 function abCuesMateria(){
   return [
     { time:3.9,  done:false, fn:function(){ abMatReveal('abMat'); } },
-    { time:7.0,  done:false, fn:function(){ abMatReveal('abDef'); } },
-    { time:12.0, done:false, fn:function(){ abQuizShow(); } }
+    { time:6.5,  done:false, fn:function(){ abDefType(); } },                                    /* "É tudo que tem..." digitado (6.5s -> 9s) */
+    { time:20.0, done:false, fn:function(){ abMatReveal('abEstados'); } },                       /* "3 estados físicos" (como "Matéria") */
+    { time:21.6, done:false, fn:function(){ abMatSlideShow('abMatSlideS'); } },                  /* sólido entra pela esquerda */
+    { time:22.0, done:false, fn:function(){ abMatSlideOut('abMatSlideS'); abMatSlideShow('abMatSlideL'); } }, /* sólido sai à direita; líquido entra */
+    { time:23.0, done:false, fn:function(){ abMatSlideOut('abMatSlideL'); abMatSlideShow('abMatSlideG'); } }, /* líquido sai; gás entra */
+    { time:41.0, done:false, fn:function(){ abMatReveal('abAtomQ'); } }                          /* "O que é um átomo?" (branco, como "O que é matéria?") */
   ];
 }
+/* digitação da definição (dialogo1) */
+var abDefTimer=null, AB_DEF_TXT='É tudo que tem massa e ocupa lugar no espaço';
+function abDefType(){
+  var e=abEl('abDef'); if(!e) return;
+  if(abDefTimer){ clearInterval(abDefTimer); abDefTimer=null; }
+  e.style.display=''; e.textContent=''; void e.offsetWidth; e.classList.add('show');
+  var i=0, n=AB_DEF_TXT.length, step=Math.max(16, 2500/n);   /* 6.5s -> 9s */
+  abDefTimer=setInterval(function(){ i++; e.textContent=AB_DEF_TXT.slice(0,i)+(i<n?'▌':''); if(i>=n){ clearInterval(abDefTimer); abDefTimer=null; } }, step);
+  abVibe(AB_VTXT);
+}
+/* imagens dos 3 estados deslizando (dialogo1) */
+function abMatSlideShow(id){ var e=abEl(id); if(e){ e.classList.remove('out'); e.classList.add('in'); abVibe(AB_VTXT); } }
+function abMatSlideOut(id){ var e=abEl(id); if(e){ e.classList.remove('in'); e.classList.add('out'); } }
+function abMatSlideReset(){ ['abMatSlideS','abMatSlideL','abMatSlideG'].forEach(function(id){ var e=abEl(id); if(e){ e.classList.remove('in','out'); } }); }
 
 /* ===== Luz / estados físicos (dialogo1.0) ===== */
 /* Dois textos: 'A' = "A luz não é matéria", 'B' = "Luz é energia". */
