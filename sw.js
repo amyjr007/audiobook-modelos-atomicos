@@ -1,5 +1,5 @@
 /* Service Worker — Audiobook Modelos Atômicos (PWA offline + auto-update) */
-const CACHE = 'audiobook-atomos-b20260706083134'; /* BUILD — carimbado automaticamente pelo git hook */
+const CACHE = 'audiobook-atomos-b20260706083856'; /* BUILD — carimbado automaticamente pelo git hook */
 
 /* App shell pré-cacheado para funcionar offline. */
 const SHELL = [
@@ -25,8 +25,8 @@ const SHELL = [
   './audio/dialogo1.3.mp3',
   './audio/dialogo1.4.mp3',
   './audio/dialogo1.5.mp3',
+  './audio/dialogo1.6.mp3',
   './audio/dialogo1.6A.mp3',
-  './audio/dialogo1.6B.mp3',
   './audio/dialogo1.7.mp3',
   './audio/dialogo1.7A.mp3',
   './audio/dialogo1.7B.mp3',

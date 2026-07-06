@@ -2874,7 +2874,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.149</div>
+<div class="app-version" id="appVersion">v1.3.150</div>
 
 </div>
 <script>
@@ -2948,7 +2948,7 @@ var timestamps = [
   { title:'Introdução',         sub:'', time:null, seg:0 },
   { title:'O que é matéria',    sub:'', time:null, seg:2 },
   { title:'A ideia do átomo',   sub:'', time:null, seg:5 },  /* NOVO: vai direto pro começo do dialogo1.2 (maçã) */
-  { title:'A analogia com lego', sub:'', time:null, seg:12 },
+  { title:'A analogia com lego', sub:'', time:null, seg:10 },  /* NOVO: dialogo1.6 (entrada do barco) */
   { title:'Quiz',  sub:'Teste seus conhecimentos', time:null, quiz:true }
 ];
 
@@ -3144,12 +3144,12 @@ var ab = {
     { src:'audio/dialogo1.3.mp3?v=1.3.147', build:abCues13,     onStart:abInitAt2,         next:true  }, /* dialogo1.3: seta+"Construtor básico" (10.5s), "Átomo" (19.6s), "Indivisível" (23.6s); fim -> ▶ -> dialogo1.4 */
     { src:'audio/dialogo1.4.mp3?v=1.3.147', build:abCues16A,    onStart:abInit16A,         next:false }, /* dialogo1.4: refazer a maçã (botão Refazer aos 2.5s); ao completar a remontagem -> dialogo1.5 */
     { src:'audio/dialogo1.5.mp3?v=1.3.72', build:abCuesNone,    onStart:abInitHold,        next:true  }, /* dialogo1.5 (regravado): Átomo/Indivisível migrou p/ o 1.3; eventos ainda a definir; fim -> ▶ -> 1.6A */
-    { src:'audio/dialogo1.6A.mp3?v=1.3.72', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
-    { src:'audio/dialogo1.6B.mp3?v=1.3.72', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
-    { src:'audio/dialogo1.7.mp3?v=1.3.72', build:abCues17,     onStart:abInit17,          next:true  }, /* barco de Lego: entra (delay 2s); 12.3s sai 1 peça; 15s "Construtor básico"; fim -> ▶ -> 1.7A */
-    { src:'audio/dialogo1.7A.mp3?v=1.3.72', build:abCues17A,   onStart:abInit17A,         next:false }, /* mesmo barco: segurar 1s p/ explodir -> auto 1.7B */
-    { src:'audio/dialogo1.7B.mp3?v=1.3.72', build:abCuesNone,  onStart:abInit17B, onEnd:abShow17BRedo, next:false }, /* pós-explosão: ao fim do áudio, botão "Refazer" */
-    { src:'audio/dialogo1.7C.mp3?v=1.3.72', build:abCuesNone,  onStart:abInit17C, onEnd:abShow17CQuiz, next:false }  /* barco refeito; ao fim, botão de quiz no lugar do play */
+    { src:'audio/dialogo1.6.mp3?v=1.3.150',  build:abCues17,     onStart:abInit17,      onEnd:abEndLego16, auto:true }, /* dialogo1.6: 7s a cena sobe + barco de Lego entra; 12.3s sai 1 peça; 15s "Construtor básico"; fim -> AUTO (sem pausa) -> 1.6A */
+    { src:'audio/dialogo1.6A.mp3?v=1.3.150', build:abCuesNone,   onStart:abInitLegoHold,                   next:true  }, /* dialogo1.6A: narração; barco parado (pode girar); fim -> ▶ -> 1.7 */
+    { src:'audio/dialogo1.7.mp3?v=1.3.150',  build:abCuesNone,   onStart:abInit17A,     onEnd:abLego17ArmExplode, next:false }, /* dialogo1.7: barco inteiro; FIM do áudio habilita segurar 1s -> explode -> 1.7A */
+    { src:'audio/dialogo1.7A.mp3?v=1.3.150', build:abCuesNone,   onStart:abInit17B,     onEnd:abShow17BRedo,      next:false }, /* dialogo1.7A (pós-explosão): fim -> some o play e aparece "Refazer" -> remonta -> 1.7B */
+    { src:'audio/dialogo1.7B.mp3?v=1.3.150', build:abCuesNone,   onStart:abInit17C,     onEnd:abShow17CQuiz,      next:false }, /* dialogo1.7B: barco refeito; ao fim, botão de quiz no lugar do play */
+    { src:'audio/dialogo1.7C.mp3?v=1.3.72',  build:abCuesNone,   onStart:abInitHold,                       next:false }  /* sobra: fluxo antigo do 1.7C desativado */
   ]
 };
 
@@ -4301,7 +4301,7 @@ function legoExplode(){
   });
   lego.canExplode=false; /* já explodiu */
   /* após explodir, encadeia o dialogo1.7B (narração pós-explosão) */
-  setTimeout(function(){ if(lego.exploded && ab.seg===13){ startSegment(14); } }, 1200);
+  setTimeout(function(){ if(lego.exploded && ab.seg===12){ startSegment(13); } }, 1200); /* explodiu no dialogo1.7 -> 1.7A */
 }
 /* Remontagem animada (Refazer): cada peça volta da posição espalhada p/ a original. */
 function legoStartRewind(onDone){
@@ -4423,7 +4423,7 @@ function abLego17Raise(){
 }
 function abCues17(){
   return [
-    { time:6.0,  done:false, fn:function(){ abLego17Raise(); } }, /* maçã sobe + barco sobe juntos */
+    { time:7.0,  done:false, fn:function(){ abLego17Raise(); } }, /* 7s: a cena sobe + o barco sobe juntos */
     { time:12.3, done:false, fn:function(){ legoEmitBrick(); } },
     { time:15.0, done:false, fn:function(){ legoLabel(); } }
   ];
@@ -4440,14 +4440,31 @@ function abInit17A(){
   requestAnimationFrame(function(){
     legoInit();
     legoResize();
-    legoResetScene(true);          /* barco inteiro de novo (desfaz a peça destacada do 1.7), MANTENDO a rotação atual */
+    legoResetScene(true);          /* barco inteiro de novo (desfaz a peça destacada do 1.6), MANTENDO a rotação atual */
     legoStartLoop();
-    lego.interactive=true; lego.canExplode=true; /* segurar 1s -> explode */
-    ov.classList.add('in');        /* já no centro (vindo do 1.7 nem se mexe) */
+    lego.interactive=true; lego.canExplode=false; /* durante o áudio só gira; explode habilita no fim (abLego17ArmExplode) */
+    ov.classList.add('in');        /* já no centro */
   });
   abShowFab(true);
 }
 function abCues17A(){ return []; }
+/* fim do dialogo1.7: habilita a interação de segurar 1s p/ explodir e some o play. */
+function abLego17ArmExplode(){ lego.canExplode=true; abShowFab(false); }
+/* fim do dialogo1.6: encadeia o dialogo1.6A DIRETO, sem pausa. */
+function abEndLego16(){ startSegment(ab.seg + 1); }
+/* onStart do dialogo1.6A: mantém o barco na tela (inteiro, pode girar; não explode);
+   o play conduz p/ o dialogo1.7. */
+function abInitLegoHold(){
+  abSpotlight(false); abNavDemoEnd();
+  var ov=abEl('abLego'); if(ov){ ov.style.display='block'; ov.classList.add('show','in'); }
+  abEl('abLegoLabel').classList.remove('show');
+  abEl('abLegoRedo').classList.remove('show'); abEl('abLegoQuiz').classList.remove('show');
+  requestAnimationFrame(function(){
+    legoInit(); legoResize(); legoResetScene(true); legoStartLoop();
+    lego.interactive=true; lego.canExplode=false;
+  });
+  abShowFab(true);
+}
 /* onStart do dialogo1.7B (pós-explosão): MANTÉM as peças espalhadas na tela.
    Narração automática; ao terminar, surge o botão "Refazer". */
 function abInit17B(){
@@ -4466,7 +4483,7 @@ function abShow17BRedo(){ abEl('abLegoRedo').classList.add('show'); }
 function legoRedoClick(){
   abEl('abLegoRedo').classList.remove('show');
   abShowFab(false);
-  legoStartRewind(function(){ startSegment(15); }); /* barco refeito -> 1.7C */
+  legoStartRewind(function(){ startSegment(14); }); /* barco refeito -> dialogo1.7B */
 }
 /* onStart do dialogo1.7C: barco inteiro de novo; narração automática.
    Ao terminar, o botão de quiz aparece no lugar do play. */
