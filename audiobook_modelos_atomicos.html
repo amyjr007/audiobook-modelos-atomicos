@@ -1592,6 +1592,21 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
   transform:translate(-50%,-50%) translateX(-185%);opacity:0;transition:transform .7s cubic-bezier(.5,0,.2,1),opacity .5s ease;-webkit-user-drag:none}
 .ab-mat-slide-img.in{transform:translate(-50%,-50%) translateX(0);opacity:1}
 .ab-mat-slide-img.out{transform:translate(-50%,-50%) translateX(185%);opacity:1}
+/* dialogo1.1 (novo): img7 sobe empurrando a cena pra cima; textos digitados */
+.ab-d11{position:fixed;inset:0;z-index:109;display:none;pointer-events:none;overflow:hidden}
+.ab-d11-img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;transform:translateY(100%);transition:transform 1.4s cubic-bezier(.22,1,.36,1)}
+.ab-d11.rise .ab-d11-img{transform:translateY(0)}
+.ab-d11-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 8vw;text-align:center;opacity:0;transition:opacity .5s ease,backdrop-filter .5s ease}
+.ab-d11-center.on{opacity:1;background:rgba(10,8,6,.30);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.ab-d11-text{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(20px,5.6vw,32px);line-height:1.32;color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.85);max-width:560px;opacity:0;transition:opacity .55s ease}
+.ab-d11-text.show{opacity:1}
+.ab-d11-text.orange{background:linear-gradient(135deg,var(--amber),var(--orange) 50%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;text-shadow:none}
+.ab-d11-atomo{font-family:'Fraunces',serif;font-weight:900;font-style:italic;font-size:clamp(30px,8vw,46px);line-height:1.05;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0}
+.ab-d11-atomo.show{animation:abMatPop .7s cubic-bezier(.22,1,.36,1) both}
+.ab-d11-indiv{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(18px,5vw,26px);color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.85);opacity:0;transition:opacity .7s ease}
+.ab-d11-indiv.show{opacity:1}
+/* a cena do capítulo é empurrada pra cima e pra fora (dialogo1 -> dialogo1.1) */
+.ab-chapter.pushed{transform:translateY(-130vh);transition:transform 1.4s cubic-bezier(.22,1,.36,1);pointer-events:none}
 
 /* ===== Luz / estados físicos (dialogo1.0) ===== */
 /* dois textos centralizados: "A luz não é matéria" / "Luz é energia" */
@@ -1918,7 +1933,17 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         </div>
       </div>
 
-      <!-- Cena do celular que se desmonta (dialogo1.1) -->
+      <!-- dialogo1.1 (novo): img7 sobe empurrando a cena; textos digitados (átomo/indivisível) -->
+      <div class="ab-d11" id="abD11" aria-hidden="true">
+        <img class="ab-d11-img" id="abD11Img" src="images/img7.jpg?v=1.3.143" alt="" draggable="false">
+        <div class="ab-d11-center" id="abD11Center">
+          <div class="ab-d11-text" id="abD11Text"></div>
+          <div class="ab-d11-atomo" id="abD11Atomo" style="display:none">Átomo</div>
+          <div class="ab-d11-indiv" id="abD11Indiv" style="display:none">“Indivisível”</div>
+        </div>
+      </div>
+
+      <!-- Cena do celular que se desmonta (dialogo1.1 antigo — desativado) -->
       <div class="ab-phone" id="abPhone" aria-hidden="true">
         <div class="ab-layer ab-layer-case" id="abLayerCase"><span class="ab-part-label">Plástico</span></div>
         <div class="ab-layer ab-layer-board" id="abLayerBoard"><span class="ab-part-label">Placa de circuitos</span></div>
@@ -2846,7 +2871,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.142</div>
+<div class="app-version" id="appVersion">v1.3.143</div>
 
 </div>
 <script>
@@ -3110,7 +3135,7 @@ var ab = {
     { src:'audio/dialogo0.1.mp3?v=1.3.72', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
     { src:'audio/dialogo1A.mp3?v=1.3.72',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
     { src:'audio/dialogo1.mp3?v=1.3.141',  build:abCuesMateria, onStart:abInitMateria, next:true }, /* Matéria + estados; fim -> ▶ -> dialogo1.0 */
-    { src:'audio/dialogo1.0.mp3?v=1.3.72', build:abCuesSeg3,    onStart:abInitSeg3,       onEnd:abSolidAudioEnded,  next:false }, /* luz/estados; fim -> toque no gelo */
+    { src:'audio/dialogo1.1.mp3?v=1.3.143', build:abCues11,     onStart:abInit11,          next:false }, /* NOVO: átomo/indivisível — img7 sobe empurrando a cena; textos digitados (dialogo1.0 antigo desativado) */
     { src:'audio/dialogo1.1.mp3?v=1.3.72', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abLiquidAudioEnded, next:false }, /* sobre o líquido; fim -> toque no copo */
     { src:'audio/dialogo1.2.mp3?v=1.3.72', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
     { src:'audio/dialogo1.3.mp3?v=1.3.72', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
@@ -3236,7 +3261,8 @@ function abResetSeg0(){
   abEl('abChapterNum').classList.remove('show');
   abEl('abChapterSub').classList.remove('show','orange');
   abEl('abChapterHead').classList.remove('show');
-  abEl('abChapter').classList.remove('gone');
+  abEl('abChapter').classList.remove('gone','pushed');
+  if(typeof ab11Reset==='function'){ ab11Reset(); } var _d11=abEl('abD11'); if(_d11){ _d11.style.display='none'; }
   abPhoneReset();
   abEl('abSciTitleInner').classList.remove('in','out');
   abEl('abScatter').innerHTML = '';
@@ -3389,6 +3415,8 @@ function abInitMateria(){
   abSpotlight(false);
   abNavDemoEnd();
   abShowFab(true); /* dialogo1: o botão de play volta */
+  var ch=abEl('abChapter'); if(ch){ ch.classList.remove('pushed','gone'); }   /* desfaz o push do 1.1 (replay) */
+  if(typeof ab11Reset==='function'){ ab11Reset(); } var d=abEl('abD11'); if(d){ d.style.display='none'; }
   abMateriaReset();
 }
 
@@ -3419,6 +3447,45 @@ function abDefType(){
 function abMatSlideShow(id){ var e=abEl(id); if(e){ e.classList.remove('out'); e.classList.add('in'); abVibe(AB_VTXT); } }
 function abMatSlideOut(id){ var e=abEl(id); if(e){ e.classList.remove('in'); e.classList.add('out'); } }
 function abMatSlideReset(){ var c=abEl('abMatSlide'); if(c){ c.style.display='none'; } ['abMatSlideS','abMatSlideL','abMatSlideG'].forEach(function(id){ var e=abEl(id); if(e){ e.classList.remove('in','out'); } }); }
+/* ===== dialogo1.1 (novo): img7 sobe empurrando a cena; textos digitados ===== */
+var abD11Timer=null;
+function ab11Reset(){
+  if(abD11Timer){ clearInterval(abD11Timer); abD11Timer=null; }
+  var d=abEl('abD11'); if(d){ d.classList.remove('rise'); }
+  var c=abEl('abD11Center'); if(c){ c.classList.remove('on'); }
+  var t=abEl('abD11Text'); if(t){ t.classList.remove('show','orange'); t.textContent=''; }
+  var a=abEl('abD11Atomo'); if(a){ a.classList.remove('show'); a.style.display='none'; }
+  var iv=abEl('abD11Indiv'); if(iv){ iv.classList.remove('show'); iv.style.display='none'; }
+}
+function ab11Type(text, durMs, orange){
+  var t=abEl('abD11Text'); if(!t) return;
+  var c=abEl('abD11Center'); if(c){ c.classList.add('on'); }                 /* embaça o fundo */
+  if(abD11Timer){ clearInterval(abD11Timer); abD11Timer=null; }
+  t.classList.toggle('orange', !!orange); t.textContent=''; void t.offsetWidth; t.classList.add('show');
+  var i=0, n=text.length, step=Math.max(16, durMs/n);
+  abD11Timer=setInterval(function(){ i++; t.textContent=text.slice(0,i)+(i<n?'▌':''); if(i>=n){ clearInterval(abD11Timer); abD11Timer=null; } }, step);
+  abVibe(AB_VTXT);
+}
+function ab11TextFade(){ if(abD11Timer){ clearInterval(abD11Timer); abD11Timer=null; } var t=abEl('abD11Text'); if(t){ t.classList.remove('show'); } }
+function ab11Atomo(){ var a=abEl('abD11Atomo'); if(a){ a.style.display=''; void a.offsetWidth; a.classList.add('show'); abVibe(AB_VTXT); } }
+function ab11Indiv(){ var iv=abEl('abD11Indiv'); if(iv){ iv.style.display=''; void iv.offsetWidth; iv.classList.add('show'); abVibe(AB_VTXT); } }
+function abInit11(){
+  abSpotlight(false); abNavDemoEnd(); abShowFab(true);
+  var d=abEl('abD11'); if(d){ d.style.display=''; }
+  ab11Reset();
+  var ch=abEl('abChapter'); if(ch){ ch.classList.add('pushed'); }            /* empurra a cena da Matéria pra cima */
+  if(d){ void d.offsetWidth; d.classList.add('rise'); }                       /* img7 sobe de baixo */
+  setTimeout(function(){ abMateriaReset(); var c2=abEl('abChapter'); if(c2){ c2.classList.add('gone'); } }, 1500);   /* depois da subida, limpa a Matéria */
+}
+function abCues11(){
+  return [
+    { time:10.2, done:false, fn:function(){ ab11Type('“A matéria não pode ser dividida infinitamente”', 3000, false); } }, /* digita até ~13.2s */
+    { time:14.0, done:false, fn:function(){ ab11TextFade(); } },                                                          /* some (fade out) */
+    { time:15.0, done:false, fn:function(){ ab11Type('“Há um limite mínimo de tamanho que não pode ser ultrapassado”', 4000, true); } }, /* laranja, até ~19s */
+    { time:21.5, done:false, fn:function(){ ab11Atomo(); } },                                                            /* "Átomo" (laranja, tamanho de "Matéria") */
+    { time:26.7, done:false, fn:function(){ ab11Indiv(); } }                                                             /* "Indivisível" (fade in) */
+  ];
+}
 
 /* ===== Luz / estados físicos (dialogo1.0) ===== */
 /* Dois textos: 'A' = "A luz não é matéria", 'B' = "Luz é energia". */
