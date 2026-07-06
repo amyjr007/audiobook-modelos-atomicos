@@ -2950,7 +2950,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.159</div>
+<div class="app-version" id="appVersion">v1.3.160</div>
 
 </div>
 <script>
@@ -3828,7 +3828,7 @@ function abCuesAtom(){
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
 var abAppleWhole='images/apple.svg?v=1.3.72', abApplePiece='images/apple-piece.svg?v=1.3.158';
-var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5, APPLE_MIN_SCALE=0.13;   /* cada corte = metade; para no pedaço mínimo (não vira pontinho invisível) */
+var APPLE_MAX_CUTS=5, APPLE_SHRINK=0.5, APPLE_MIN_SCALE=0.05;   /* cada corte = metade; no 5º chega no "átomo" (pedaço mínimo visível) */
 
 function abAppleReset(){
   abAppleCut=false; abAppleScale=1; abAtomReached=false; abAppleCuts=0; abAppleDone=false;
@@ -4783,7 +4783,16 @@ function abRedoCelebrate(){
 /* Executa um corte (ou sacode, se já chegou no átomo). */
 function abAppleDoCut(){
   abEl('abAppleHint').classList.remove('show');
-  if(abAtomReached) return;    /* no limite: o pedaço mínimo fica parado; nada mais acontece */
+  if(abAtomReached){
+    /* Chegou no "átomo" (pedaço mínimo): ele é INDIVISÍVEL. Tentar cortar dispara
+       os EVENTOS FINAIS (som/áudio), mas o átomo continua na tela — não sai daqui
+       nem avança de cena; sem flash de maçã. Dispara uma única vez. */
+    if(abAppleDone) return;
+    abAppleDone=true;
+    abScreenShake(); abVibe([60,40,70]);
+    abSfx('audio/yes.mp3?v=1.3.72'); abSfx('audio/applause.mp3?v=1.3.72');
+    return;
+  }
   abVibe(35);                  /* corte: vibração */
   abSfx('audio/cutting_sound.mp3?v=1.3.158');   /* som do corte ao arrastar o dedo */
   abAppleSliceHalves();        /* metades voam (com a imagem atual) */
@@ -4791,15 +4800,13 @@ function abAppleDoCut(){
   abAppleCuts++;
   var img=abEl('abAppleImg');
   if(abAppleCuts===1){ img.src=abApplePiece; } /* depois do 1º corte, sobra um pedaço */
-  /* Escala EXIBIDA: encolhe a cada corte, mas nunca abaixo do pedaço mínimo (fica
-     sempre visível). O nº de cortes NÃO depende disso — só do APPLE_MAX_CUTS. */
+  /* Escala EXIBIDA: encolhe metade a cada corte, com piso no pedaço mínimo visível. */
   var sc = Math.max(APPLE_MIN_SCALE, Math.pow(APPLE_SHRINK, abAppleCuts));
-  /* Só no nº máximo de cortes: congela. O pedaço mínimo fica na tela e NÃO sai
-     mais — sem flash de maçã, sem avançar de cena. */
+  /* No nº máx. de cortes chegou no "átomo": marca o limite MAS NÃO trava o gesto —
+     o próximo corte cai no ramo acima e dispara os eventos finais. */
   if(abAppleCuts>=APPLE_MAX_CUTS){
     sc = APPLE_MIN_SCALE;
     abAtomReached = true;
-    abAppleCut = false;                          /* trava novos cortes */
     abEl('abAppleRedo').classList.remove('show');
   }
   abAppleScale = sc;
