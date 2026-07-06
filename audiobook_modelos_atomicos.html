@@ -2961,7 +2961,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.165</div>
+<div class="app-version" id="appVersion">v1.3.166</div>
 
 </div>
 <script>
@@ -3230,7 +3230,7 @@ var ab = {
     { src:'audio/dialogo1.2.mp3?v=1.3.72', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
     { src:'audio/dialogo1.3.mp3?v=1.3.147', build:abCues13,     onStart:abInitAt2,         next:true  }, /* dialogo1.3: seta+"Construtor básico" (10.5s), "Átomo" (19.6s), "Indivisível" (23.6s); fim -> ▶ -> dialogo1.4 */
     { src:'audio/dialogo1.4.mp3?v=1.3.147', build:abCues16A,    onStart:abInit16A,         next:false }, /* dialogo1.4: refazer a maçã (botão Refazer aos 2.5s); ao completar a remontagem -> dialogo1.5 */
-    { src:'audio/dialogo1.5.mp3?v=1.3.72', build:abCuesNone,    onStart:abInitHold,        next:true  }, /* dialogo1.5 (regravado): Átomo/Indivisível migrou p/ o 1.3; eventos ainda a definir; fim -> ▶ -> 1.6A */
+    { src:'audio/dialogo1.5.mp3?v=1.3.72', build:abCues15,      onStart:abInit15,          next:true  }, /* dialogo1.5: 4s -> átomo sai da maçã (sobe/desce) + "Átomo"; fim -> ▶ -> 1.6A */
     { src:'audio/dialogo1.6.mp3?v=1.3.150',  build:abCues17,     onStart:abInit17,      onEnd:abEndLego16, auto:true }, /* dialogo1.6: 7s a cena sobe + barco de Lego entra; 12.3s sai 1 peça; 15s "Construtor básico"; fim -> AUTO (sem pausa) -> 1.6A */
     { src:'audio/dialogo1.6A.mp3?v=1.3.150', build:abCuesNone,   onStart:abInitLegoHold,                   next:true  }, /* dialogo1.6A: narração; barco parado (pode girar); fim -> ▶ -> 1.7 */
     { src:'audio/dialogo1.7.mp3?v=1.3.150',  build:abCuesNone,   onStart:abInit17A,     onEnd:abLego17ArmExplode, next:false }, /* dialogo1.7: barco inteiro; FIM do áudio habilita segurar 1s -> explode -> 1.7A */
@@ -3981,6 +3981,10 @@ function abInitHold(){
   abBladeStop();
   abShowFab(true);
 }
+/* dialogo1.5: mantém a maçã (remontada) e, aos 4s, o átomo sai da maçã, sobe,
+   desce e assenta embaixo escrevendo "Átomo" (evento que existia no dialogo1.6B). */
+function abInit15(){ abInitHold(); ab16BReset(); }
+function abCues15(){ return [ { time:4.0, done:false, fn:function(){ abAtom16BEmit(); } } ]; }
 
 /* ===== Átomo / indivisível (dialogo1.5) ===== */
 function abAt2Reset(){
@@ -4081,7 +4085,7 @@ function abAtom16BEmit(){
   var restVY=r.bottom + 30, restX=-28, restY=restVY - holeVY;
   /* apex: sobe e oblíqua p/ a esquerda antes de cair */
   var apexX=-Math.max(64, r.width*0.24), apexY=-Math.max(56, r.height*0.22);
-  var p=document.createElement('img'); p.className='ab-exit-particle'; p.src=abApplePiece;
+  var p=document.createElement('img'); p.className='ab-exit-particle'; p.src=abApplePieceRed; /* átomo com o visual original (vermelho) */
   p.style.width=p.style.height=sz+'px';
   p.style.left=hx+'%'; p.style.top=hy+'%';
   p.style.marginLeft=(-sz/2)+'px'; p.style.marginTop=(-sz/2)+'px';
