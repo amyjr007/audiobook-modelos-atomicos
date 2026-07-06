@@ -70,6 +70,24 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .nav-hand{position:fixed;left:50%;top:82vh;z-index:210;font-size:42px;pointer-events:none;opacity:0;transform:translate(-50%,0);transition:opacity .35s ease,top .55s cubic-bezier(.22,1,.36,1);filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))}
 .nav-hand.show{opacity:1}
 .nav-hand.tap{animation:navTap .55s ease-in-out 2}
+/* ===== Tutorial guiado (dialogo0.2) ===== */
+.ab-demo-blur{position:fixed;inset:0;z-index:114;opacity:0;visibility:hidden;background:rgba(8,5,2,.28);backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);transition:opacity .8s ease,visibility .8s ease;pointer-events:none}
+.ab-demo-blur.on{opacity:1;visibility:visible}
+.ab-demo-text{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:116;width:min(560px,86vw);text-align:center;font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(22px,6vw,36px);line-height:1.3;color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.7);opacity:0;transition:opacity .8s ease;pointer-events:none}
+.ab-demo-text.show{opacity:1}
+.ab-demo-caps{position:fixed;inset:0;z-index:180;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:calc(14vh + env(safe-area-inset-top,0px)) 8vw 0;background:var(--bg);opacity:0;visibility:hidden;transition:opacity .45s ease,visibility .45s ease;pointer-events:none}
+.ab-demo-caps.show{opacity:1;visibility:visible}
+.ab-demo-caps-head{font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:clamp(26px,7vw,40px);background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.ab-demo-caps-list{display:flex;flex-direction:column;gap:11px;width:min(460px,90vw)}
+.ab-demo-caps-card{display:flex;align-items:center;gap:14px;padding:15px 18px;border-radius:16px;background:var(--surface);border:1px solid rgba(255,122,24,.2);font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:15px;color:var(--text)}
+.ab-demo-caps-card span{flex-shrink:0;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#160c05;background:linear-gradient(135deg,var(--orange),var(--coral))}
+.ab-demo-quiz{position:fixed;z-index:120;bottom:44px;left:50%;transform:translateX(calc(min(360px,50vw) - 66px));min-width:78px;height:64px;padding:0 22px;border-radius:32px;border:none;cursor:default;background:linear-gradient(135deg,#5fe0aa,#1fae7a);color:#04241a;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:19px;letter-spacing:.5px;box-shadow:0 12px 32px rgba(70,211,154,.55);opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease}
+.ab-demo-quiz.show{opacity:1;visibility:visible}
+.ab-demo-card{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);z-index:205;width:min(340px,84vw);padding:28px 24px;border-radius:24px;text-align:center;background:var(--surface);border:1px solid rgba(255,122,24,.3);box-shadow:0 20px 60px rgba(0,0,0,.55);opacity:0;visibility:hidden;transition:opacity .5s ease,visibility .5s ease,transform .5s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.ab-demo-card.show{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1)}
+.ab-demo-card-ico{font-size:52px;line-height:1;margin-bottom:10px}
+.ab-demo-card-name{font-family:'Fraunces',serif;font-style:italic;font-weight:900;font-size:26px;color:var(--text);margin-bottom:6px}
+.ab-demo-card-score{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:var(--orange)}
 @keyframes navTap{0%,100%{transform:translate(-50%,0) scale(1)}50%{transform:translate(-50%,6px) scale(.82)}}
 
 /* Backdrop */
@@ -2852,11 +2870,25 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 <!-- Mãozinha ilustrativa da barra de navegação -->
 <div class="nav-hand" id="navHand">👆</div>
 
+<!-- ===== Tutorial guiado (dialogo0.2) ===== -->
+<div class="ab-demo-blur" id="abDemoBlur" aria-hidden="true"></div>
+<div class="ab-demo-text" id="abDemoText" aria-hidden="true">“A matéria é o alicerce da Química”</div>
+<div class="ab-demo-caps" id="abDemoCaps" aria-hidden="true">
+  <div class="ab-demo-caps-head">Capítulos</div>
+  <div class="ab-demo-caps-list" id="abDemoCapsList"></div>
+</div>
+<button type="button" class="ab-demo-quiz" id="abDemoQuiz" aria-hidden="true" tabindex="-1">Quiz</button>
+<div class="ab-demo-card" id="abDemoCard" aria-hidden="true">
+  <div class="ab-demo-card-ico">🏅</div>
+  <div class="ab-demo-card-name">S. Jaqueline</div>
+  <div class="ab-demo-card-score">Pontuação: 8 / 10</div>
+</div>
+
 <!-- Cabeçalho do capítulo (topo): número + nome -->
 <div class="chapter-top" id="chapterTop">
   <span class="chapter-top-num" id="chapterTopNum">1</span>
   <span class="chapter-top-name" id="chapterTopName">A gênese do átomo</span>
-  <button type="button" class="chapter-top-home" onclick="goTo('capitulos')" aria-label="Ir aos capítulos">
+  <button type="button" class="chapter-top-home" id="chapterTopHome" onclick="goTo('capitulos')" aria-label="Ir aos capítulos">
     <span class="chapter-top-home-ico" aria-hidden="true">🏠</span>
     <span class="chapter-top-home-txt">capítulos</span>
   </button>
@@ -2879,7 +2911,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.151</div>
+<div class="app-version" id="appVersion">v1.3.152</div>
 
 </div>
 <script>
@@ -3140,7 +3172,7 @@ var ab = {
   cues:[],
   segments:[
     { src:'audio/dialogo0.mp3?v=1.3.72',   build:abCuesSeg0,    onStart:abResetSeg0,  next:true  },
-    { src:'audio/dialogo0.1.mp3?v=1.3.72', build:abCuesSeg1,    onStart:abInitSeg1,   next:true  },
+    { src:'audio/dialogo0.1.mp3?v=1.3.72', build:abCuesSeg1,    onStart:abInitSeg1,   onEnd:abEnd01, auto:true },
     { src:'audio/dialogo1A.mp3?v=1.3.72',  build:abCuesSeg2,    onStart:abInitSeg2,   onEnd:abEndSeg2, auto:true }, /* intro Capítulo 1 */
     { src:'audio/dialogo1.mp3?v=1.3.141',  build:abCuesMateria, onStart:abInitMateria, next:true }, /* Matéria + estados; fim -> ▶ -> dialogo1.0 */
     { src:'audio/dialogo1.1.mp3?v=1.3.143', build:abCues11,     onStart:abInit11,          next:true }, /* NOVO: átomo/indivisível — img7 sobe empurrando a cena; textos digitados; fim -> ▶ -> dialogo1.2 (maçã) */
@@ -3154,7 +3186,8 @@ var ab = {
     { src:'audio/dialogo1.7.mp3?v=1.3.150',  build:abCuesNone,   onStart:abInit17A,     onEnd:abLego17ArmExplode, next:false }, /* dialogo1.7: barco inteiro; FIM do áudio habilita segurar 1s -> explode -> 1.7A */
     { src:'audio/dialogo1.7A.mp3?v=1.3.150', build:abCuesNone,   onStart:abInit17B,     onEnd:abShow17BRedo,      next:false }, /* dialogo1.7A (pós-explosão): fim -> some o play e aparece "Refazer" -> remonta -> 1.7B */
     { src:'audio/dialogo1.7B.mp3?v=1.3.150', build:abCuesNone,   onStart:abInit17C,     onEnd:abShow17CQuiz,      next:false }, /* dialogo1.7B: barco refeito; ao fim, botão de quiz no lugar do play */
-    { src:'audio/dialogo1.7C.mp3?v=1.3.72',  build:abCuesNone,   onStart:abInitHold,                       next:false }  /* sobra: fluxo antigo do 1.7C desativado */
+    { src:'audio/dialogo1.7C.mp3?v=1.3.72',  build:abCuesNone,   onStart:abInitHold,                       next:false }, /* sobra: fluxo antigo do 1.7C desativado */
+    { src:'audio/dialogo0.2.mp3?v=1.3.152',  build:abCuesDemo,   onStart:abInitDemo,    onEnd:abDemo2End,  next:false }  /* seg16: tutorial guiado (mãozinha); dialogo0.1 -> AUTO -> aqui; ao fim, play -> dialogo1A (seg 2) */
   ]
 };
 
@@ -3202,6 +3235,7 @@ function abOnEnded(){
 function abToggle(){
   abInit();
   if(!ab.started){ startSegment(0); return; }
+  if(ab.demoAwait){ ab.demoAwait=false; startSegment(2); return; } /* fim do tutorial (dialogo0.2) -> dialogo1A */
   if(ab.awaitingNext){ startSegment(ab.seg + 1); return; }
   if(ab.ended){ startSegment(ab.seg); return; } /* replay do último segmento */
   if(ab.audio.paused){
@@ -5111,6 +5145,110 @@ function abNavDemoEnd(){
   chClose();
   var h = abEl('navHand');
   h.classList.remove('show', 'tap');
+}
+
+/* ===================== Tutorial guiado (dialogo0.2) ===================== */
+function abEnd01(){ startSegment(16); }   /* dialogo0.1 -> dialogo0.2 (sem play) */
+
+function abDemoReset(){
+  ab.demoAwait=false;
+  ['abDemoText','abDemoCaps','abDemoCard','abDemoQuiz'].forEach(function(id){ var e=abEl(id); if(e){ e.classList.remove('show'); } });
+  var b=abEl('abDemoBlur'); if(b){ b.classList.remove('on'); }
+  var h=abEl('navHand'); if(h){ h.classList.remove('show','tap'); h.style.transition=''; }
+  chClose();
+}
+function abInitDemo(){
+  abSpotlight(false); abNavDemoEnd();
+  abDemoReset();
+  abShowFab(false);   /* durante o tutorial não há play */
+}
+/* volta o play pra continuar -> dialogo1A */
+function abDemo2End(){
+  abDemoReset();
+  abShowFab(true);
+  ab.demoAwait=true;
+}
+
+/* --- texto inicial (blur atrás) --- */
+function abDemoTextIn(){ var t=abEl('abDemoText'); if(t){ t.classList.add('show'); } }
+function abDemoTextOut(){ var t=abEl('abDemoText'); if(t){ t.classList.remove('show'); } var b=abEl('abDemoBlur'); if(b){ b.classList.remove('on'); } }
+
+/* --- mãozinha --- */
+function abDemoHandShow(){
+  var h=abEl('navHand'); if(!h){ return; }
+  h.style.transition='opacity .35s ease, left .75s cubic-bezier(.22,1,.36,1), top .75s cubic-bezier(.22,1,.36,1)';
+  h.style.right='auto'; h.style.left='50%'; h.style.top='58vh'; h.style.transform='translate(-50%,0)';
+  h.classList.remove('tap');
+  void h.offsetWidth;
+  h.classList.add('show');
+}
+function abDemoHandTo(x, y){
+  var h=abEl('navHand'); if(!h){ return; }
+  h.classList.remove('tap');
+  h.style.right='auto'; h.style.transform='translate(-50%,0)';
+  h.style.left=x+'px'; h.style.top=y+'px';
+}
+function abDemoHandToEl(id, yFrac){
+  var e=abEl(id); if(!e){ return; }
+  var r=e.getBoundingClientRect();
+  var f=(yFrac==null)?0.86:yFrac;
+  abDemoHandTo(r.left + r.width/2, r.top + r.height*f);
+}
+function abDemoTap(){
+  var h=abEl('navHand'); if(!h){ return; }
+  h.classList.remove('tap'); void h.offsetWidth; h.classList.add('tap');
+  abVibe(20);
+}
+function abDemoHandOverList(i){
+  var list=abEl('chList'); if(!list || !list.children[i]){ return; }
+  var r=list.children[i].getBoundingClientRect();
+  abDemoHandTo(r.left + r.width*0.5, r.top + r.height*0.5);
+}
+
+/* --- capítulos (ilustrativo) --- */
+function abDemoCapsShow(){
+  var body=abEl('abDemoCapsList');
+  if(body && !body.getAttribute('data-filled') && typeof chapters!=='undefined'){
+    var html='';
+    for(var i=0;i<chapters.length;i++){ html+='<div class="ab-demo-caps-card"><span>'+(i+1)+'</span>'+chapters[i].title+'</div>'; }
+    body.innerHTML=html; body.setAttribute('data-filled','1');
+  }
+  var c=abEl('abDemoCaps'); if(c){ c.classList.add('show'); } abVibe(AB_VTXT);
+}
+function abDemoCapsHide(){ var c=abEl('abDemoCaps'); if(c){ c.classList.remove('show'); } }
+
+/* --- botão verde "Quiz" no lugar do play --- */
+function abDemoQuizShow(){ abShowFab(false); var q=abEl('abDemoQuiz'); if(q){ q.classList.add('show'); } }
+
+/* --- card de pontuação (confete + som) --- */
+function abDemoCardShow(){
+  var h=abEl('navHand'); if(h){ h.classList.remove('show','tap'); }   /* some a mãozinha */
+  var q=abEl('abDemoQuiz'); if(q){ q.classList.remove('show'); }
+  var c=abEl('abDemoCard'); if(c){ c.classList.add('show'); }
+  abConfetti(); abSfx('audio/yes.mp3?v=1.3.72'); abVibe([40,30,60]);
+}
+function abDemoCardHide(){ var c=abEl('abDemoCard'); if(c){ c.classList.remove('show'); } }
+
+function abCuesDemo(){
+  return [
+    { time:0.3,  done:false, fn:function(){ var b=abEl('abDemoBlur'); if(b){ b.classList.add('on'); } } }, /* embaça atrás */
+    { time:3.0,  done:false, fn:function(){ abDemoTextIn(); } },                 /* texto fade in */
+    { time:7.0,  done:false, fn:function(){ abDemoTextOut(); } },                /* texto some + desembaça */
+    { time:10.0, done:false, fn:function(){ abDemoHandShow(); } },              /* mãozinha aparece e navega */
+    { time:11.0, done:false, fn:function(){ abDemoHandToEl('chapterTopHome'); } }, /* vai até "Capítulos" */
+    { time:12.0, done:false, fn:function(){ abDemoTap(); abDemoCapsShow(); } }, /* clica -> capítulos (ilustrativo) */
+    { time:14.0, done:false, fn:function(){ abDemoCapsHide(); abDemoHandToEl('chBar', 0.5); } }, /* volta + vai à Navegação Rápida */
+    { time:17.8, done:false, fn:function(){ abDemoTap(); chOpen(); } },         /* clica -> abre tópicos */
+    { time:19.6, done:false, fn:function(){ abDemoHandOverList(0); } },         /* navega pelos tópicos */
+    { time:21.0, done:false, fn:function(){ abDemoHandOverList(1); } },
+    { time:22.4, done:false, fn:function(){ abDemoHandOverList(2); } },
+    { time:23.8, done:false, fn:function(){ abDemoHandOverList(3); } },
+    { time:25.0, done:false, fn:function(){ chClose(); } },                     /* fecha */
+    { time:26.0, done:false, fn:function(){ abDemoQuizShow(); abDemoHandToEl('abDemoQuiz', 0.5); } }, /* botão verde "Quiz" + mão vai até ele */
+    { time:28.0, done:false, fn:function(){ abDemoTap(); } },                   /* simula tocar */
+    { time:30.0, done:false, fn:function(){ abDemoCardShow(); } },             /* card + confete + "yes" */
+    { time:35.7, done:false, fn:function(){ abDemoCardHide(); } }             /* card some */
+  ];
 }
 
 /* Digitação letra a letra entre 12s e 17s (apenas no segmento 0) */
