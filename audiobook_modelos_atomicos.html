@@ -935,9 +935,11 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 /* Legenda/frase (dialogo2.2) — branca, FIXA na parte de baixo da tela.
    Posicionada de forma absoluta (fora do fluxo) p/ NÃO deslocar o vídeo ao
    entrar/sair. */
-.ch2-caption{position:absolute;left:0;right:0;bottom:14vh;z-index:6;text-align:center;padding:0 22px;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(20px,5.4vw,28px);line-height:1.18;color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.6);pointer-events:none;opacity:0;transform:translateY(16px) scale(.94);filter:blur(9px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1),filter .8s ease}
+.ch2-caption{position:absolute;left:0;right:0;bottom:calc(14vh + 0.6em);z-index:6;text-align:center;padding:0 22px;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(22px,5.4vw,30px);line-height:1.18;color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.6);pointer-events:none;opacity:0;transform:translateY(16px) scale(.94);filter:blur(9px);transition:opacity .8s cubic-bezier(.22,1,.36,1),transform .8s cubic-bezier(.22,1,.36,1),filter .8s ease}
 .ch2-caption.in{opacity:1;transform:none;filter:blur(0)}
 .ch2-caption.out{opacity:0;transform:translateY(-12px) scale(1.08);filter:blur(11px);transition:opacity .6s ease,transform .6s ease,filter .6s ease}
+/* pausa geral: ao pausar o áudio, congela as animações CSS da cena (vídeos são pausados via JS) */
+.ch2-frozen, .ch2-frozen *{animation-play-state:paused !important}
 
 /* Ken Burns na imagem (dialogo2.1): zoom/pan lento ~10s */
 @keyframes ch2KenBurns{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.26) translate(-3.5%,-3%)}}
@@ -978,6 +980,9 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ch2-video.in{opacity:1;transform:none;filter:blur(0)}
 .ch2-video.out{opacity:0;transform:scale(1.2);filter:blur(18px);transition:opacity .7s ease,transform .7s ease,filter .7s ease}
 .ch2-video video{display:block;width:100%;height:100%;object-fit:cover;background:#000}
+/* dalton_annoyed (último vídeo do cap.2): normal (sem crop/zoom) e menor, p/ caber a legenda embaixo */
+.ch2-video.ch2-vid-small{max-height:46vh}
+.ch2-video.ch2-vid-small video{object-fit:contain}
 /* Legenda abaixo do vídeo (branca, entra de baixo) */
 .ch2-vcaption{max-width:440px;text-align:center;font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(18px,5vw,26px);line-height:1.18;color:#fff;text-shadow:0 4px 24px rgba(0,0,0,.6);opacity:0;transform:translateY(16px) scale(.92);filter:blur(9px);transition:opacity .75s cubic-bezier(.22,1,.36,1),transform .75s cubic-bezier(.22,1,.36,1),filter .75s ease}
 .ch2-vcaption.in{opacity:1;transform:none;filter:blur(0)}
@@ -2961,7 +2966,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.167</div>
+<div class="app-version" id="appVersion">v1.3.168</div>
 
 </div>
 <script>
@@ -5657,6 +5662,7 @@ function ch2CuesSeg2(){
 /* Vídeo (entra dramático; 90% da velocidade). Ao acabar, congela no último frame. */
 function ch2ShowVideo(src){
   var v=ch2El('ch2Video'), el=ch2El('ch2VideoEl');
+  el.loop=false; v.classList.remove('ch2-vid-small'); /* padrão: sem loop e tamanho cheio (o dalton_annoyed sobrescreve) */
   el.src=src; v.style.display=''; v.classList.remove('out'); void v.offsetWidth; v.classList.add('in'); abVibe(AB_VTXT);
   try{ el.currentTime=0; el.playbackRate=0.9; }catch(_){}
   var p=el.play(); if(p && p.catch){ p.catch(function(){}); }
@@ -5693,7 +5699,7 @@ function ch2CuesSeg3(){
     { t:3.0,  done:false, fn:function(){ ch2ShowVideo('videos/john_dalton_1.mp4?v=1.3.72'); } },           /* toca o vídeo (congela no fim) */
     { t:10.5, done:false, fn:function(){ ch2ShowVCaption('Teoria com embasamento científico'); } },
     { t:17.0, done:false, fn:function(){ ch2HideVCaption(); ch2HideVideo(); } },                                 /* john_dalton_1 sai em fade out */
-    { t:19.0, done:false, fn:function(){ ch2ShowVCaption('Não discutiremos os experimentos dele'); ch2ShowVideo('videos/dalton_annoyed.mp4?v=1.3.72'); } },   /* dalton_annoyed entra em fade in */
+    { t:19.0, done:false, fn:function(){ ch2ShowVCaption('Não discutiremos os experimentos dele'); ch2ShowVideo('videos/dalton_annoyed.mp4?v=1.3.72'); var dv=ch2El('ch2VideoEl'); if(dv){ dv.loop=true; } ch2El('ch2Video').classList.add('ch2-vid-small'); } },   /* dalton_annoyed: normal (sem crop), em loop e menor (espaço p/ a legenda) */
     { t:23.0, done:false, fn:function(){ ch2HideVCaption(); } },
     { t:24.5, done:false, fn:function(){ ch2ShowVCaption('Focaremos nas conclusões'); } }
   ];
@@ -7287,6 +7293,7 @@ function ch2StartSegment(n){
   else { ch2.audio.currentTime=0; }
   abFabRing('ch2FabRingFill', 0); /* zera o anel de tempo ao (re)iniciar o segmento */
   ch2.playing=true; ch2SetFab(true);
+  if(typeof ch2FreezeVisuals==='function'){ ch2FreezeVisuals(false); } /* garante que a cena não fique congelada de uma pausa anterior */
   var p=ch2.audio.play(); if(p && p.catch){ p.catch(function(){}); }
   if(!ch2.raf){ ch2Loop(); }
 }
@@ -9591,10 +9598,22 @@ function ch2Toggle(){
   if(ch2.ended){ ch2StartSegment(ch2.seg); return; }      /* replay do segmento atual */
   if(ch2.audio.paused){
     ch2.playing=true; ch2.audio.play(); ch2SetFab(true);
+    ch2FreezeVisuals(false);          /* retoma vídeos + animações da cena */
     if(!ch2.raf){ ch2Loop(); }
   } else {
     ch2.playing=false; ch2.audio.pause(); ch2SetFab(false); ch2SetLoading(false);
+    ch2FreezeVisuals(true);           /* pausar o áudio congela tudo na tela */
   }
+}
+/* Ao pausar o áudio, congela a cena inteira: pausa os vídeos e as animações CSS
+   (o loop de cues já para sozinho quando ch2.playing=false). */
+function ch2FreezeVisuals(freeze){
+  var st=ch2El('ch2Stage'); if(st){ st.classList.toggle('ch2-frozen', !!freeze); }
+  [ch2El('ch2ImgVideo'), ch2El('ch2VideoEl')].forEach(function(v){
+    if(!v){ return; }
+    if(freeze){ try{ v.pause(); }catch(_){} }
+    else if(v.currentSrc && !v.ended && v.offsetParent!==null){ var p=v.play(); if(p && p.catch){ p.catch(function(){}); } }
+  });
 }
 
 function ch2Loop(){
