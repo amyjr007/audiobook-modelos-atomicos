@@ -2950,7 +2950,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.160</div>
+<div class="app-version" id="appVersion">v1.3.161</div>
 
 </div>
 <script>
@@ -3828,7 +3828,7 @@ function abCuesAtom(){
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
 var abAppleWhole='images/apple.svg?v=1.3.72', abApplePiece='images/apple-piece.svg?v=1.3.158';
-var APPLE_MAX_CUTS=5, APPLE_SHRINK=0.5, APPLE_MIN_SCALE=0.05;   /* cada corte = metade; no 5º chega no "átomo" (pedaço mínimo visível) */
+var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5, APPLE_MIN_SCALE=0.02;   /* cada corte = metade; no 7º chega no "átomo" (pedaço mínimo visível) */
 
 function abAppleReset(){
   abAppleCut=false; abAppleScale=1; abAtomReached=false; abAppleCuts=0; abAppleDone=false;
@@ -4785,12 +4785,19 @@ function abAppleDoCut(){
   abEl('abAppleHint').classList.remove('show');
   if(abAtomReached){
     /* Chegou no "átomo" (pedaço mínimo): ele é INDIVISÍVEL. Tentar cortar dispara
-       os EVENTOS FINAIS (som/áudio), mas o átomo continua na tela — não sai daqui
-       nem avança de cena; sem flash de maçã. Dispara uma única vez. */
+       o EVENTO FINAL: som "yes" (SEM applause) e, ao terminar o "yes", segue p/ o
+       dialogo1.3. Sem flash de maçã. Dispara uma única vez. */
     if(abAppleDone) return;
-    abAppleDone=true;
+    abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.3.72'); abSfx('audio/applause.mp3?v=1.3.72');
+    var advanced=false;
+    var goNext=function(){ if(advanced) return; advanced=true; startSegment(7); }; /* dialogo1.3 */
+    try{
+      var ya=new Audio('audio/yes.mp3?v=1.3.72');
+      ya.addEventListener('ended', goNext);
+      var pp=ya.play(); if(pp&&pp.catch){ pp.catch(function(){}); }
+    }catch(_){}
+    setTimeout(goNext, 3800); /* fallback: yes.mp3 dura ~3.4s */
     return;
   }
   abVibe(35);                  /* corte: vibração */
