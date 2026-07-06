@@ -2972,7 +2972,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.171</div>
+<div class="app-version" id="appVersion">v1.3.172</div>
 
 </div>
 <script>
@@ -3061,7 +3061,8 @@ var timestampsCh2 = [
   { title:'Dalton e o cálculo de massa relativa', sub:'', time:null, seg:16 }, /* dialogo2.5.1E */
   { title:'Postulado 3', sub:'', time:null, seg:17 }, /* dialogo2.6 */
   { title:'O que são moléculas', sub:'', time:null, seg:18 }, /* dialogo2.6.1 */
-  { title:'Quiz', sub:'', time:null, seg:25 } /* 10 — leva direto ao dialogo2.7 (CO2) */
+  { title:'Exemplos de moléculas', sub:'', time:null, seg:25 }, /* 10 — dialogo2.7 (CO2, amônia, etanol) */
+  { title:'Quiz', sub:'Teste seus conhecimentos', time:null, quiz:true } /* 11 — leva direto ao quiz do capítulo 2 */
 ];
 
 /* Marcadores do Capítulo 3 (dialogo3). seg = índice em ch3Segs. */
@@ -3078,7 +3079,8 @@ var timestampsCh3 = [
   { title:'O experimento de Thomson', sub:'', time:null, seg:14 },      /* dialogo3.5.2 */
   { title:'O elétron', sub:'', time:null, seg:22 },                     /* dialogo3.5.9 */
   { title:'O modelo do pudim de passas', sub:'', time:null, seg:23 },   /* dialogo3.5.10 */
-  { title:'Explicando a eletrização por atrito', sub:'', time:null, seg:25 }   /* dialogo3.5.12 */
+  { title:'Explicando a eletrização por atrito', sub:'', time:null, seg:25 },   /* dialogo3.5.12 */
+  { title:'Quiz', sub:'Teste seus conhecimentos', time:null, quiz:true } /* leva direto ao quiz do capítulo 3 */
 ];
 
 /* Marcadores do Capítulo 4 (dialogo4). seg = índice em ch4Segs. */
@@ -3088,7 +3090,8 @@ var timestampsCh4 = [
   { title:'O experimento de Rutherford', sub:'', time:null, seg:6 },  /* fim do dialogo4.4: o experimento já na tela (dialogo4.5) */
   { title:'As observações experimentais', sub:'', time:null, seg:12 },  /* início do dialogo4.5F */
   { title:'A análise de Rutherford', sub:'', time:null, seg:16 },  /* dialogo4.6 */
-  { title:'O modelo atômico de Rutherford', sub:'', time:null, seg:19 }  /* dialogo4.9 */
+  { title:'O modelo atômico de Rutherford', sub:'', time:null, seg:19 },  /* dialogo4.9 */
+  { title:'Quiz', sub:'Teste seus conhecimentos', time:null, quiz:true } /* leva direto ao quiz do capítulo 4 */
 ];
 
 /* Capítulos: cada um tem a SUA barra lateral de marcadores. Capítulo 1 = audiobook
@@ -3144,12 +3147,15 @@ function tsGo(i){
   var ch = currentChapter;
   var ts = chapters[ch].timestamps[i];
   if(!ts){ return; }
-  if(ts.quiz){ /* marcador que leva direto ao quiz do capítulo */
+  if(ts.quiz){ /* marcador que leva direto ao quiz do capítulo atual */
     chClose();
-    if(ab && ab.audio){ ab.audio.pause(); ab.playing=false; }
+    if(window.ab && ab.audio){ try{ ab.audio.pause(); }catch(_){} ab.playing=false; }
+    if(window.ch2 && ch2.audio){ try{ ch2.audio.pause(); }catch(_){} ch2.playing=false; }
+    if(window.ch3 && ch3.audio){ try{ ch3.audio.pause(); }catch(_){} ch3.playing=false; }
+    if(window.ch4 && ch4.audio){ try{ ch4.audio.pause(); }catch(_){} ch4.playing=false; }
     if(typeof legoHide==='function'){ legoHide(); }
     goTo('quiz');
-    quizStart();
+    quizStart(ch+1);   /* capítulo atual (0-indexado) -> quiz correspondente */
     return;
   }
   if(ts.seg == null){ return; } /* marcador provisório: sem ação */
