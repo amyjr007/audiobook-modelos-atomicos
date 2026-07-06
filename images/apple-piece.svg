@@ -1,22 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
   <defs>
-    <linearGradient id="flesh" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fff8ec"/>
-      <stop offset="1" stop-color="#f0dcb8"/>
-    </linearGradient>
-    <linearGradient id="peel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff7a6e"/>
-      <stop offset="1" stop-color="#c50d12"/>
-    </linearGradient>
+    <radialGradient id="flesh" cx="0.42" cy="0.36" r="0.75">
+      <stop offset="0" stop-color="#fffef9"/>
+      <stop offset="0.7" stop-color="#f7ecd6"/>
+      <stop offset="1" stop-color="#ead8b6"/>
+    </radialGradient>
   </defs>
-  <ellipse cx="124" cy="206" rx="58" ry="12" fill="#000000" opacity="0.24"/>
-  <!-- polpa (faces de corte) -->
-  <path d="M78 176 C66 128 90 82 142 72 C180 64 202 104 188 152 C168 184 112 188 78 176 Z" fill="url(#flesh)"/>
-  <!-- casca vermelha no lado externo -->
-  <path d="M142 72 C180 64 202 104 188 152" fill="none" stroke="url(#peel)" stroke-width="17" stroke-linecap="round"/>
-  <!-- brilho sutil na polpa -->
-  <path d="M96 150 C92 116 108 92 140 86" fill="none" stroke="#ffffff" stroke-width="5" stroke-opacity="0.55" stroke-linecap="round"/>
+  <!-- sombra de contato -->
+  <ellipse cx="120" cy="202" rx="50" ry="10" fill="#000000" opacity="0.20"/>
+  <!-- fatia de maçã: face de corte (só polpa branca), forma regular e simétrica -->
+  <path d="M120 54
+           C112 44 128 44 120 54
+           C160 56 188 92 188 132
+           C188 172 158 198 120 198
+           C82 198 52 172 52 132
+           C52 92 80 56 120 54 Z"
+        fill="url(#flesh)" stroke="#e4cfa6" stroke-width="2"/>
+  <!-- coração (miolo) sutil, em estrela suave -->
+  <path d="M120 96
+           C130 108 130 108 138 116
+           C128 122 128 122 126 134
+           C120 126 120 126 114 134
+           C112 122 112 122 102 116
+           C110 108 110 108 120 96 Z"
+        fill="none" stroke="#e0c99b" stroke-width="2" opacity="0.7"/>
   <!-- sementes -->
-  <path d="M120 150 C126 142 134 146 132 156 C130 164 120 162 120 150 Z" fill="#5b3a1a"/>
-  <path d="M138 138 C144 131 152 135 150 144 C148 152 138 150 138 138 Z" fill="#5b3a1a"/>
+  <path d="M120 118 C124 114 130 117 128 124 C126 130 118 128 120 118 Z" fill="#6b4a24"/>
+  <path d="M108 128 C110 122 117 123 116 130 C115 136 106 135 108 128 Z" fill="#6b4a24"/>
+  <path d="M132 128 C130 122 123 123 124 130 C125 136 134 135 132 128 Z" fill="#6b4a24"/>
+  <!-- brilho suave -->
+  <path d="M84 120 C82 100 94 82 116 76" fill="none" stroke="#ffffff" stroke-width="6" stroke-opacity="0.5" stroke-linecap="round"/>
 </svg>

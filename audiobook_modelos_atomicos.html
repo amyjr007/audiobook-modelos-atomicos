@@ -2950,7 +2950,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.157</div>
+<div class="app-version" id="appVersion">v1.3.158</div>
 
 </div>
 <script>
@@ -3827,8 +3827,8 @@ function abCuesAtom(){
 
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
-var abAppleWhole='images/apple.svg?v=1.3.72', abApplePiece='images/apple-piece.svg?v=1.3.72';
-var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5;   /* cada corte = metade; no 7º vira um pontinho */
+var abAppleWhole='images/apple.svg?v=1.3.72', abApplePiece='images/apple-piece.svg?v=1.3.158';
+var APPLE_MAX_CUTS=7, APPLE_SHRINK=0.5, APPLE_MIN_SCALE=0.13;   /* cada corte = metade; para no pedaço mínimo (não vira pontinho invisível) */
 
 function abAppleReset(){
   abAppleCut=false; abAppleScale=1; abAtomReached=false; abAppleCuts=0; abAppleDone=false;
@@ -4783,24 +4783,23 @@ function abRedoCelebrate(){
 /* Executa um corte (ou sacode, se já chegou no átomo). */
 function abAppleDoCut(){
   abEl('abAppleHint').classList.remove('show');
-  if(abAtomReached){
-    /* no limite (sem nada escrito): mais um corte -> comemora e vai p/ o dialogo1.5 */
-    if(abAppleDone) return;
-    abAppleDone=true; abAppleCut=false;
-    abScreenShake(); abVibe([60,40,70]);
-    abSfx('audio/yes.mp3?v=1.3.72'); abSfx('audio/applause.mp3?v=1.3.72');
-    abEl('abAppleRedo').classList.remove('show');
-    setTimeout(function(){ startSegment(7); }, 1500); /* cortou a maçã -> dialogo1.3 (depois 1.4, depois 1.5) */
-    return;
-  }
+  if(abAtomReached) return;    /* no limite: o pedaço mínimo fica parado; nada mais acontece */
   abVibe(35);                  /* corte: vibração */
+  abSfx('audio/cutting_sound.mp3?v=1.3.158');   /* som do corte ao arrastar o dedo */
   abAppleSliceHalves();        /* metades voam (com a imagem atual) */
   abAppleJuice();
   abAppleCuts++;
   var img=abEl('abAppleImg');
   if(abAppleCuts===1){ img.src=abApplePiece; } /* depois do 1º corte, sobra um pedaço */
   abAppleScale *= APPLE_SHRINK;
-  if(abAppleCuts>=APPLE_MAX_CUTS){ abAtomReached=true; } /* no limite: sem texto e (por enquanto) sem Refazer */
+  /* Ao atingir o pedaço mínimo (ou o nº máx. de cortes): congela. O pedaço mínimo
+     fica na tela e NÃO sai mais — sem flash de maçã, sem avançar de cena. */
+  if(abAppleScale <= APPLE_MIN_SCALE || abAppleCuts>=APPLE_MAX_CUTS){
+    abAppleScale = APPLE_MIN_SCALE;
+    abAtomReached = true;
+    abAppleCut = false;                          /* trava novos cortes */
+    abEl('abAppleRedo').classList.remove('show');
+  }
   img.style.transform='scale('+abAppleScale+')';
 }
 /* Duas metades voam para os lados e caem. */
