@@ -2576,6 +2576,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         </svg>
         <span class="ab-fab-icon" id="ch3FabIcon">▶</span>
       </button>
+      <!-- Botão de quiz no fim do Capítulo 3 (aparece no lugar do play) -->
+      <button type="button" class="ab-lego-quiz" id="ch3QuizBtn" onclick="ch3GoQuiz()" aria-label="Ir para o quiz">Quiz</button>
 
       <!-- Intro: "Capítulo 3" aparece primeiro; o título abaixo. No dialogo3, sobem ao topo. -->
       <div class="ch3-intro" id="ch3Intro">
@@ -2968,7 +2970,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.169</div>
+<div class="app-version" id="appVersion">v1.3.170</div>
 
 </div>
 <script>
@@ -4739,12 +4741,54 @@ var QUIZ_SETS = {
       q:'A água é formada por 2 átomos de hidrogênio e 1 de oxigênio. Sua fórmula química é:',
       options:['H2O','CO2','O2H'],
       correct:0 }
+  ],
+  3: [
+    { type:'text',
+      q:'O modelo de Dalton (esfera maciça e indivisível) NÃO consegue explicar qual fenômeno da matéria?',
+      options:['A eletricidade','A cor','O peso'],
+      correct:0 },
+    { type:'text',
+      q:'Por volta de 600 a.C., Tales de Mileto percebeu que um material, ao ser atritado na lã, atraía corpos menores. Que material era esse?',
+      options:['O ferro','O âmbar (elektron)','O vidro'],
+      correct:1 },
+    { type:'text',
+      q:'Quais cientistas do século 18 deram as primeiras explicações científicas sobre a eletricidade?',
+      options:['Du Fay e Benjamin Franklin','Thomson e Crookes','Dalton e Demócrito'],
+      correct:0 },
+    { type:'text',
+      q:'Benjamin Franklin substituiu o termo "fluido" por qual termo, usado até hoje?',
+      options:['Corrente','Carga elétrica','Voltagem'],
+      correct:1 },
+    { type:'text',
+      q:'Segundo as leis da eletricidade, existem quantos tipos de carga elétrica?',
+      options:['Um só tipo','Dois: positiva e negativa','Três tipos'],
+      correct:1 },
+    { type:'text',
+      q:'Quando um corpo tem cargas positivas e negativas em igual quantidade, dizemos que ele está:',
+      options:['Eletricamente neutro','Carregado positivamente','Carregado negativamente'],
+      correct:0 },
+    { type:'text',
+      q:'Sobre os corpos carregados: cargas iguais se ___ e cargas opostas se ___.',
+      options:['atraem / repelem','repelem / atraem','repelem / repelem'],
+      correct:1 },
+    { type:'text',
+      q:'Na ampola de Crookes usada por Thomson, os "raios catódicos" têm esse nome porque são produzidos no:',
+      options:['Ânodo','Cátodo','Vidro'],
+      correct:1 },
+    { type:'text',
+      q:'Thomson provou que os raios catódicos são partículas de carga negativa. Que nome ele deu a essas partículas?',
+      options:['Próton','Elétron','Nêutron'],
+      correct:1 },
+    { type:'text',
+      q:'Como é o modelo atômico de Thomson, conhecido como "pudim de passas"?',
+      options:['Uma esfera maciça e indivisível','Uma esfera de carga positiva com elétrons negativos incrustados','Um núcleo denso com elétrons em órbita'],
+      correct:1 }
   ]
 };
 var quizCh = 1;
 var quizData = QUIZ_SETS[1];   /* conjunto ativo */
 var QUIZ_LETTERS=['a','b','c','d'];
-var QUIZ_ADV_SFX=['maisessa','maisuma','agoraessa','maisessa','somaisuma']; /* transições 1>2, 2>3, 3>4, 4>5, 5>6 (4>5 e 5>6 invertidos) */
+var QUIZ_ADV_CYCLE=['maisessa','maisuma','agoraessa']; /* sons de transição; a última transição (antes da pergunta final) usa 'somaisuma' */
 var quizIdx=0, quizLock=false, quizScore=0, quizName='';
 
 /* entrada no quiz: pede o nome antes da 1ª pergunta. chNum = capítulo (1 = padrão) */
@@ -4824,7 +4868,8 @@ function quizAnswer(i, btn){
   setTimeout(function(){
     if(isLast){ quizFinish(); }
     else {
-      abSfx('audio/'+(QUIZ_ADV_SFX[quizIdx]||'maisessa')+'.mp3?v=1.3.72'); /* 1>2 maisessa, 2>3 maisuma, 3>4 agoraessa, 4>5 somaisuma, 5>6 fallback */
+      var advSfx=(quizIdx===quizData.length-2) ? 'somaisuma' : QUIZ_ADV_CYCLE[quizIdx % QUIZ_ADV_CYCLE.length]; /* última transição -> 'somaisuma'; demais ciclam */
+      abSfx('audio/'+advSfx+'.mp3?v=1.3.72');
       quizIdx++; quizRender();
     }
   }, 1900);
@@ -4857,10 +4902,11 @@ function quizMsg(pct){
 function quizNextChapter(){
   quizConfettiStop();
   goTo('aprenda');
-  var nextIdx = quizCh; /* 0-indexado: quizCh(1) -> índice 1 = cap.2; quizCh(2) -> índice 2 = cap.3 */
+  var nextIdx = quizCh; /* 0-indexado: quizCh(1)->cap.2; (2)->cap.3; (3)->cap.4 */
   goChapter(nextIdx);
   if(nextIdx===1 && typeof ch2PlayIntro==='function'){ ch2PlayIntro(); }
   else if(nextIdx===2 && typeof ch3PlayIntro==='function'){ ch3PlayIntro(); }
+  else if(nextIdx===3 && typeof ch4PlayIntro==='function'){ ch4PlayIntro(); }
 }
 /* Confete próprio da tela de quiz (a tela do audiobook fica oculta aqui). */
 var quizConfettiRaf=null;
@@ -7441,8 +7487,17 @@ var ch3Segs = [
   { src:'audio/dialogo3.5.10.mp3?v=1.3.72', build:ch3CuesD3510, onStart:ch3D3510Start, keepScene:true },   /* 3.5.10: ampola sai + título sobe; 18.8s esfera; 20s +; 26.6-31s elétrons 1 a 1; 32s rótulo "Elétron"; 34.8s "átomo neutro"; 43s frase entre aspas */
   { src:'audio/dialogo3.5.11.mp3?v=1.3.105', build:ch3CuesD3511, keepScene:true },   /* 3.5.11: nada sai; 4s foto "Pudim de passas" (modelo encolhe p/ o topo); 6s tira o título; 8.7s novo título "Modelo do pudim de passas"; 11s rótulo "Massa positiva"; 14s rótulo "elétron" */
   { src:'audio/dialogo3.5.12.mp3?v=1.3.72', build:ch3CuesD3512, onStart:ch3D3512Start, onEnded:ch3D3512Ended, keepScene:true },   /* 3.5.12: tudo sai + título sobe ao topo; 5-7s revê vídeo tales_ambar; 9.6-15s pergunta; 20s papel de seda; ao fim: interação (esfregar -> eletrizar -> seguir o dedo) */
-  { src:'audio/dialogo3.6.mp3?v=1.3.72', onStart:ch3D36Start, keepScene:true }   /* 3.6: ao dar play, entra o retrato do Thomson com ken burns */
+  { src:'audio/dialogo3.6.mp3?v=1.3.72', onStart:ch3D36Start, onEnded:ch3ShowQuizBtn, keepScene:true }   /* 3.6: retrato do Thomson (ken burns); ao fim -> botão "Quiz" (fim do cap.3) */
 ];
+/* fim do Capítulo 3: some o play e aparece o botão "Quiz". */
+function ch3ShowQuizBtn(){ ch3ShowFab(false); var b=ch3El('ch3QuizBtn'); if(b){ b.classList.add('show'); } }
+/* clique no botão "Quiz": pausa o áudio e abre o quiz do capítulo 3. */
+function ch3GoQuiz(){
+  if(ch3.audio){ try{ ch3.audio.pause(); }catch(_){} } ch3.playing=false;
+  var b=ch3El('ch3QuizBtn'); if(b){ b.classList.remove('show'); }
+  goTo('quiz');
+  quizStart(3);
+}
 function ch3SegIndex(part){ for(var i=0;i<ch3Segs.length;i++){ if(ch3Segs[i].src.indexOf(part)>=0){ return i; } } return -1; }
 /* cues do dialogo3: 4s esfera+"Maciça", 5s "Indestrutível", 6s "Indivisível" */
 function ch3CuesD3(){
@@ -8594,6 +8649,7 @@ function ch3Reset(){
   /* limpa a cena das folhas */
   if(typeof ch3Leaf!=='undefined'){ ch3Leaf.active=false; ch3Leaf.leaves=[]; ch3Leaf.waveLeaves=[]; ch3Leaf.wave=0; if(ch3Leaf.audio){ try{ ch3Leaf.audio.pause(); }catch(_){} } }
   var lc=ch3El('ch3Leaves'); if(lc){ lc.innerHTML=''; }
+  var qb=ch3El('ch3QuizBtn'); if(qb){ qb.classList.remove('show'); }
   ch3ShowFab(true);
   if(ch3.audio){ try{ ch3.audio.pause(); ch3.audio.currentTime=0; }catch(_){} }
   var intro=ch3El('ch3Intro'); if(intro){ intro.classList.remove('up','out'); }
