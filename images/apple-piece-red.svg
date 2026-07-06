@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    <linearGradient id="flesh" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff8ec"/>
+      <stop offset="1" stop-color="#f0dcb8"/>
+    </linearGradient>
+    <linearGradient id="peel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7a6e"/>
+      <stop offset="1" stop-color="#c50d12"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="124" cy="206" rx="58" ry="12" fill="#000000" opacity="0.24"/>
+  <!-- polpa (faces de corte) -->
+  <path d="M78 176 C66 128 90 82 142 72 C180 64 202 104 188 152 C168 184 112 188 78 176 Z" fill="url(#flesh)"/>
+  <!-- casca vermelha no lado externo -->
+  <path d="M142 72 C180 64 202 104 188 152" fill="none" stroke="url(#peel)" stroke-width="17" stroke-linecap="round"/>
+  <!-- brilho sutil na polpa -->
+  <path d="M96 150 C92 116 108 92 140 86" fill="none" stroke="#ffffff" stroke-width="5" stroke-opacity="0.55" stroke-linecap="round"/>
+  <!-- sementes -->
+  <path d="M120 150 C126 142 134 146 132 156 C130 164 120 162 120 150 Z" fill="#5b3a1a"/>
+  <path d="M138 138 C144 131 152 135 150 144 C148 152 138 150 138 138 Z" fill="#5b3a1a"/>
+</svg>

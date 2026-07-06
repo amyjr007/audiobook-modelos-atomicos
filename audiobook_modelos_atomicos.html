@@ -2961,7 +2961,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.164</div>
+<div class="app-version" id="appVersion">v1.3.165</div>
 
 </div>
 <script>
@@ -3839,6 +3839,7 @@ function abCuesAtom(){
 /* ===== A maçã (dialogo1.4): cortar até o "átomo" (estilo fruit ninja) ===== */
 var abAppleCut=false, abAppleScale=1, abAtomReached=false, abAppleCuts=0, abAppleDone=false;
 var abAppleWhole='images/apple.svg?v=1.3.72', abApplePiece='images/apple-piece.svg?v=1.3.158';
+var abApplePieceRed='images/apple-piece-red.svg?v=1.3.165';   /* pedaço original (com casca vermelha) — usado só na animação de refazer, como antes */
 var APPLE_MAX_CUTS=8, APPLE_SHRINK=0.5, APPLE_MIN_SCALE=0.02;   /* cada corte = metade; no 8º chega no "átomo" (pedaço mínimo visível) */
 
 function abAppleReset(){
@@ -3925,7 +3926,7 @@ function abAppleRedo(onDone){
   var n=306;
   for(var i=0;i<n;i++){
     (function(k){
-      var p=document.createElement('img'); p.className='ab-apple-gather'; p.src=abApplePiece;
+      var p=document.createElement('img'); p.className='ab-apple-gather'; p.src=abApplePieceRed; /* mesmo pedaço de antes (casca vermelha) */
       p.style.width=p.style.height=sz+'px'; p.style.marginLeft=(-sz/2)+'px'; p.style.marginTop=(-sz/2)+'px';
       var delay=Math.random()*conv*0.4;
       p.style.transition='transform '+conv+'s cubic-bezier(.25,.7,.35,1) '+delay+'s, opacity '+fade+'s ease '+delay+'s';
@@ -4032,16 +4033,22 @@ function abCues13(){
   return [
     { time:10.7, done:false, fn:function(){ abAt2Set('abAt2L1','“Construtor básico”'); abEl('abParticleArrow').classList.add('show'); } }, /* seta -> pedaço restante (em cima) */
     { time:12.5, done:false, fn:function(){ abAt2Set('abAt2L2','“Tijolo primordial”'); } },                                                /* amarelo, abaixo do pedaço */
-    { time:19.5, done:false, fn:function(){ abAt2Set('abAt2Title','“Átomo”'); abEl('abParticleArrow').classList.remove('show'); } },       /* laranja, abaixo (SEM crescer/brilho) */
+    { time:19.5, done:false, fn:function(){ abAt2Set('abAt2Title','“Átomo”'); } },       /* laranja, abaixo (SEM crescer/brilho); a seta CONTINUA até o 1.4 */
     { time:23.5, done:false, fn:function(){ abAt2Set('abAt2L3','“Indivisível”'); } }                                                        /* branco, abaixo */
   ];
 }
 /* ===== dialogo1.6A (refazer a maçã) e 1.6B ===== */
 function abInit16A(){ abSpotlight(false); abNavDemoEnd(); abShowFab(false); } /* mantém cena do 1.5 */
 function abCues16A(){ return [
-  { time:2.0, done:false, fn:function(){ abAt2Reset(); abEl('abParticleArrow').classList.remove('show'); } }, /* some TODOS os textos; deixa só a maçã (pedaço) */
-  { time:3.0, done:false, fn:function(){ abEl('abAppleRedo').classList.add('show'); } }                        /* Refazer (ativa o próximo evento) */
+  { time:2.0, done:false, fn:function(){ abAt2FadeOut(); abEl('abParticleArrow').classList.remove('show'); } }, /* some TODOS os textos + seta em FADE OUT; deixa só a maçã */
+  { time:3.0, done:false, fn:function(){ abEl('abAppleRedo').classList.add('show'); } }                         /* Refazer (ativa o próximo evento) */
 ]; }
+/* Some os rótulos do átomo em FADE OUT (remove 'show' -> transição de opacity),
+   e só depois do fade limpa/esconde o overlay. */
+function abAt2FadeOut(){
+  ['abAt2L1','abAt2L2','abAt2Title','abAt2L3'].forEach(function(id){ abEl(id).classList.remove('show'); });
+  setTimeout(function(){ abAt2Reset(); }, 850);
+}
 function abInit16B(){
   abSpotlight(false); abNavDemoEnd();
   abAt2Reset(); abEl('abParticleArrow').classList.remove('show');
