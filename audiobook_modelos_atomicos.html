@@ -1721,7 +1721,11 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-apple-redo:active{transform:translateX(-50%) scale(.95)}
 
 /* ===== Átomo / indivisível (dialogo1.5) — empilhados do topo p/ baixo ===== */
-.ab-at2{position:fixed;inset:0;z-index:109;display:none;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;padding:13vh 7vw 0;text-align:center;pointer-events:none}
+.ab-at2{position:fixed;inset:0;z-index:109;display:none;pointer-events:none}
+/* "Construtor básico" ACIMA do pedaço (com a seta apontando pra ele) */
+.ab-at2-top{position:absolute;left:0;right:0;top:30%;text-align:center;padding:0 7vw}
+/* "Tijolo primordial" / "Átomo" / "Indivisível" ABAIXO do pedaço da maçã */
+.ab-at2-bottom{position:absolute;left:0;right:0;top:53%;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:0 7vw}
 .ab-at2-l1,.ab-at2-l3{font-family:'Fraunces',serif;font-style:italic;font-weight:600;font-size:clamp(20px,5.4vw,30px);line-height:1.25;color:var(--text);max-width:480px;opacity:0;transform:translateY(14px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
 .ab-at2-l1.show,.ab-at2-l3.show{opacity:1;transform:none}
 .ab-at2-l2{font-family:'Fraunces',serif;font-style:italic;font-weight:800;font-size:clamp(22px,5.8vw,32px);line-height:1.2;color:#ffe24d;text-shadow:0 3px 16px rgba(0,0,0,.5),0 0 20px rgba(255,210,60,.28);max-width:480px;opacity:0;transform:translateY(14px);transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1)}
@@ -2081,10 +2085,14 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 
       <!-- Átomo / indivisível (dialogo1.5) — textos empilhados do topo p/ baixo -->
       <div class="ab-at2" id="abAt2" style="display:none">
-        <div class="ab-at2-l1" id="abAt2L1"></div>
-        <div class="ab-at2-l2" id="abAt2L2"></div>
-        <div class="ab-at2-title" id="abAt2Title"></div>
-        <div class="ab-at2-l3" id="abAt2L3"></div>
+        <div class="ab-at2-top">
+          <div class="ab-at2-l1" id="abAt2L1"></div>
+        </div>
+        <div class="ab-at2-bottom">
+          <div class="ab-at2-l2" id="abAt2L2"></div>
+          <div class="ab-at2-title" id="abAt2Title"></div>
+          <div class="ab-at2-l3" id="abAt2L3"></div>
+        </div>
       </div>
 
       <!-- dialogo1.6B: título + saída da partícula (átomo) -->
@@ -2953,7 +2961,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.163</div>
+<div class="app-version" id="appVersion">v1.3.164</div>
 
 </div>
 <script>
@@ -3304,8 +3312,8 @@ function startSegment(n){
      (dialogo1.4 corte / 1.5 átomo / 1.6A refazer / 1.6B) e PRECISA manter a
      partícula e a maçã entre eles — por isso só resetamos a maçã ao saltar p/
      FORA desse grupo. O átomo (dialogo1.3) fica logo antes do grupo. */
-  var abAppleStart = 8; /* índice fixo do 1.4; grupo da maçã = 1.4/1.5/1.6A/1.6B (8..11) */
-  if(n < abAppleStart){ abAppleReset(); }
+  var abAppleStart = 7; /* dialogo1.3 (7) já mantém o pedaço/átomo do corte; grupo da maçã = 1.3..1.6B (7..11) */
+  if(n < abAppleStart){ abAppleReset(); }              /* seg 7 (dialogo1.3) NÃO reseta a maçã -> sem flash da maçã inteira */
   if(n < abAppleStart - 1){ abAtomReset(); } /* não reseta o átomo (penúltimo antes do grupo) nem o grupo */
   if(n < 12 || n > 15){ legoHide(); } /* mantém a cena do barco em 1.7/1.7A/1.7B/1.7C (12..15); esconde nos demais */
   if(seg.onStart){ seg.onStart(); }
@@ -4022,14 +4030,18 @@ function abCuesAt2(){
    -> "Átomo" -> "Indivisível"), com os novos tempos e "Átomo" entre aspas. */
 function abCues13(){
   return [
-    { time:10.5, done:false, fn:function(){ abAt2Set('abAt2L1','“Construtor básico”'); abEl('abParticleArrow').classList.add('show'); } }, /* seta -> último pedaço + texto em cima */
-    { time:19.6, done:false, fn:function(){ abAt2Set('abAt2Title','“Átomo”'); abEl('abParticleArrow').classList.remove('show'); abParticlePulse(); } },
-    { time:23.6, done:false, fn:function(){ abAt2Set('abAt2L3','“Indivisível”'); } }  /* branco (var --text) */
+    { time:10.7, done:false, fn:function(){ abAt2Set('abAt2L1','“Construtor básico”'); abEl('abParticleArrow').classList.add('show'); } }, /* seta -> pedaço restante (em cima) */
+    { time:12.5, done:false, fn:function(){ abAt2Set('abAt2L2','“Tijolo primordial”'); } },                                                /* amarelo, abaixo do pedaço */
+    { time:19.5, done:false, fn:function(){ abAt2Set('abAt2Title','“Átomo”'); abEl('abParticleArrow').classList.remove('show'); } },       /* laranja, abaixo (SEM crescer/brilho) */
+    { time:23.5, done:false, fn:function(){ abAt2Set('abAt2L3','“Indivisível”'); } }                                                        /* branco, abaixo */
   ];
 }
 /* ===== dialogo1.6A (refazer a maçã) e 1.6B ===== */
 function abInit16A(){ abSpotlight(false); abNavDemoEnd(); abShowFab(false); } /* mantém cena do 1.5 */
-function abCues16A(){ return [ { time:2.5, done:false, fn:function(){ abEl('abAppleRedo').classList.add('show'); } } ]; }
+function abCues16A(){ return [
+  { time:2.0, done:false, fn:function(){ abAt2Reset(); abEl('abParticleArrow').classList.remove('show'); } }, /* some TODOS os textos; deixa só a maçã (pedaço) */
+  { time:3.0, done:false, fn:function(){ abEl('abAppleRedo').classList.add('show'); } }                        /* Refazer (ativa o próximo evento) */
+]; }
 function abInit16B(){
   abSpotlight(false); abNavDemoEnd();
   abAt2Reset(); abEl('abParticleArrow').classList.remove('show');
@@ -4793,38 +4805,18 @@ function abCutSound(){
     var p=abCutAudio.play(); if(p&&p.catch){ p.catch(function(){}); }
   }catch(_){}
 }
-/* Evento final do átomo: toca o dialogo1.3 (sem trocar de cena) e escreve os
-   rótulos sincronizados por cima do pedaço mínimo que restou. */
-function abAtomLabelsPlay(){
-  abAt2Reset();
-  abEl('abAt2').style.display='flex';
-  var au=new Audio('audio/dialogo1.3.mp3?v=1.3.147');
-  var cues=[
-    { t:10.7, done:false, fn:function(){ abAt2Set('abAt2L1','“Construtor básico”'); abEl('abParticleArrow').classList.add('show'); } }, /* seta -> pedaço restante */
-    { t:12.5, done:false, fn:function(){ abAt2Set('abAt2L2','“Tijolo primordial”'); } },                                                /* amarelo */
-    { t:19.5, done:false, fn:function(){ abAt2Set('abAt2Title','“Átomo”'); abEl('abParticleArrow').classList.remove('show'); abParticlePulse(); } }, /* laranja */
-    { t:23.5, done:false, fn:function(){ abAt2Set('abAt2L3','“Indivisível”'); } }
-  ];
-  au.addEventListener('timeupdate', function(){
-    var t=au.currentTime, i;
-    for(i=0;i<cues.length;i++){ if(!cues[i].done && t>=cues[i].t){ cues[i].done=true; cues[i].fn(); } }
-  });
-  var p=au.play(); if(p&&p.catch){ p.catch(function(){}); }
-}
-
 /* Executa um corte (ou sacode, se já chegou no átomo). */
 function abAppleDoCut(){
   abEl('abAppleHint').classList.remove('show');
   if(abAtomReached){
-    /* Chegou no "átomo" (pedaço mínimo): ele é INDIVISÍVEL. Tentar cortar dispara
-       o EVENTO FINAL: "yes" e, 1s depois, o dialogo1.3 com os rótulos. NÃO troca
-       de segmento (isso resetava a maçã inteira = o flash) — o átomo (pedaço
-       mínimo) FICA na tela até segunda ordem. Dispara uma única vez. */
+    /* Chegou no "átomo" (pedaço mínimo, INDIVISÍVEL): dispara "yes" e, 1s depois,
+       segue p/ o dialogo1.3 (segmento 7) — que MANTÉM o pedaço (sem flash da maçã
+       inteira, pois seg 7 não reseta a maçã) e escreve os rótulos. Dispara 1x. */
     if(abAppleDone) return;
     abAppleDone=true; abAppleCut=false;
     abScreenShake(); abVibe([60,40,70]);
     abSfx('audio/yes.mp3?v=1.3.72');
-    setTimeout(abAtomLabelsPlay, 1000);   /* 1s depois do "yes" -> dialogo1.3 + rótulos */
+    setTimeout(function(){ startSegment(7); }, 1000);   /* 1s depois do "yes" -> dialogo1.3 */
     return;
   }
   abVibe(35);                  /* corte: vibração */
@@ -4833,7 +4825,7 @@ function abAppleDoCut(){
   abAppleJuice();
   abAppleCuts++;
   var img=abEl('abAppleImg');
-  if(abAppleCuts===1){ img.src=abApplePiece; } /* depois do 1º corte, sobra um pedaço */
+  if(abAppleCuts===1){ img.src=abApplePiece; abEl('abAppleTitle').classList.remove('show'); } /* 1º corte: sobra um pedaço + some o título "A maçã" (fade out) */
   /* Escala EXIBIDA: encolhe metade a cada corte, com piso no pedaço mínimo visível. */
   var sc = Math.max(APPLE_MIN_SCALE, Math.pow(APPLE_SHRINK, abAppleCuts));
   /* No nº máx. de cortes chegou no "átomo": marca o limite MAS NÃO trava o gesto —
