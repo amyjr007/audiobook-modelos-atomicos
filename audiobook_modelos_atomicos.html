@@ -2874,7 +2874,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.146</div>
+<div class="app-version" id="appVersion">v1.3.147</div>
 
 </div>
 <script>
@@ -3141,8 +3141,8 @@ var ab = {
     { src:'audio/dialogo1.1.mp3?v=1.3.143', build:abCues11,     onStart:abInit11,          next:true }, /* NOVO: átomo/indivisível — img7 sobe empurrando a cena; textos digitados; fim -> ▶ -> dialogo1.2 (maçã) */
     { src:'audio/dialogo1.2.mp3?v=1.3.146', build:abCuesApple,  onStart:abInitApple, onEnd:abAppleAudioEnded, next:false }, /* NOVO dialogo1.2: interação da maçã (cortar até o átomo). 1s some tudo; 3.9s entra a maçã. Ao cortar até o fim -> startSegment(9) (líquido antigo desativado) */
     { src:'audio/dialogo1.2.mp3?v=1.3.72', build:abCuesNone,    onStart:abInitStatesAudio, onEnd:abGasAudioEnded,    next:false }, /* sobre o gás; fim -> toque no vidro */
-    { src:'audio/dialogo1.3.mp3?v=1.3.72', build:abCuesAtom,    onStart:abInitAtom,        next:true  }, /* o átomo (Demócrito); fim -> ▶ -> dialogo1.4 */
-    { src:'audio/dialogo1.4.mp3?v=1.3.72', build:abCuesApple,   onStart:abInitApple,       onEnd:abAppleAudioEnded, next:false }, /* A maçã: cortar até o átomo */
+    { src:'audio/dialogo1.3.mp3?v=1.3.147', build:abCuesNone,   onStart:abInitHold,        next:true  }, /* dialogo1.3 (regravado): toca após a maçã; mantém a partícula na tela; eventos ainda a definir; fim -> ▶ -> dialogo1.4 */
+    { src:'audio/dialogo1.4.mp3?v=1.3.147', build:abCuesNone,   onStart:abInitHold,        next:true  }, /* dialogo1.4 (regravado): toca após 1.3; mantém a cena; eventos ainda a definir; fim -> ▶ -> dialogo1.5 */
     { src:'audio/dialogo1.5.mp3?v=1.3.72', build:abCuesAt2,     onStart:abInitAt2,         next:true  }, /* Átomo / indivisível; fim -> ▶ -> 1.6A */
     { src:'audio/dialogo1.6A.mp3?v=1.3.72', build:abCues16A,    onStart:abInit16A,         next:false }, /* refazer: Refazer aos 2.5s -> remonta -> 1.6B */
     { src:'audio/dialogo1.6B.mp3?v=1.3.72', build:abCues16B,    onStart:abInit16B,         next:true  }, /* aglomerado de partículas; 5.7s -> sai 1 átomo; fim -> ▶ -> 1.7 */
@@ -3880,6 +3880,17 @@ function abCuesApple(){
     { time:3.9, done:false, fn:function(){ abAppleReveal(); } }     /* 3.9s: entra a maçã */
   ];
 }
+/* Placeholder p/ dialogo1.3 e 1.4 (regravados): só toca o áudio e mantém a cena
+   atual (a partícula que sobrou da maçã). Limpa a UI da maçã (título/dica/refazer).
+   Eventos visuais desses diálogos ainda serão definidos. */
+function abInitHold(){
+  abSpotlight(false); abNavDemoEnd();
+  var t=abEl('abAppleTitle'); if(t){ t.classList.remove('show'); }
+  var h=abEl('abAppleHint');  if(h){ h.classList.remove('show'); }
+  var r=abEl('abAppleRedo');  if(r){ r.classList.remove('show'); }
+  abBladeStop();
+  abShowFab(true);
+}
 
 /* ===== Átomo / indivisível (dialogo1.5) ===== */
 function abAt2Reset(){
@@ -4606,7 +4617,7 @@ function abAppleDoCut(){
     abScreenShake(); abVibe([60,40,70]);
     abSfx('audio/yes.mp3?v=1.3.72'); abSfx('audio/applause.mp3?v=1.3.72');
     abEl('abAppleRedo').classList.remove('show');
-    setTimeout(function(){ startSegment(9); }, 1500); /* -> dialogo1.5 */
+    setTimeout(function(){ startSegment(7); }, 1500); /* cortou a maçã -> dialogo1.3 (depois 1.4, depois 1.5) */
     return;
   }
   abVibe(35);                  /* corte: vibração */
