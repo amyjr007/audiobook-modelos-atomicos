@@ -1817,6 +1817,27 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .quiz-next{margin-top:28px;padding:15px 30px;border-radius:30px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:15px;letter-spacing:.3px;color:#160c05;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));box-shadow:0 12px 30px rgba(255,122,24,.5);transition:transform .2s ease,box-shadow .2s ease}
 .quiz-next:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(255,122,24,.6)}
 .quiz-next:active{transform:scale(.97)}
+/* nome antes do quiz */
+.quiz-name{display:flex;flex-direction:column;align-items:center;text-align:center}
+.quiz-name-title{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(21px,5.6vw,28px);line-height:1.2;color:var(--text);margin:16px 4px 22px}
+.quiz-name-input{width:min(320px,86vw);padding:15px 18px;border-radius:15px;background:rgba(22,12,5,.66);border:1px solid rgba(255,122,24,.35);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;text-align:center;outline:none;transition:border-color .2s}
+.quiz-name-input:focus{border-color:var(--orange)}
+.quiz-name-input::placeholder{color:var(--text2);font-weight:600}
+.quiz-name .quiz-next{margin-top:22px}
+/* letra a/b/c nas opções */
+.quiz-opt-letter{display:inline-flex;flex-shrink:0;align-items:center;justify-content:center;width:24px;height:24px;margin-right:12px;border-radius:8px;background:rgba(255,122,24,.16);border:1px solid rgba(255,122,24,.35);color:var(--orange);font-size:12px;font-weight:800;text-transform:uppercase;vertical-align:middle}
+.quiz-opt{display:flex;align-items:center}
+.quiz-opt.correct .quiz-opt-letter,.quiz-opt.wrong .quiz-opt-letter{border-color:currentColor}
+.quiz-cardimg .quiz-opt-letter{margin:0 0 2px}
+/* card final */
+.quiz-done-kicker{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--orange);margin-bottom:4px}
+.quiz-done-score{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:16px;color:var(--orange);margin-top:10px}
+.quiz-done-btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:26px}
+.quiz-done-btns .quiz-next{margin-top:0}
+.quiz-redo{padding:15px 26px;border-radius:30px;border:1px solid rgba(255,122,24,.4);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:15px;color:var(--orange);background:rgba(22,12,5,.5);transition:transform .2s ease,background .2s ease}
+.quiz-redo:hover{background:rgba(255,122,24,.12);transform:translateY(-2px)}
+.quiz-redo:active{transform:scale(.97)}
+.quiz-wrap.shake{animation:abShake .5s ease}
 </style>
 </head>
 <body>
@@ -2843,21 +2864,33 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 <!-- QUIZ (fim do Capítulo 1) -->
 <div id="screen-quiz" class="screen">
   <canvas class="quiz-confetti" id="quizConfetti"></canvas>
-  <div class="quiz-wrap">
-    <!-- perguntas -->
-    <div id="quizPlay">
+  <div class="quiz-wrap" id="quizWrap">
+    <!-- nome (antes da 1ª pergunta) -->
+    <div id="quizName" class="quiz-name">
       <div class="quiz-kicker">Quiz · Capítulo 1</div>
-      <div class="quiz-progress" id="quizProgress">Pergunta 1 de 2</div>
+      <div class="quiz-name-title">Antes de começar,<br>como você se chama?</div>
+      <input type="text" id="quizNameInput" class="quiz-name-input" placeholder="Digite seu nome" maxlength="26" autocomplete="off" spellcheck="false">
+      <button type="button" class="quiz-next" onclick="quizNameSubmit()">Começar o quiz →</button>
+    </div>
+    <!-- perguntas -->
+    <div id="quizPlay" style="display:none">
+      <div class="quiz-kicker">Quiz · Capítulo 1</div>
+      <div class="quiz-progress" id="quizProgress">Pergunta 1 de 5</div>
       <div class="quiz-q" id="quizQuestion"></div>
       <div class="quiz-options" id="quizOptions"></div>
       <div class="quiz-feedback" id="quizFeedback"></div>
     </div>
-    <!-- tela final -->
+    <!-- tela final (card) -->
     <div class="quiz-done" id="quizDone">
-      <div class="quiz-done-emoji">🎉</div>
-      <div class="quiz-done-title">Capítulo 1 concluído!</div>
-      <div class="quiz-done-sub">Você entendeu por que o átomo recebeu esse nome. Pronto para o próximo passo da história?</div>
-      <button type="button" class="quiz-next" onclick="quizNextChapter()">Próximo capítulo →</button>
+      <div class="quiz-done-emoji">🏅</div>
+      <div class="quiz-done-kicker">Quiz · Capítulo 1 concluído</div>
+      <div class="quiz-done-title" id="quizDoneName">Estudante</div>
+      <div class="quiz-done-score" id="quizDoneScore">Nota: 0 / 10</div>
+      <div class="quiz-done-sub" id="quizDoneMsg"></div>
+      <div class="quiz-done-btns">
+        <button type="button" class="quiz-redo" onclick="quizRestart()">↺ Refazer</button>
+        <button type="button" class="quiz-next" onclick="quizNextChapter()">Próximo capítulo →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2911,7 +2944,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.153</div>
+<div class="app-version" id="appVersion">v1.3.154</div>
 
 </div>
 <script>
@@ -4550,11 +4583,23 @@ function legoGoQuiz(){
    capítulo" leva direto ao Capítulo II (John Dalton). */
 var quizData = [
   { type:'text',
-    q:'A palavra "átomo" vem do grego antigo. O que ela significa?',
-    options:['Eterno', 'Indivisível', 'Minúsculo'],
+    q:'Formalmente, o que é a matéria?',
+    options:['Tudo que tem cor e forma','Tudo que tem massa e ocupa lugar no espaço','Tudo que é sólido e pesado'],
+    correct:1 },
+  { type:'text',
+    q:'No dia a dia, a matéria é encontrada principalmente em quais três estados físicos?',
+    options:['Sólido, líquido e gasoso','Quente, frio e morno','Duro, mole e derretido'],
+    correct:0 },
+  { type:'text',
+    q:'A palavra "átomo", do grego antigo, significa:',
+    options:['Eterno','Indivisível','Minúsculo'],
+    correct:1 },
+  { type:'text',
+    q:'Quais filósofos gregos, por volta de 450 a.C., propuseram a ideia do átomo?',
+    options:['Sócrates e Platão','Demócrito e Leucipo','Aristóteles e Tales'],
     correct:1 },
   { type:'image',
-    q:'Qual das imagens a seguir expressa bem o conceito de indivisível, termo que deu origem à palavra "Átomo"?',
+    q:'Qual das imagens a seguir expressa melhor o conceito de "indivisível"?',
     options:[
       { img:'images/apple.svg?v=1.3.72',       label:'Maçã' },
       { img:'images/quiz-atomo.svg?v=1.3.72',  label:'Esfera maciça' },
@@ -4562,12 +4607,33 @@ var quizData = [
     ],
     correct:1 }
 ];
-var quizIdx=0, quizLock=false;
+var QUIZ_LETTERS=['a','b','c','d'];
+var QUIZ_ADV_SFX=['maisessa','maisuma','agoraessa','somaisuma']; /* transições 1>2, 2>3, 3>4, 4>5 */
+var quizIdx=0, quizLock=false, quizScore=0, quizName='';
 
+/* entrada no quiz: pede o nome antes da 1ª pergunta */
 function quizStart(){
-  quizIdx=0; quizLock=false;
+  quizIdx=0; quizLock=false; quizScore=0;
   abEl('quizDone').classList.remove('show');
+  abEl('quizPlay').style.display='none';
+  abEl('quizName').style.display='';
+  var inp=abEl('quizNameInput'); if(inp){ inp.value=quizName||''; setTimeout(function(){ try{ inp.focus(); }catch(_){} }, 80); }
+}
+function quizNameSubmit(){
+  var inp=abEl('quizNameInput');
+  quizName=(inp && inp.value.trim()) ? inp.value.trim() : 'Estudante';
+  abEl('quizName').style.display='none';
   abEl('quizPlay').style.display='';
+  quizIdx=0; quizScore=0;
+  quizRender();
+}
+/* "Refazer": recomeça as perguntas mantendo o nome */
+function quizRestart(){
+  quizConfettiStop();
+  abEl('quizDone').classList.remove('show');
+  abEl('quizName').style.display='none';
+  abEl('quizPlay').style.display='';
+  quizIdx=0; quizScore=0; quizLock=false;
   quizRender();
 }
 function quizRender(){
@@ -4582,42 +4648,68 @@ function quizRender(){
   q.options.forEach(function(o,i){
     var btn=document.createElement('button');
     btn.type='button';
+    var letter='<span class="quiz-opt-letter">'+QUIZ_LETTERS[i]+'</span>';
     if(q.type==='image'){
       btn.className='quiz-cardimg';
-      btn.innerHTML='<img src="'+o.img+'" alt="'+o.label+'" draggable="false"><span>'+o.label+'</span>';
+      btn.innerHTML=letter+'<img src="'+o.img+'" alt="'+o.label+'" draggable="false"><span>'+o.label+'</span>';
     } else {
       btn.className='quiz-opt';
-      btn.textContent=o;
+      btn.innerHTML=letter+'<span>'+o+'</span>';
     }
     btn.onclick=function(){ quizAnswer(i, btn); };
     opts.appendChild(btn);
   });
 }
+/* marca a resposta (acerto OU erro) e segue pra próxima com o som de transição. */
 function quizAnswer(i, btn){
   if(quizLock) return;
-  var q=quizData[quizIdx], fb=abEl('quizFeedback');
+  quizLock=true;
+  var q=quizData[quizIdx], fb=abEl('quizFeedback'), opts=abEl('quizOptions');
+  opts.classList.add('locked');
   if(i===q.correct){
-    quizLock=true;
-    abEl('quizOptions').classList.add('locked');
-    btn.classList.remove('wrong'); btn.classList.add('correct');
-    fb.textContent='Correto!'; fb.className='quiz-feedback ok';
-    abSfx('audio/yes.mp3?v=1.3.72'); abSfx('audio/applause.mp3?v=1.3.72');
+    quizScore++;
+    btn.classList.add('correct');
+    fb.textContent='Parabéns! 🎉'; fb.className='quiz-feedback ok';
+    abSfx('audio/yes.mp3?v=1.3.72');
     quizConfetti();
-    setTimeout(function(){
-      if(quizIdx < quizData.length-1){ quizIdx++; quizRender(); }
-      else { quizFinish(); }
-    }, 2200);
+    abVibe(AB_VTXT);
   } else {
-    btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong');
-    fb.textContent='Não é essa. Tente de novo!'; fb.className='quiz-feedback no';
-    abSfx('audio/error.mp3?v=1.3.72'); abSfx('audio/lowscore.mp3?v=1.3.72');
+    btn.classList.add('wrong');
+    if(opts.children[q.correct]){ opts.children[q.correct].classList.add('correct'); } /* revela a certa */
+    fb.textContent='Ops! A resposta certa está destacada.'; fb.className='quiz-feedback no';
+    quizShake();
+    abSfx('audio/error.mp3?v=1.3.72');
   }
+  var isLast = (quizIdx >= quizData.length-1);
+  setTimeout(function(){
+    if(isLast){ quizFinish(); }
+    else {
+      abSfx('audio/'+QUIZ_ADV_SFX[quizIdx]+'.mp3?v=1.3.72'); /* 1>2 maisessa, 2>3 maisuma, 3>4 agoraessa, 4>5 somaisuma */
+      quizIdx++; quizRender();
+    }
+  }, 1900);
+}
+function quizShake(){
+  var w=abEl('quizWrap'); if(!w){ return; }
+  w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake');
+  abVibe([60,40,70]);
 }
 function quizFinish(){
   abEl('quizPlay').style.display='none';
+  var nota = quizScore*2; /* 0..10 (5 perguntas × 2) */
+  abEl('quizDoneName').textContent = quizName;
+  abEl('quizDoneScore').textContent = 'Nota: '+nota+' / 10  ·  '+quizScore+' de '+quizData.length+' acertos';
+  abEl('quizDoneMsg').textContent = quizMsg(nota);
   abEl('quizDone').classList.add('show');
   abSfx('audio/yes.mp3?v=1.3.72'); abSfx('audio/applause.mp3?v=1.3.72');
   quizConfetti();
+}
+function quizMsg(nota){
+  if(nota>=10) return 'Perfeito! Você dominou a ideia do átomo. 🏆';
+  if(nota>=8)  return 'Muito bem! Você aprendeu quase tudo por aqui.';
+  if(nota>=6)  return 'Bom trabalho! Vale revisar um ponto ou outro.';
+  if(nota>=4)  return 'Você está no caminho! Que tal revisar o capítulo?';
+  return 'Não desanime! Refaça o capítulo e tente de novo — você consegue!';
 }
 /* "Próximo capítulo" -> Capítulo II (John Dalton) com o cartão de título que
    sobe em tela cheia e a narração já tocando. */
