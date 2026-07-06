@@ -2961,7 +2961,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.166</div>
+<div class="app-version" id="appVersion">v1.3.167</div>
 
 </div>
 <script>
@@ -4120,7 +4120,7 @@ var lego = {
   inited:false, active:false, raf:null, prev:0,
   renderer:null, scene:null, camera:null, boat:null, canvas:null,
   ringEl:null, ringFill:null, ringText:null,
-  bricks:[], pickIndex:0, emitted:null,
+  bricks:[], pickIndex:0, emitted:null, floating:false,
   boatBaseY:0.3, boatScale:0.918,          /* 15% menor que o 1.08 anterior */
   CAM_Y:2.2, CAM_Z:4.5, LOOK_Y:0.6,
   HOLD_TIME:1.0, GROUND_Y:-1.0,            /* segurar 1s p/ explodir; chão (invisível) onde as peças assentam, dentro da tela */
@@ -4293,7 +4293,7 @@ function legoResetScene(keepRotation){
     b.dropping=false; b.landed=false; b.vel.set(0,0,0); b.rotVel.set(0,0,0);
   });
   lego.emitted=null;
-  lego.exploded=false; lego.pressing=false; lego.hProg=0; lego.shake=0;
+  lego.exploded=false; lego.pressing=false; lego.hProg=0; lego.shake=0; lego.floating=false;
   /* keepRotation: preserva a última posição/auto-giro (ex.: do 1.7 p/ o 1.7A). */
   if(!keepRotation){
     lego.rotX=-0.2; lego.rotY=0.4; lego.autoR=true;
@@ -4316,8 +4316,12 @@ function legoTick(){
   var dt=Math.min((now-lego.prev)/1000, 0.05); lego.prev=now;
   if(!lego.inited){ legoInit(); legoResize(); legoResetScene(); }
   if(!lego.boat){ return; }
+  // peças soltas flutuando no ar (dialogo1.6): espalham suave e pairam/derivam
+  if(lego.floating){
+    legoFloatStep(dt, now);
+  }
   // barco intacto: gira (auto até o 1º toque, depois pelo arrasto) e flutua de leve
-  if(!lego.exploded && !lego.rewinding){
+  else if(!lego.exploded && !lego.rewinding){
     if(lego.autoR){ lego.rotY += dt*0.3; }
     lego.boat.rotation.x = lego.rotX;
     lego.boat.rotation.y = lego.rotY;
@@ -4407,6 +4411,60 @@ function legoExplode(){
   /* após explodir, encadeia o dialogo1.7B (narração pós-explosão) */
   setTimeout(function(){ if(lego.exploded && ab.seg===12){ startSegment(13); } }, 1200); /* explodiu no dialogo1.7 -> 1.7A */
 }
+/* dialogo1.6: as peças se soltam do barco e FLUTUAM no ar (sem cair): cada peça
+   desacopla, se afasta um pouco (spread suave) e fica pairando/derivando. */
+function legoStartFloat(){
+  if(!lego.boat){ return; }
+  lego.boat.updateMatrixWorld(true);
+  lego.autoR=false;                                   /* congela o giro p/ o reencontro ser estável */
+  lego.bricks.forEach(function(bk){
+    if(bk.mesh.parent===lego.boat){
+      var wp=new THREE.Vector3(); bk.mesh.getWorldPosition(wp);
+      var wq=new THREE.Quaternion(); bk.mesh.getWorldQuaternion(wq);
+      lego.boat.remove(bk.mesh); lego.scene.add(bk.mesh);
+      bk.mesh.position.copy(wp); bk.mesh.quaternion.copy(wq);
+      bk.mesh.scale.set(lego.boatScale, lego.boatScale, lego.boatScale);
+    }
+    bk.floatStart=bk.mesh.position.clone();
+    var dir=new THREE.Vector3(bk.mesh.position.x, bk.mesh.position.y*0.5, bk.mesh.position.z);
+    if(dir.length()<0.001){ dir.set(Math.random()-0.5, 0.3, Math.random()-0.5); }
+    dir.normalize();
+    var spread=0.5+Math.random()*0.9;
+    bk.floatHome=new THREE.Vector3(
+      bk.mesh.position.x + dir.x*spread + (Math.random()-0.5)*0.35,
+      bk.mesh.position.y + 0.25 + Math.random()*0.9,
+      bk.mesh.position.z + dir.z*spread + (Math.random()-0.5)*0.35
+    );
+    bk.floatT=0; bk.floatPhase=Math.random()*6.2832;
+    bk.floatAmp=0.05+Math.random()*0.09;
+    bk.floatRot=new THREE.Vector3((Math.random()-0.5)*0.35,(Math.random()-0.5)*0.4,(Math.random()-0.5)*0.35);
+  });
+  lego.floating=true;
+  abVibe(AB_VTXT);
+}
+/* passo por frame do estado flutuante: espalha (ease) e faz pairar (bob/deriva). */
+function legoFloatStep(dt, now){
+  for(var i=0;i<lego.bricks.length;i++){
+    var bk=lego.bricks[i];
+    if(bk.mesh.parent!==lego.scene || !bk.floatHome){ continue; }
+    if(bk.floatT<1){ bk.floatT=Math.min(1, bk.floatT + dt/1.6); }
+    var e=legoEaseInOut(bk.floatT);
+    var bx=bk.floatStart.x+(bk.floatHome.x-bk.floatStart.x)*e;
+    var by=bk.floatStart.y+(bk.floatHome.y-bk.floatStart.y)*e;
+    var bz=bk.floatStart.z+(bk.floatHome.z-bk.floatStart.z)*e;
+    var bob=Math.sin(now*0.001+bk.floatPhase)*bk.floatAmp*e;
+    var drift=Math.cos(now*0.0006+bk.floatPhase)*bk.floatAmp*0.5*e;
+    bk.mesh.position.set(bx+drift, by+bob, bz);
+    bk.mesh.rotation.x += bk.floatRot.x*dt;
+    bk.mesh.rotation.y += bk.floatRot.y*dt;
+    bk.mesh.rotation.z += bk.floatRot.z*dt;
+  }
+}
+/* dialogo1.6 (15s): as peças voltam e se REÚNEM formando o barco de novo. */
+function legoStartReunite(onDone){
+  lego.floating=false;
+  legoStartRewind(function(){ lego.autoR=true; if(typeof onDone==='function'){ onDone(); } });
+}
 /* Remontagem animada (Refazer): cada peça volta da posição espalhada p/ a original. */
 function legoStartRewind(onDone){
   if(lego.rewinding){ return; }
@@ -4475,7 +4533,7 @@ function legoLabel(){
 }
 /* Esconde a cena do barco e pausa o render (ao sair de 1.7/1.7A). */
 function legoHide(){
-  lego.active=false; lego.dragging=false; lego.pressing=false; lego.interactive=false; lego.canExplode=false;
+  lego.active=false; lego.dragging=false; lego.pressing=false; lego.interactive=false; lego.canExplode=false; lego.floating=false;
   var ov=abEl('abLego'); if(ov){ ov.classList.remove('in','show'); ov.style.display='none'; }
   var lb=abEl('abLegoLabel'); if(lb){ lb.classList.remove('show'); }
   if(lego.ringEl){ lego.ringEl.classList.remove('on'); }
@@ -4527,9 +4585,10 @@ function abLego17Raise(){
 }
 function abCues17(){
   return [
-    { time:7.0,  done:false, fn:function(){ abLego17Raise(); } }, /* 7s: a cena sobe + o barco sobe juntos */
-    { time:12.3, done:false, fn:function(){ legoEmitBrick(); } },
-    { time:15.0, done:false, fn:function(){ legoLabel(); } }
+    { time:7.0,  done:false, fn:function(){ abLego17Raise(); } },    /* 7s: a cena sobe + o barco entra */
+    { time:8.8,  done:false, fn:function(){ legoStartFloat(); } },   /* as peças se soltam e flutuam no ar */
+    { time:15.0, done:false, fn:function(){ legoStartReunite(); } }, /* as peças se reúnem -> barco de novo */
+    { time:24.5, done:false, fn:function(){ legoEmitBrick(); } }     /* a peça amarela sai pra baixo */
   ];
 }
 /* onStart do dialogo1.7A: mesmo barco (remontado e inteiro), já centralizado.
