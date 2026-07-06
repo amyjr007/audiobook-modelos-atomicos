@@ -2159,6 +2159,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         </svg>
         <span class="ab-fab-icon" id="ch2FabIcon">▶</span>
       </button>
+      <!-- Botão de quiz no fim do Capítulo 2 (aparece no lugar do play) -->
+      <button type="button" class="ab-lego-quiz" id="ch2QuizBtn" onclick="ch2GoQuiz()" aria-label="Ir para o quiz">Quiz</button>
 
       <!-- Linha do tempo: ano em cima + imagem; depois áreas de estudo e as bolas -->
       <div class="ch2-scene" id="ch2Scene">
@@ -2966,7 +2968,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.168</div>
+<div class="app-version" id="appVersion">v1.3.169</div>
 
 </div>
 <script>
@@ -4673,50 +4675,84 @@ function legoGoQuiz(){
   quizStart();
 }
 
-/* ===================== QUIZ DO FIM DO CAPÍTULO 1 ===================== */
-/* 2 perguntas, 3 alternativas cada. Acertou -> yes+applause+confete; só então
-   avança. Errou -> error+lowscore e pode tentar de novo. No fim, botão "Próximo
-   capítulo" leva direto ao Capítulo II (John Dalton). */
-var quizData = [
-  { type:'text',
-    q:'Formalmente, o que é a matéria?',
-    options:['Tudo que tem cor e forma','Tudo que tem massa e ocupa lugar no espaço','Tudo que é sólido e pesado'],
-    correct:1 },
-  { type:'image',
-    q:'Qual das imagens a seguir representa algo que NÃO é formado por matéria, de acordo com a nossa definição?',
-    options:[
-      { img:'images/rock_transparent.jpeg?v=1.3.155', label:'Pedra' },
-      { img:'images/water_cup.jpg?v=1.3.155',          label:'Água' },
-      { img:'images/light_energy.png?v=1.3.155',       label:'Luz' }
-    ],
-    correct:2 },
-  { type:'text',
-    q:'No dia a dia, a matéria é encontrada principalmente em quais três estados físicos?',
-    options:['Sólido, líquido e gasoso','Quente, frio e morno','Duro, mole e derretido'],
-    correct:0 },
-  { type:'text',
-    q:'A palavra "átomo", do grego antigo, significa:',
-    options:['Eterno','Indivisível','Minúsculo'],
-    correct:1 },
-  { type:'text',
-    q:'Quais filósofos gregos, por volta de 450 a.C., propuseram a ideia do átomo?',
-    options:['Sócrates e Platão','Demócrito e Leucipo','Aristóteles e Tales'],
-    correct:1 },
-  { type:'image',
-    q:'Qual das imagens a seguir representa melhor o conceito de indivisível, proposto por Demócrito e Leucipo?',
-    options:[
-      { img:'images/apple.svg?v=1.3.72',       label:'Maçã' },
-      { img:'images/celular.svg?v=1.3.155',    label:'Celular' },
-      { img:'images/quiz-blocos.svg?v=1.3.72', label:'Bloco de montar' }
-    ],
-    correct:2 }
-];
+/* ===================== QUIZ (fim de cada capítulo) ===================== */
+/* Mesma estrutura para todos os capítulos (nome -> perguntas a/b/c -> card).
+   Acerto: yes+confete+"Parabéns!". Erro: treme+error+vermelho e revela a certa.
+   Sons de transição entre as perguntas; card final com nota + botões. */
+var QUIZ_SETS = {
+  1: [
+    { type:'text',
+      q:'Formalmente, o que é a matéria?',
+      options:['Tudo que tem cor e forma','Tudo que tem massa e ocupa lugar no espaço','Tudo que é sólido e pesado'],
+      correct:1 },
+    { type:'image',
+      q:'Qual das imagens a seguir representa algo que NÃO é formado por matéria, de acordo com a nossa definição?',
+      options:[
+        { img:'images/rock_transparent.jpeg?v=1.3.155', label:'Pedra' },
+        { img:'images/water_cup.jpg?v=1.3.155',          label:'Água' },
+        { img:'images/light_energy.png?v=1.3.155',       label:'Luz' }
+      ],
+      correct:2 },
+    { type:'text',
+      q:'No dia a dia, a matéria é encontrada principalmente em quais três estados físicos?',
+      options:['Sólido, líquido e gasoso','Quente, frio e morno','Duro, mole e derretido'],
+      correct:0 },
+    { type:'text',
+      q:'A palavra "átomo", do grego antigo, significa:',
+      options:['Eterno','Indivisível','Minúsculo'],
+      correct:1 },
+    { type:'text',
+      q:'Quais filósofos gregos, por volta de 450 a.C., propuseram a ideia do átomo?',
+      options:['Sócrates e Platão','Demócrito e Leucipo','Aristóteles e Tales'],
+      correct:1 },
+    { type:'image',
+      q:'Qual das imagens a seguir representa melhor o conceito de indivisível, proposto por Demócrito e Leucipo?',
+      options:[
+        { img:'images/apple.svg?v=1.3.72',       label:'Maçã' },
+        { img:'images/celular.svg?v=1.3.155',    label:'Celular' },
+        { img:'images/quiz-blocos.svg?v=1.3.72', label:'Bloco de montar' }
+      ],
+      correct:2 }
+  ],
+  2: [
+    { type:'text',
+      q:'Quem retomou cientificamente a ideia do átomo, por volta de 1800, publicando o primeiro modelo atômico da história?',
+      options:['Demócrito','John Dalton','Jöns Berzelius'],
+      correct:1 },
+    { type:'text',
+      q:'Qual anomalia da visão foi estudada por Dalton e batizada com o nome dele (que também tinha essa condição)?',
+      options:['Daltonismo','Miopia','Astigmatismo'],
+      correct:0 },
+    { type:'text',
+      q:'Segundo o 1º postulado de Dalton, os átomos são:',
+      options:['Ocos e divisíveis','Esféricos, maciços e indivisíveis','Moles e deformáveis'],
+      correct:1 },
+    { type:'text',
+      q:'De acordo com o 2º postulado, por que os materiais são diferentes uns dos outros?',
+      options:['Porque têm cores diferentes','Porque existem átomos (elementos) diferentes','Porque têm tamanhos diferentes'],
+      correct:1 },
+    { type:'text',
+      q:'Pelo 3º postulado, quando átomos diferentes se combinam, eles formam:',
+      options:['Um novo elemento químico','Uma molécula (composto químico)','Um átomo maior'],
+      correct:1 },
+    { type:'text',
+      q:'A água é formada por 2 átomos de hidrogênio e 1 de oxigênio. Sua fórmula química é:',
+      options:['H2O','CO2','O2H'],
+      correct:0 }
+  ]
+};
+var quizCh = 1;
+var quizData = QUIZ_SETS[1];   /* conjunto ativo */
 var QUIZ_LETTERS=['a','b','c','d'];
 var QUIZ_ADV_SFX=['maisessa','maisuma','agoraessa','maisessa','somaisuma']; /* transições 1>2, 2>3, 3>4, 4>5, 5>6 (4>5 e 5>6 invertidos) */
 var quizIdx=0, quizLock=false, quizScore=0, quizName='';
 
-/* entrada no quiz: pede o nome antes da 1ª pergunta */
-function quizStart(){
+/* entrada no quiz: pede o nome antes da 1ª pergunta. chNum = capítulo (1 = padrão) */
+function quizStart(chNum){
+  quizCh = chNum || 1;
+  quizData = QUIZ_SETS[quizCh] || QUIZ_SETS[1];
+  document.querySelectorAll('#screen-quiz .quiz-kicker').forEach(function(e){ e.textContent='Quiz · Capítulo '+quizCh; });
+  var dk=document.querySelector('#screen-quiz .quiz-done-kicker'); if(dk){ dk.textContent='Quiz · Capítulo '+quizCh+' concluído'; }
   quizIdx=0; quizLock=false; quizScore=0;
   abEl('quizDone').classList.remove('show');
   abEl('quizPlay').style.display='none';
@@ -4816,13 +4852,15 @@ function quizMsg(pct){
   if(pct>=0.5)  return 'Bom trabalho! Vale revisar um ponto ou outro.';
   return 'Você acertou menos da metade. Que tal revisar o capítulo e tentar de novo?';
 }
-/* "Próximo capítulo" -> Capítulo II (John Dalton) com o cartão de título que
-   sobe em tela cheia e a narração já tocando. */
+/* "Próximo capítulo" -> capítulo seguinte ao do quiz (com o cartão de título
+   subindo em tela cheia e a narração já tocando). quizCh=1 -> cap.2; quizCh=2 -> cap.3 */
 function quizNextChapter(){
   quizConfettiStop();
   goTo('aprenda');
-  goChapter(1);
-  ch2PlayIntro();
+  var nextIdx = quizCh; /* 0-indexado: quizCh(1) -> índice 1 = cap.2; quizCh(2) -> índice 2 = cap.3 */
+  goChapter(nextIdx);
+  if(nextIdx===1 && typeof ch2PlayIntro==='function'){ ch2PlayIntro(); }
+  else if(nextIdx===2 && typeof ch3PlayIntro==='function'){ ch3PlayIntro(); }
 }
 /* Confete próprio da tela de quiz (a tela do audiobook fica oculta aqui). */
 var quizConfettiRaf=null;
@@ -5537,7 +5575,7 @@ var ch2 = {
     { src:'audio/dialogo2.7.mp3?v=1.3.72', build:ch2CuesSeg25, onStart:ch2InitSeg25, onEnd:ch2Seg25End, next:false }, /* seg25: CO2 — isola "Postulado 3", imagem+zoom (moléculas em movimento) + quiz da fórmula */
     { src:'audio/proxima.mp3?v=1.3.72', build:ch2CuesNone, onStart:ch2InitSeg26, onEnd:ch2Seg26End, next:false }, /* seg26: "próxima" -> amônia (NH3): mesma imagem+zoom + mesmo quiz */
     { src:'audio/maisessa.mp3?v=1.3.72', build:ch2CuesNone, onStart:ch2InitSeg27, onEnd:ch2Seg27End, next:false }, /* seg27: "mais essa" -> etanol (C2H6O): mesma imagem+zoom + mesmo quiz */
-    { src:'audio/dialogo2.7.1.mp3?v=1.3.72', build:ch2CuesNone, onStart:ch2InitSeg28, next:false } /* seg28: dialogo2.7.1 — após o etanol (play -> toca; ▶ ao fim) */
+    { src:'audio/dialogo2.7.1.mp3?v=1.3.72', build:ch2CuesNone, onStart:ch2InitSeg28, onEnd:ch2ShowQuizBtn, next:false } /* seg28: dialogo2.7.1 (fim do cap.2); ao fim -> botão "Quiz" */
   ]
 };
 function ch2El(id){ return document.getElementById(id); }
@@ -6979,10 +7017,20 @@ function ch2SegIndex(srcPart){ for(var i=0;i<ch2.segments.length;i++){ if(ch2.se
 function ch2InitSeg28(){
   ch2.mzAfter=null;
   ch2ShowFab(true);
+  var qb=ch2El('ch2QuizBtn'); if(qb){ qb.classList.remove('show'); } /* esconde o botão de quiz ao (re)iniciar o último áudio */
   if(typeof ch2MzClearHighlight==='function'){ ch2MzClearHighlight(); }
   var q=ch2El('ch2Co2Quiz'); if(q){ q.classList.remove('show','out'); }
   var qt=ch2El('ch2Co2QTitle'); if(qt){ qt.classList.remove('in'); }
   var nx=ch2El('ch2MzNext'); if(nx){ nx.classList.remove('show'); }
+}
+/* fim do dialogo2.7.1 (fim do capítulo 2): some o play e aparece o botão "Quiz". */
+function ch2ShowQuizBtn(){ ch2ShowFab(false); var b=ch2El('ch2QuizBtn'); if(b){ b.classList.add('show'); } }
+/* clique no botão "Quiz": pausa o áudio e abre o quiz do capítulo 2. */
+function ch2GoQuiz(){
+  if(ch2.audio){ try{ ch2.audio.pause(); }catch(_){} } ch2.playing=false;
+  var b=ch2El('ch2QuizBtn'); if(b){ b.classList.remove('show'); }
+  goTo('quiz');
+  quizStart(2);
 }
 /* some tudo dramaticamente, exceto o cabeçalho "Postulado 3" */
 function ch2Co2IsolatePost3(){
