@@ -1601,6 +1601,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 .ab-d11-text{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(20px,5.6vw,32px);line-height:1.32;color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.85);max-width:560px;opacity:0;transition:opacity .55s ease}
 .ab-d11-text.show{opacity:1}
 .ab-d11-text.orange{background:linear-gradient(135deg,var(--amber),var(--orange) 50%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;text-shadow:none}
+.ab-d11-text.def{font-size:clamp(16px,4.4vw,24px)}   /* mesmo tamanho da definição "Matéria é tudo..." */
 .ab-d11-atomo{font-family:'Fraunces',serif;font-weight:900;font-style:italic;font-size:clamp(30px,8vw,46px);line-height:1.05;background:linear-gradient(135deg,var(--amber),var(--orange) 45%,var(--coral));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:0}
 .ab-d11-atomo.show{animation:abMatPop .7s cubic-bezier(.22,1,.36,1) both}
 .ab-d11-indiv{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:clamp(18px,5vw,26px);color:#fff;text-shadow:0 3px 16px rgba(0,0,0,.85);opacity:0;transition:opacity .7s ease}
@@ -2872,7 +2873,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.144</div>
+<div class="app-version" id="appVersion">v1.3.145</div>
 
 </div>
 <script>
@@ -3450,7 +3451,7 @@ function abMatQuoteType(){
 }
 function abMatQuoteHide(){ if(abMatQuoteTimer){ clearInterval(abMatQuoteTimer); abMatQuoteTimer=null; } var e=abEl('abMatQuote'); if(e){ e.classList.remove('show'); } }
 /* digitação da definição (dialogo1) */
-var abDefTimer=null, AB_DEF_TXT='É tudo que tem massa e ocupa lugar no espaço';
+var abDefTimer=null, AB_DEF_TXT='“Matéria é tudo que tem massa e ocupa lugar no espaço.”';
 function abDefType(){
   var e=abEl('abDef'); if(!e) return;
   if(abDefTimer){ clearInterval(abDefTimer); abDefTimer=null; }
@@ -3469,15 +3470,16 @@ function ab11Reset(){
   if(abD11Timer){ clearInterval(abD11Timer); abD11Timer=null; }
   var d=abEl('abD11'); if(d){ d.classList.remove('rise'); }
   var c=abEl('abD11Center'); if(c){ c.classList.remove('on'); }
-  var t=abEl('abD11Text'); if(t){ t.classList.remove('show','orange'); t.textContent=''; }
+  var t=abEl('abD11Text'); if(t){ t.classList.remove('show','orange','def'); t.textContent=''; }
   var a=abEl('abD11Atomo'); if(a){ a.classList.remove('show'); a.style.display='none'; }
   var iv=abEl('abD11Indiv'); if(iv){ iv.classList.remove('show'); iv.style.display='none'; }
 }
-function ab11Type(text, durMs, orange){
+function ab11Type(text, durMs, defSize){
   var t=abEl('abD11Text'); if(!t) return;
   var c=abEl('abD11Center'); if(c){ c.classList.add('on'); }                 /* embaça o fundo */
   if(abD11Timer){ clearInterval(abD11Timer); abD11Timer=null; }
-  t.classList.toggle('orange', !!orange); t.textContent=''; void t.offsetWidth; t.classList.add('show');
+  t.classList.remove('orange'); t.classList.toggle('def', !!defSize);       /* branco; 'def' = tamanho da definição "Matéria é tudo..." */
+  t.textContent=''; void t.offsetWidth; t.classList.add('show');
   var i=0, n=text.length, step=Math.max(16, durMs/n);
   abD11Timer=setInterval(function(){ i++; t.textContent=text.slice(0,i)+(i<n?'▌':''); if(i>=n){ clearInterval(abD11Timer); abD11Timer=null; } }, step);
   abVibe(AB_VTXT);
