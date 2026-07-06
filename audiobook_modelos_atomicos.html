@@ -2911,7 +2911,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.152</div>
+<div class="app-version" id="appVersion">v1.3.153</div>
 
 </div>
 <script>
@@ -5055,8 +5055,6 @@ function abCuesSeg0(){
 /* ---- Cues do segmento 1 (dialogo0.1) ---- */
 function abCuesSeg1(){
   return [
-    { time:9.8,  done:false, fn:function(){ abSpotlight(true); } },   /* escurece + pergunta */
-    { time:15.0, done:false, fn:function(){ abSpotlight(false); } },  /* volta ao normal */
     { time:22.0, done:false, fn:function(){ abNavDemoStart(); } },    /* mãozinha toca a barra, abre menu */
     { time:23.6, done:false, fn:function(){ abNavHandTo('47vh'); } }, /* move entre os tópicos */
     { time:24.4, done:false, fn:function(){ abNavHandTo('57vh'); } },
@@ -5148,7 +5146,7 @@ function abNavDemoEnd(){
 }
 
 /* ===================== Tutorial guiado (dialogo0.2) ===================== */
-function abEnd01(){ startSegment(16); }   /* dialogo0.1 -> dialogo0.2 (sem play) */
+function abEnd01(){ setTimeout(function(){ startSegment(16); }, 1000); }   /* dialogo0.1 -> (delay 1s) -> dialogo0.2 */
 
 function abDemoReset(){
   ab.demoAwait=false;
