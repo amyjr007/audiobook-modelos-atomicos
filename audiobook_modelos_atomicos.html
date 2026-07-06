@@ -2950,7 +2950,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.158</div>
+<div class="app-version" id="appVersion">v1.3.159</div>
 
 </div>
 <script>
@@ -4791,16 +4791,19 @@ function abAppleDoCut(){
   abAppleCuts++;
   var img=abEl('abAppleImg');
   if(abAppleCuts===1){ img.src=abApplePiece; } /* depois do 1º corte, sobra um pedaço */
-  abAppleScale *= APPLE_SHRINK;
-  /* Ao atingir o pedaço mínimo (ou o nº máx. de cortes): congela. O pedaço mínimo
-     fica na tela e NÃO sai mais — sem flash de maçã, sem avançar de cena. */
-  if(abAppleScale <= APPLE_MIN_SCALE || abAppleCuts>=APPLE_MAX_CUTS){
-    abAppleScale = APPLE_MIN_SCALE;
+  /* Escala EXIBIDA: encolhe a cada corte, mas nunca abaixo do pedaço mínimo (fica
+     sempre visível). O nº de cortes NÃO depende disso — só do APPLE_MAX_CUTS. */
+  var sc = Math.max(APPLE_MIN_SCALE, Math.pow(APPLE_SHRINK, abAppleCuts));
+  /* Só no nº máximo de cortes: congela. O pedaço mínimo fica na tela e NÃO sai
+     mais — sem flash de maçã, sem avançar de cena. */
+  if(abAppleCuts>=APPLE_MAX_CUTS){
+    sc = APPLE_MIN_SCALE;
     abAtomReached = true;
     abAppleCut = false;                          /* trava novos cortes */
     abEl('abAppleRedo').classList.remove('show');
   }
-  img.style.transform='scale('+abAppleScale+')';
+  abAppleScale = sc;
+  img.style.transform='scale('+sc+')';
 }
 /* Duas metades voam para os lados e caem. */
 function abAppleSliceHalves(){
