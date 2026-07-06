@@ -2874,6 +2874,8 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
         </svg>
         <span class="ab-fab-icon" id="ch4FabIcon">▶</span>
       </button>
+      <!-- Botão de quiz no fim do Capítulo 4 (aparece no lugar do play) -->
+      <button type="button" class="ab-lego-quiz" id="ch4QuizBtn" onclick="ch4GoQuiz()" aria-label="Ir para o quiz">Quiz</button>
       <audio id="ch4Audio" preload="auto"></audio>
     </div>
   </div>
@@ -2970,7 +2972,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.170</div>
+<div class="app-version" id="appVersion">v1.3.171</div>
 
 </div>
 <script>
@@ -4783,6 +4785,48 @@ var QUIZ_SETS = {
       q:'Como é o modelo atômico de Thomson, conhecido como "pudim de passas"?',
       options:['Uma esfera maciça e indivisível','Uma esfera de carga positiva com elétrons negativos incrustados','Um núcleo denso com elétrons em órbita'],
       correct:1 }
+  ],
+  4: [
+    { type:'text',
+      q:'Quem descobriu o fenômeno da radioatividade, em 1896, ao estudar sais de urânio herdados do pai?',
+      options:['Henri Becquerel','Ernest Rutherford','J.J. Thomson'],
+      correct:0 },
+    { type:'text',
+      q:'Qual cientista investigou a fundo o fenômeno, isolou novos elementos e cunhou o termo "Radioatividade"?',
+      options:['Marie Curie','Marie Becquerel','Dorothy Hodgkin'],
+      correct:0 },
+    { type:'text',
+      q:'Quem, em Manchester, planejou os experimentos que revelaram a estrutura interna do átomo?',
+      options:['Ernest Rutherford','Henri Becquerel','John Dalton'],
+      correct:0 },
+    { type:'text',
+      q:'Existem três tipos de radiação (alfa, beta e gama). Qual delas Rutherford usou no seu experimento?',
+      options:['A partícula alfa','A radiação beta','A radiação gama'],
+      correct:0 },
+    { type:'text',
+      q:'Quais são as características da partícula alfa, segundo Rutherford?',
+      options:['Carga negativa e sem massa','Carga positiva e muito massiva (massa de um átomo de hélio)','Neutra e muito leve'],
+      correct:1 },
+    { type:'text',
+      q:'No famoso experimento de Rutherford, as partículas alfa foram disparadas contra:',
+      options:['Uma finíssima folha de ouro','Uma placa de vidro','Um bloco de chumbo'],
+      correct:0 },
+    { type:'text',
+      q:'A maior parte das partículas alfa atravessou a folha de ouro sem desviar. O que Rutherford concluiu disso?',
+      options:['Que o átomo é maciço','Que o átomo é formado principalmente por espaço vazio','Que a folha era grossa demais'],
+      correct:1 },
+    { type:'text',
+      q:'O que explicava o raríssimo ricochete das partículas alfa (que batiam e voltavam)?',
+      options:['Um núcleo central minúsculo, muito massivo e denso','O ar dentro do aparelho','A carga negativa dos elétrons'],
+      correct:0 },
+    { type:'text',
+      q:'Por que algumas partículas alfa sofriam grandes desvios ao passar perto do núcleo?',
+      options:['Porque o núcleo é negativo e as atraía','Porque o núcleo é positivo e as repelia (cargas iguais se repelem)','Porque colidiam com os elétrons'],
+      correct:1 },
+    { type:'text',
+      q:'No modelo atômico de Rutherford (1911), onde ficam os elétrons?',
+      options:['Presos dentro do núcleo','Girando em órbitas ao redor do núcleo, na eletrosfera','Fixos e espalhados por toda a esfera positiva'],
+      correct:1 }
   ]
 };
 var quizCh = 1;
@@ -4797,6 +4841,8 @@ function quizStart(chNum){
   quizData = QUIZ_SETS[quizCh] || QUIZ_SETS[1];
   document.querySelectorAll('#screen-quiz .quiz-kicker').forEach(function(e){ e.textContent='Quiz · Capítulo '+quizCh; });
   var dk=document.querySelector('#screen-quiz .quiz-done-kicker'); if(dk){ dk.textContent='Quiz · Capítulo '+quizCh+' concluído'; }
+  var nb=document.querySelector('#quizDone .quiz-next'); /* último capítulo: não há "próximo" */
+  if(nb){ nb.textContent = (typeof chapters!=='undefined' && quizCh>=chapters.length) ? 'Concluir ✓' : 'Próximo capítulo →'; }
   quizIdx=0; quizLock=false; quizScore=0;
   abEl('quizDone').classList.remove('show');
   abEl('quizPlay').style.display='none';
@@ -4901,8 +4947,9 @@ function quizMsg(pct){
    subindo em tela cheia e a narração já tocando). quizCh=1 -> cap.2; quizCh=2 -> cap.3 */
 function quizNextChapter(){
   quizConfettiStop();
-  goTo('aprenda');
   var nextIdx = quizCh; /* 0-indexado: quizCh(1)->cap.2; (2)->cap.3; (3)->cap.4 */
+  if(typeof chapters!=='undefined' && nextIdx >= chapters.length){ goTo('capitulos'); return; } /* último capítulo -> lista de capítulos */
+  goTo('aprenda');
   goChapter(nextIdx);
   if(nextIdx===1 && typeof ch2PlayIntro==='function'){ ch2PlayIntro(); }
   else if(nextIdx===2 && typeof ch3PlayIntro==='function'){ ch3PlayIntro(); }
@@ -8751,8 +8798,17 @@ var ch4Segs = [
   { src:'audio/dialogo4.8.mp3?v=1.3.118' },                /* 21.6s some a parede (fade); 28s 3 núcleos (só prótons 3D, distantes); 31s feixe alfa passa entre eles */
   { src:'audio/dialogo4.9.mp3?v=1.3.120' },                /* ▶ ao fim do 4.8: átomo isolado (limite + núcleo) */
   { src:'audio/dialogo4.10.mp3?v=1.3.124' },               /* 6s zoom no núcleo (esfera some); 10s "carga elétrica positiva"; 25s 3 pulsos; 30s/40s repulsão (cima/baixo) */
-  { src:'audio/dialogo4.11.mp3?v=1.3.127' }                /* zoom out (átomo inteiro); 4.8s "Onde estão os elétrons?"; 16s Eletrosfera; 21s 4 elétrons orbitando (rastro cometa) */
+  { src:'audio/dialogo4.11.mp3?v=1.3.127', onEnded:ch4ShowQuizBtn }  /* zoom out (átomo inteiro); ...; ao fim (fim do cap.4) -> botão "Quiz" */
 ];
+/* fim do Capítulo 4: some o play e aparece o botão "Quiz". */
+function ch4ShowQuizBtn(){ ch4ShowFab(false); var b=ch4El('ch4QuizBtn'); if(b){ b.classList.add('show'); } }
+/* clique no botão "Quiz": pausa o áudio e abre o quiz do capítulo 4. */
+function ch4GoQuiz(){
+  if(ch4.audio){ try{ ch4.audio.pause(); }catch(_){} } ch4.playing=false;
+  var b=ch4El('ch4QuizBtn'); if(b){ b.classList.remove('show'); }
+  goTo('quiz');
+  quizStart(4);
+}
 /* manda a câmera do experimento (iframe) tweenar até um preset nomeado (set1/set2/set3) */
 function ch4ExpCam(preset, dur){ var fr=ch4El('ch4ExpFrame'); if(fr && fr.contentWindow){ try{ fr.contentWindow.postMessage({ type:'ruthCam', preset:preset, dur:dur }, '*'); }catch(_){} } }
 /* anotações roteirizadas do experimento (Chumbo/Polônio/Tampa) durante o dialogo4.5 */
@@ -9682,6 +9738,7 @@ function ch4Toggle(){
 function ch4Reset(){
   ch4.started=false; ch4.playing=false; ch4.ended=false; ch4.seg=0; ch4.cues=[]; ch4.awaitMachine=null;
   if(ch4.raf){ cancelAnimationFrame(ch4.raf); ch4.raf=null; }
+  var qb=ch4El('ch4QuizBtn'); if(qb){ qb.classList.remove('show'); }
   ch4ShowFab(true); ch4SetFab(false); ch4SetLoading(false);
   if(ch4.audio){ try{ ch4.audio.pause(); ch4.audio.currentTime=0; }catch(_){} }
 }
