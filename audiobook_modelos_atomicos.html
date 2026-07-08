@@ -2972,7 +2972,7 @@ body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans
 </div>
 
 <!-- Selo de versão -->
-<div class="app-version" id="appVersion">v1.3.173</div>
+<div class="app-version" id="appVersion">v1.3.174</div>
 
 </div>
 <script>
@@ -4426,6 +4426,7 @@ function legoExplode(){
   if(lego.exploded){ return; }
   lego.exploded=true; lego.pressing=false; lego.shake=0;
   if(lego.ringEl){ lego.ringEl.classList.remove('on'); }
+  abShowFab(false);   /* garante que o play não apareça no 1.7A (pós-explosão) */
   abVibe([60,40,70]);
   lego.boat.updateMatrixWorld(true);
   lego.bricks.forEach(function(bk){
@@ -4683,8 +4684,8 @@ function abInit17B(){
   requestAnimationFrame(function(){ legoInit(); legoResize(); legoStartLoop(); }); /* garante render contínuo */
   abShowFab(false); /* sem play: o Refazer conduz */
 }
-/* fim do 1.7B: mostra o botão Refazer. */
-function abShow17BRedo(){ abEl('abLegoRedo').classList.add('show'); }
+/* fim do 1.7A: mostra o botão Refazer (e mantém o play escondido). */
+function abShow17BRedo(){ abShowFab(false); abEl('abLegoRedo').classList.add('show'); }
 /* clique no Refazer: remonta o barco e, ao completar, toca o dialogo1.7C. */
 function legoRedoClick(){
   abEl('abLegoRedo').classList.remove('show');
